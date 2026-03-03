@@ -18,7 +18,7 @@ export const Classes: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     group: 'Academic',
-    defaultColumns: ['title', 'course', 'section', 'teacher', 'day', 'timeSlot'],
+    defaultColumns: ['title', 'course', 'section', 'teacher', 'days', 'timeSlot'],
     description: 'Manage class sections for courses',
   },
   fields: [
@@ -151,19 +151,23 @@ export const Classes: CollectionConfig = {
 
     // ===== 7. DAY (Monday to Saturday) =====
     {
-      name: 'day',
+      name: 'days',
       type: 'select',
+      label: 'Days',
       required: true,
-      label: 'Day',
+      hasMany: true,
       options: [
         { label: 'Monday', value: 'monday' },
         { label: 'Tuesday', value: 'tuesday' },
         { label: 'Wednesday', value: 'wednesday' },
         { label: 'Thursday', value: 'thursday' },
         { label: 'Friday', value: 'friday' },
+        { label: 'Saturday', value: 'saturday' },
       ],
       admin: {
-        width: '33%',
+        layout: 'grid', // 2 columns mein dikhega
+        columns: 3, // 3 columns
+        width: '50%',
       },
     },
 
@@ -230,10 +234,10 @@ export const Classes: CollectionConfig = {
       fields: ['course', 'section', 'semester'],
       unique: true,
     },
-    {
-      fields: ['day', 'timeSlot', 'semester'],
-      unique: true,
-    },
+    // {
+    //   fields: ['days', 'timeSlot', 'semester'],
+    //   unique: true,
+    // },
   ],
 
   // ===== HOOKS =====

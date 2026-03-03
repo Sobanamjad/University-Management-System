@@ -293,7 +293,7 @@ export interface Class {
   course?: (number | null) | Course;
   semester?: (number | null) | Semester;
   teacher?: (number | null) | User;
-  day: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday';
+  days: ('monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday')[];
   /**
    * Select time slot (hourly from 8 AM to 5 PM)
    */
@@ -523,7 +523,7 @@ export interface ClassesSelect<T extends boolean = true> {
   course?: T;
   semester?: T;
   teacher?: T;
-  day?: T;
+  days?: T;
   timeSlot?: T;
   lectureType?: T;
   status?: T;
