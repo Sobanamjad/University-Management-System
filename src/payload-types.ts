@@ -69,6 +69,10 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    departments: Department;
+    universities: University;
+    semesters: Semester;
+    courses: Course;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -78,13 +82,17 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    departments: DepartmentsSelect<false> | DepartmentsSelect<true>;
+    universities: UniversitiesSelect<false> | UniversitiesSelect<true>;
+    semesters: SemestersSelect<false> | SemestersSelect<true>;
+    courses: CoursesSelect<false> | CoursesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
   db: {
-    defaultIDType: string;
+    defaultIDType: number;
   };
   fallbackLocale: null;
   globals: {};
@@ -119,7 +127,41 @@ export interface UserAuthOperations {
  * via the `definition` "users".
  */
 export interface User {
-  id: string;
+  id: number;
+  name: string;
+  role: 'admin' | 'coordinator' | 'teacher';
+  status: 'active' | 'inactive';
+  teacherInfo?: {
+    department: number | Department;
+    designation: 'Permanent' | 'visiting';
+    /**
+     * e.g., PhD Computer Science, M.Sc Mathematics
+     */
+    qualification: string;
+    joiningDate: string;
+  };
+  coordinatorInfo?: {
+    department: number | Department;
+    /**
+     * e.g., PhD Computer Science, M.Sc Mathematics
+     */
+    qualification: string;
+    joiningDate: string;
+  };
+  personalInfo: {
+    phone: string;
+    dateOfBirth: string;
+    gender: 'male' | 'female';
+    /**
+     * 13 digits (format: 36300-5419772-3)
+     */
+    cnic: string;
+  };
+  address: {
+    street: string;
+    city: string;
+    state: string;
+  };
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -140,11 +182,27 @@ export interface User {
   collection: 'users';
 }
 /**
+ * Manage university departments
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "departments".
+ */
+export interface Department {
+  id: number;
+  name: string;
+  /**
+   * e.g., CS, MATH, PHY
+   */
+  code: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
 export interface Media {
-  id: string;
+  id: number;
   alt: string;
   updatedAt: string;
   createdAt: string;
@@ -160,10 +218,87 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "universities".
+ */
+export interface University {
+  id: number;
+  name: string;
+  status: 'active' | 'inactive';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Manage academic semesters for each department
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "semesters".
+ */
+export interface Semester {
+  id: number;
+  /**
+   * Enter academic session (e.g., Fall 2024)
+   */
+  session: string;
+  semesterNumber: '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8';
+  /**
+   * Select university first
+   */
+  university: number | University;
+  /**
+   * Auto-generated from session, semester number, and university
+   */
+  name: string;
+  /**
+   * Auto-generated unique code
+   */
+  code?: string | null;
+  /**
+   * Select the department (subject) for this semester
+   */
+  department: number | Department;
+  startDate: string;
+  endDate: string;
+  /**
+   * Auto-calculated based on dates
+   */
+  status: 'upcoming' | 'ongoing' | 'completed';
+  /**
+   * Check if this is the currently running semester for this department
+   */
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "courses".
+ */
+export interface Course {
+  id: number;
+  title: string;
+  code: string;
+  creditHours: number;
+  /**
+   * Select the department (subject)
+   */
+  department: number | Department;
+  /**
+   * Semesters filtered by department
+   */
+  semester?: (number | null) | Semester;
+  /**
+   * Teachers filtered by department only
+   */
+  teacher?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
-  id: string;
+  id: number;
   key: string;
   data:
     | {
@@ -180,20 +315,36 @@ export interface PayloadKv {
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
-  id: string;
+  id: number;
   document?:
     | ({
         relationTo: 'users';
-        value: string | User;
+        value: number | User;
       } | null)
     | ({
         relationTo: 'media';
-        value: string | Media;
+        value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'departments';
+        value: number | Department;
+      } | null)
+    | ({
+        relationTo: 'universities';
+        value: number | University;
+      } | null)
+    | ({
+        relationTo: 'semesters';
+        value: number | Semester;
+      } | null)
+    | ({
+        relationTo: 'courses';
+        value: number | Course;
       } | null);
   globalSlug?: string | null;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   updatedAt: string;
   createdAt: string;
@@ -203,10 +354,10 @@ export interface PayloadLockedDocument {
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
-  id: string;
+  id: number;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   key?: string | null;
   value?:
@@ -226,7 +377,7 @@ export interface PayloadPreference {
  * via the `definition` "payload-migrations".
  */
 export interface PayloadMigration {
-  id: string;
+  id: number;
   name?: string | null;
   batch?: number | null;
   updatedAt: string;
@@ -237,6 +388,39 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  name?: T;
+  role?: T;
+  status?: T;
+  teacherInfo?:
+    | T
+    | {
+        department?: T;
+        designation?: T;
+        qualification?: T;
+        joiningDate?: T;
+      };
+  coordinatorInfo?:
+    | T
+    | {
+        department?: T;
+        qualification?: T;
+        joiningDate?: T;
+      };
+  personalInfo?:
+    | T
+    | {
+        phone?: T;
+        dateOfBirth?: T;
+        gender?: T;
+        cnic?: T;
+      };
+  address?:
+    | T
+    | {
+        street?: T;
+        city?: T;
+        state?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -271,6 +455,58 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "departments_select".
+ */
+export interface DepartmentsSelect<T extends boolean = true> {
+  name?: T;
+  code?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "universities_select".
+ */
+export interface UniversitiesSelect<T extends boolean = true> {
+  name?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "semesters_select".
+ */
+export interface SemestersSelect<T extends boolean = true> {
+  session?: T;
+  semesterNumber?: T;
+  university?: T;
+  name?: T;
+  code?: T;
+  department?: T;
+  startDate?: T;
+  endDate?: T;
+  status?: T;
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "courses_select".
+ */
+export interface CoursesSelect<T extends boolean = true> {
+  title?: T;
+  code?: T;
+  creditHours?: T;
+  department?: T;
+  semester?: T;
+  teacher?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
