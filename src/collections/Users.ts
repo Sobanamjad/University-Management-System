@@ -38,6 +38,7 @@ export const Users: CollectionConfig = {
         { label: 'Admin', value: 'admin' },
         { label: 'Coordinator', value: 'coordinator' },
         { label: 'Teacher', value: 'teacher' },
+        { label: 'Student', value: 'student' },
       ],
     },
     {

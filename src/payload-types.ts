@@ -73,6 +73,7 @@ export interface Config {
     semesters: Semester;
     courses: Course;
     classes: Class;
+    students: Student;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -86,6 +87,7 @@ export interface Config {
     semesters: SemestersSelect<false> | SemestersSelect<true>;
     courses: CoursesSelect<false> | CoursesSelect<true>;
     classes: ClassesSelect<false> | ClassesSelect<true>;
+    students: StudentsSelect<false> | StudentsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -129,7 +131,7 @@ export interface UserAuthOperations {
 export interface User {
   id: number;
   name: string;
-  role: 'admin' | 'coordinator' | 'teacher';
+  role: 'admin' | 'coordinator' | 'teacher' | 'student';
   status: 'active' | 'inactive';
   teacherInfo?: {
     department: number | Department;
@@ -314,6 +316,27 @@ export interface Class {
   createdAt: string;
 }
 /**
+ * Manage student academic records
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "students".
+ */
+export interface Student {
+  id: number;
+  rollNo: string;
+  university: number | University;
+  department?: (number | null) | Department;
+  semester: number | Semester;
+  batch: string;
+  admissionDate: string;
+  /**
+   * Link to student account (personal info will come from Users)
+   */
+  user: number | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -360,6 +383,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'classes';
         value: number | Class;
+      } | null)
+    | ({
+        relationTo: 'students';
+        value: number | Student;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -527,6 +554,21 @@ export interface ClassesSelect<T extends boolean = true> {
   timeSlot?: T;
   lectureType?: T;
   status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "students_select".
+ */
+export interface StudentsSelect<T extends boolean = true> {
+  rollNo?: T;
+  university?: T;
+  department?: T;
+  semester?: T;
+  batch?: T;
+  admissionDate?: T;
+  user?: T;
   updatedAt?: T;
   createdAt?: T;
 }
