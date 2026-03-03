@@ -7,38 +7,6 @@ export const Departments: CollectionConfig = {
     group: 'Academic',
     description: 'Manage university departments',
   },
-
-  // ===== HOOKS: Compute fullTitle BEFORE saving =====
-  hooks: {
-    beforeChange: [
-      async ({ data, req }) => {
-        const deptName = data?.name ?? ''
-        let uniName = ''
-
-        const universityId =
-          typeof data?.university === 'object' && data.university !== null
-            ? (data.university as { id?: string }).id
-            : data?.university
-
-        if (universityId && req?.payload) {
-          try {
-            const uni = await req.payload.findByID({
-              collection: 'universities',
-              id: String(universityId),
-              depth: 0,
-            })
-            uniName = (uni as { name?: string })?.name ?? ''
-          } catch {}
-        }
-
-        return {
-          ...data,
-          fullTitle: uniName ? `${deptName} — ${uniName}` : deptName,
-        }
-      },
-    ],
-  },
-
   fields: [
     {
       name: 'name',
@@ -56,24 +24,18 @@ export const Departments: CollectionConfig = {
         description: 'e.g., CS, MATH, PHY',
       },
     },
-    // {
-    //   name: 'university',
-    //   type: 'relationship',
-    //   relationTo: 'universities',
-    //   required: true,
-    //   label: 'Affiliated University',
-    // },
-
-    // // ===== STORED: fullTitle (computed & saved in beforeChange) =====
-    // {
-    //   name: 'fullTitle',
-    //   type: 'text',
-    //   label: 'Full Title',
-    //   admin: {
-    //     hidden: true,
-    //     disableBulkEdit: true,
-    //     readOnly: true,
-    //   },
-    // },
   ],
+  // ===== ACCESS CONTROL =====
+  access: {
+    read: () => true,
+    create: ({ req: { user } }) => {
+      return user?.role === 'admin' || user?.role === 'coordinator'
+    },
+    update: ({ req: { user } }) => {
+      return user?.role === 'admin' || user?.role === 'coordinator'
+    },
+    delete: ({ req: { user } }) => {
+      return user?.role === 'admin'
+    },
+  },
 }

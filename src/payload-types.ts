@@ -68,11 +68,11 @@ export interface Config {
   blocks: {};
   collections: {
     users: User;
-    media: Media;
     departments: Department;
     universities: University;
     semesters: Semester;
     courses: Course;
+    classes: Class;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -81,11 +81,11 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
-    media: MediaSelect<false> | MediaSelect<true>;
     departments: DepartmentsSelect<false> | DepartmentsSelect<true>;
     universities: UniversitiesSelect<false> | UniversitiesSelect<true>;
     semesters: SemestersSelect<false> | SemestersSelect<true>;
     courses: CoursesSelect<false> | CoursesSelect<true>;
+    classes: ClassesSelect<false> | ClassesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -199,25 +199,6 @@ export interface Department {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
- */
-export interface Media {
-  id: number;
-  alt: string;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "universities".
  */
 export interface University {
@@ -282,6 +263,7 @@ export interface Course {
    * Select the department (subject)
    */
   department: number | Department;
+  university: number | University;
   /**
    * Semesters filtered by department
    */
@@ -290,6 +272,44 @@ export interface Course {
    * Teachers filtered by department only
    */
   teacher?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Manage class sections for courses
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "classes".
+ */
+export interface Class {
+  id: number;
+  /**
+   * Auto-generated from course and section
+   */
+  title?: string | null;
+  section: string;
+  university: number | University;
+  department: number | Department;
+  course?: (number | null) | Course;
+  semester?: (number | null) | Semester;
+  teacher?: (number | null) | User;
+  day: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday';
+  /**
+   * Select time slot (hourly from 8 AM to 5 PM)
+   */
+  timeSlot:
+    | '08:00-09:00'
+    | '09:00-10:00'
+    | '10:00-11:00'
+    | '11:00-12:00'
+    | '12:00-13:00'
+    | '13:00-14:00'
+    | '14:00-15:00'
+    | '15:00-16:00'
+    | '16:00-17:00'
+    | '17:00-18:00';
+  lectureType: 'theory' | 'lab';
+  status: 'scheduled' | 'ongoing' | 'completed' | 'cancelled';
   updatedAt: string;
   createdAt: string;
 }
@@ -322,10 +342,6 @@ export interface PayloadLockedDocument {
         value: number | User;
       } | null)
     | ({
-        relationTo: 'media';
-        value: number | Media;
-      } | null)
-    | ({
         relationTo: 'departments';
         value: number | Department;
       } | null)
@@ -340,6 +356,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'courses';
         value: number | Course;
+      } | null)
+    | ({
+        relationTo: 'classes';
+        value: number | Class;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -440,24 +460,6 @@ export interface UsersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media_select".
- */
-export interface MediaSelect<T extends boolean = true> {
-  alt?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-  focalX?: T;
-  focalY?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "departments_select".
  */
 export interface DepartmentsSelect<T extends boolean = true> {
@@ -503,8 +505,28 @@ export interface CoursesSelect<T extends boolean = true> {
   code?: T;
   creditHours?: T;
   department?: T;
+  university?: T;
   semester?: T;
   teacher?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "classes_select".
+ */
+export interface ClassesSelect<T extends boolean = true> {
+  title?: T;
+  section?: T;
+  university?: T;
+  department?: T;
+  course?: T;
+  semester?: T;
+  teacher?: T;
+  day?: T;
+  timeSlot?: T;
+  lectureType?: T;
+  status?: T;
   updatedAt?: T;
   createdAt?: T;
 }

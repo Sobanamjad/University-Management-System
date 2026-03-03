@@ -1,11 +1,22 @@
 import { CollectionConfig } from 'payload'
 
+// Helper: ensure a relationship value is a valid numeric ID
+const isValidId = (val: unknown): val is number => typeof val === 'number' && !isNaN(val) && val > 0
+
 export const Courses: CollectionConfig = {
   slug: 'courses',
   admin: {
     useAsTitle: 'title',
     group: 'Academic',
-    defaultColumns: ['title', 'code', 'creditHours', 'department', 'teacher', 'semester'],
+    defaultColumns: [
+      'title',
+      'code',
+      'creditHours',
+      'university',
+      'department',
+      'teacher',
+      'semester',
+    ],
   },
   fields: [
     // ===== BASIC INFO =====
@@ -49,6 +60,15 @@ export const Courses: CollectionConfig = {
       },
     },
 
+    // ===== UNIVERSITY (ADD THIS) =====
+    {
+      name: 'university',
+      type: 'relationship',
+      relationTo: 'universities',
+      required: true,
+      label: 'University',
+    },
+
     // ===== SEMESTER (Filtered by department) =====
     {
       name: 'semester',
@@ -57,9 +77,11 @@ export const Courses: CollectionConfig = {
       required: true,
       label: 'Semester',
       filterOptions: ({ data }) => {
-        if (data?.department) {
+        const deptId =
+          typeof data?.department === 'object' ? data.department?.value : data?.department
+        if (isValidId(deptId)) {
           return {
-            department: { equals: data.department },
+            department: { equals: deptId },
           }
         }
         return false
@@ -78,11 +100,12 @@ export const Courses: CollectionConfig = {
       required: true,
       label: 'Course Teacher',
       filterOptions: ({ data }) => {
-        if (data?.department) {
+        const deptId =
+          typeof data?.department === 'object' ? data.department?.value : data?.department
+        if (isValidId(deptId)) {
           return {
             role: { equals: 'teacher' },
-            'teacherInfo.department': { equals: data.department },
-            // ❌ University filter hata diya
+            'teacherInfo.department': { equals: deptId },
           }
         }
         return false
@@ -99,6 +122,12 @@ export const Courses: CollectionConfig = {
     {
       fields: ['code'],
       unique: true,
+    },
+    {
+      fields: ['university'],
+    },
+    {
+      fields: ['department'],
     },
   ],
 
