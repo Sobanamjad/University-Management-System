@@ -12,6 +12,7 @@ import { Semesters } from './collections/Semesters'
 import { Courses } from './collections/Courses'
 import { Classes } from './collections/Classes'
 import { Students } from './collections/Students'
+import { Enrollments } from './collections/Enrollments'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -23,7 +24,16 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Departments, Universities, Semesters, Courses, Classes, Students],
+  collections: [
+    Users,
+    Departments,
+    Universities,
+    Semesters,
+    Courses,
+    Classes,
+    Students,
+    Enrollments,
+  ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

@@ -4,12 +4,23 @@ import { CollectionConfig } from 'payload'
 export const Students: CollectionConfig = {
   slug: 'students',
   admin: {
-    useAsTitle: 'rollNo',
+    useAsTitle: 'displayTitle',
     group: 'Academic',
-    defaultColumns: ['rollNo', 'user', 'department', 'semester', 'status'],
+    defaultColumns: ['displayTitle', 'department', 'semester', 'batch'],
     description: 'Manage student academic records',
   },
   fields: [
+    // ===== DISPLAY TITLE (Auto: rollNo - Name) =====
+    {
+      name: 'displayTitle',
+      type: 'text',
+      label: 'Student',
+      admin: {
+        readOnly: true,
+        description: 'Auto-generated: Roll No - Student Name',
+      },
+    },
+
     // ===== ACADEMIC INFO ONLY =====
     {
       name: 'rollNo',
@@ -97,18 +108,46 @@ export const Students: CollectionConfig = {
       fields: ['user'],
       unique: true,
     },
+    {
+      fields: ['university'],
+    },
+    {
+      fields: ['department'],
+    },
+    {
+      fields: ['semester'],
+    },
   ],
 
   // ===== HOOKS =====
   hooks: {
     beforeChange: [
-      ({ data }) => {
+      async ({ data, req }) => {
+        // Auto-generate rollNo if not set
         if (!data?.rollNo && data?.department && data?.batch) {
           const year = data.batch.split('-')[0] || new Date().getFullYear()
           const deptCode = data.department?.toString().slice(-3).toUpperCase() || 'XXX'
           const random = Math.floor(100 + Math.random() * 900)
           data.rollNo = `${deptCode}-${year}-${random}`
         }
+
+        // Auto-generate displayTitle: "rollNo - Name"
+        if (data?.user) {
+          try {
+            const userId = typeof data.user === 'object' ? (data.user as any).id : data.user
+            const userDoc = await req.payload.findByID({
+              collection: 'users',
+              id: userId,
+              depth: 0,
+            })
+            const rollNo = data.rollNo || 'N/A'
+            const name = userDoc?.name || 'Unknown'
+            data.displayTitle = `${rollNo} - ${name}`
+          } catch {
+            data.displayTitle = data.rollNo || 'Unknown'
+          }
+        }
+
         return data
       },
     ],

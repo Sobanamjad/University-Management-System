@@ -165,8 +165,6 @@ export const Classes: CollectionConfig = {
         { label: 'Saturday', value: 'saturday' },
       ],
       admin: {
-        layout: 'grid', // 2 columns mein dikhega
-        columns: 3, // 3 columns
         width: '50%',
       },
     },
@@ -192,6 +190,28 @@ export const Classes: CollectionConfig = {
       admin: {
         width: '33%',
         description: 'Select time slot (hourly from 8 AM to 5 PM)',
+      },
+    },
+
+    // ===== 9. CAPACITY =====
+    {
+      name: 'maxStudents',
+      type: 'number',
+      required: true,
+      defaultValue: 20,
+      label: 'Max Students',
+      admin: {
+        width: '33%',
+      },
+    },
+    {
+      name: 'currentStudents',
+      type: 'number',
+      defaultValue: 0,
+      label: 'Current Students',
+      admin: {
+        readOnly: true,
+        width: '33%',
       },
     },
 

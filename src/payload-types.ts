@@ -74,6 +74,7 @@ export interface Config {
     courses: Course;
     classes: Class;
     students: Student;
+    enrollments: Enrollment;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -88,6 +89,7 @@ export interface Config {
     courses: CoursesSelect<false> | CoursesSelect<true>;
     classes: ClassesSelect<false> | ClassesSelect<true>;
     students: StudentsSelect<false> | StudentsSelect<true>;
+    enrollments: EnrollmentsSelect<false> | EnrollmentsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -310,6 +312,8 @@ export interface Class {
     | '15:00-16:00'
     | '16:00-17:00'
     | '17:00-18:00';
+  maxStudents: number;
+  currentStudents?: number | null;
   lectureType: 'theory' | 'lab';
   status: 'scheduled' | 'ongoing' | 'completed' | 'cancelled';
   updatedAt: string;
@@ -323,6 +327,10 @@ export interface Class {
  */
 export interface Student {
   id: number;
+  /**
+   * Auto-generated: Roll No - Student Name
+   */
+  displayTitle?: string | null;
   rollNo: string;
   university: number | University;
   department?: (number | null) | Department;
@@ -333,6 +341,34 @@ export interface Student {
    * Link to student account (personal info will come from Users)
    */
   user: number | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Manage student enrollments in class sections
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "enrollments".
+ */
+export interface Enrollment {
+  id: number;
+  /**
+   * Select university first to filter students and classes
+   */
+  university: number | University;
+  /**
+   * Select department to filter students and classes
+   */
+  department?: (number | null) | Department;
+  /**
+   * Students filtered by selected university & department
+   */
+  student?: (number | null) | Student;
+  /**
+   * Classes filtered by selected university & department
+   */
+  class?: (number | null) | Class;
+  status: 'enrolled' | 'dropped' | 'completed';
   updatedAt: string;
   createdAt: string;
 }
@@ -387,6 +423,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'students';
         value: number | Student;
+      } | null)
+    | ({
+        relationTo: 'enrollments';
+        value: number | Enrollment;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -552,6 +592,8 @@ export interface ClassesSelect<T extends boolean = true> {
   teacher?: T;
   days?: T;
   timeSlot?: T;
+  maxStudents?: T;
+  currentStudents?: T;
   lectureType?: T;
   status?: T;
   updatedAt?: T;
@@ -562,6 +604,7 @@ export interface ClassesSelect<T extends boolean = true> {
  * via the `definition` "students_select".
  */
 export interface StudentsSelect<T extends boolean = true> {
+  displayTitle?: T;
   rollNo?: T;
   university?: T;
   department?: T;
@@ -569,6 +612,19 @@ export interface StudentsSelect<T extends boolean = true> {
   batch?: T;
   admissionDate?: T;
   user?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "enrollments_select".
+ */
+export interface EnrollmentsSelect<T extends boolean = true> {
+  university?: T;
+  department?: T;
+  student?: T;
+  class?: T;
+  status?: T;
   updatedAt?: T;
   createdAt?: T;
 }
