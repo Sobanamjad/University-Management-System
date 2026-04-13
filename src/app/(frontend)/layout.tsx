@@ -36,10 +36,14 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
     { name: 'Enrollments', href: '/enrollments', icon: UserCheck },
     { name: 'Timetable', href: '/timetable', icon: BookMarked },
   ]
+  const isAuthPage = pathname === '/login' || pathname === '/register'
+
+  if (isAuthPage) {
+    return <>{children}</>
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Mobile menu button */}
       <button
         onClick={() => setSidebarOpen(true)}
         className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md hover:bg-gray-50 transition-colors"
@@ -47,7 +51,6 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
         <Menu size={24} />
       </button>
 
-      {/* Sidebar overlay for mobile */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
@@ -63,21 +66,19 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
       >
         <div className="h-full flex flex-col">
           {/* Logo */}
-          <div className="p-6 border-b">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
+          <div className="h-20 px-6 border-b border-gray-200 flex items-center justify-between">
+            <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold">U</span>
                 </div>
                 <span className="font-bold text-xl">UMS</span>
               </div>
               <button
-                onClick={() => setSidebarOpen(false)}
+                onClick={() => setSidebarOpen(true)}
                 className="lg:hidden p-1 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 <X size={20} />
               </button>
-            </div>
           </div>
 
           {/* User Info */}
@@ -121,7 +122,6 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
         </div>
       </div>
 
-      {/* Main content */}
       <div className="lg:ml-64 min-h-screen">{children}</div>
     </div>
   )

@@ -95,11 +95,11 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white border-b sticky top-0 z-30">
-        <div className="px-6 py-4">
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-30 h-20 flex items-center">
+        <div className="px-6 w-full">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+              <h1 className="text-2xl font-bold text-gray-900 leading-tight">Dashboard</h1>
               <p className="text-sm text-gray-600">Welcome back, {user?.name}</p>
             </div>
             <div className="text-sm text-gray-600">
