@@ -59,7 +59,7 @@ export default function StudentsPage() {
         <div className="px-6 w-full">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <GraduationCap className="w-8 h-8 text-orange-600" />
+              <GraduationCap className="w-8 h-8 text-blue-600" />
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Students</h1>
                 <p className="text-sm text-gray-600">Manage student records</p>
@@ -67,7 +67,7 @@ export default function StudentsPage() {
             </div>
             <Link
               href="/students/create"
-              className="flex items-center space-x-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               <Plus size={20} />
               <span>Add Student</span>
@@ -77,7 +77,6 @@ export default function StudentsPage() {
       </div>
 
       <div className="p-6">
-        {/* Students Grid - Similar pattern to above */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {students.map((student: any) => (
             <div
@@ -86,8 +85,8 @@ export default function StudentsPage() {
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <User className="w-6 h-6 text-orange-600" />
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <User className="w-6 h-6 text-blue-600" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900">{student.user?.name}</h3>
@@ -121,13 +120,13 @@ export default function StudentsPage() {
                 <div className="flex space-x-2">
                   <Link
                     href={`/students/${student.id}`}
-                    className="p-2 text-gray-600 hover:text-orange-600 rounded-lg"
+                    className="p-2 text-gray-600 hover:text-blue-600 rounded-lg"
                   >
                     <Eye size={18} />
                   </Link>
                   <Link
                     href={`/students/edit/${student.id}`}
-                    className="p-2 text-gray-600 hover:text-orange-600 rounded-lg"
+                    className="p-2 text-gray-600 hover:text-blue-600 rounded-lg"
                   >
                     <Edit size={18} />
                   </Link>

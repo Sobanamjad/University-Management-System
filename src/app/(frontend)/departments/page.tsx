@@ -67,7 +67,7 @@ export default function DepartmentsPage() {
         <div className="px-6 w-full">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Layers className="w-8 h-8 text-green-600" />
+              <Layers className="w-8 h-8 text-blue-600" />
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Departments</h1>
                 <p className="text-sm text-gray-600">Manage academic departments</p>
@@ -75,7 +75,7 @@ export default function DepartmentsPage() {
             </div>
             <Link
               href="/departments/create"
-              className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               <Plus size={20} />
               <span>Add Department</span>
@@ -98,7 +98,7 @@ export default function DepartmentsPage() {
                 placeholder="Search departments..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-2">
@@ -108,10 +108,9 @@ export default function DepartmentsPage() {
           </div>
         </div>
 
-        {/* Departments Grid */}
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <div className="w-12 h-12 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : (
           <>
@@ -124,8 +123,8 @@ export default function DepartmentsPage() {
                   <div className="p-6">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center space-x-3">
-                        <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                          <BookOpen className="w-6 h-6 text-green-600" />
+                        <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                          <BookOpen className="w-6 h-6 text-blue-600" />
                         </div>
                         <div>
                           <h3 className="font-semibold text-gray-900">{dept.name}</h3>
@@ -148,13 +147,13 @@ export default function DepartmentsPage() {
                       <div className="flex space-x-2">
                         <Link
                           href={`/departments/${dept.id}`}
-                          className="p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg"
+                          className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
                         >
                           <Eye size={18} />
                         </Link>
                         <Link
                           href={`/departments/edit/${dept.id}`}
-                          className="p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg"
+                          className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
                         >
                           <Edit size={18} />
                         </Link>
@@ -171,7 +170,6 @@ export default function DepartmentsPage() {
               ))}
             </div>
 
-            {/* Pagination */}
             {totalPages > 1 && (
               <div className="flex justify-center items-center space-x-4 mt-8">
                 <button

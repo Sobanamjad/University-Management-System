@@ -26,21 +26,18 @@ export default function RegisterPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  // Refs for animations
   const containerRef = useRef(null)
   const formRef = useRef(null)
   const stepRef = useRef(null)
   const fieldsRef = useRef<(HTMLDivElement | null)[]>([])
 
   useEffect(() => {
-    // Entrance animation
     gsap.fromTo(
       containerRef.current,
       { opacity: 0, y: 50 },
       { opacity: 1, y: 0, duration: 1, ease: 'power3.out' },
     )
 
-    // Animate progress bar
     gsap.to('.progress-bar', {
       width: `${step * 33.33}%`,
       duration: 0.5,
@@ -70,7 +67,6 @@ export default function RegisterPage() {
       [e.target.name]: e.target.value,
     })
 
-    // Input field animation
     gsap.to(e.target, {
       scale: 1.02,
       duration: 0.1,
@@ -93,7 +89,6 @@ export default function RegisterPage() {
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match')
       setLoading(false)
-      // Shake animation
       gsap.to(formRef.current, {
         x: [-10, 10, -10, 10, 0],
         duration: 0.4,
@@ -152,9 +147,7 @@ export default function RegisterPage() {
       ref={containerRef}
       className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center p-4"
     >
-      {/* Main Container */}
       <div className="relative w-full max-w-2xl">
-        {/* Progress Bar */}
         <div ref={stepRef} className="mb-8">
           <div className="flex justify-between mb-2">
             {['Account', 'Personal', 'Address'].map((label, i) => (
@@ -173,7 +166,6 @@ export default function RegisterPage() {
           </div>
         </div>
 
-        {/* Form Card */}
         <div
           ref={formRef}
           className="backdrop-blur-xl bg-white/10 rounded-3xl shadow-2xl p-8 border border-white/20"
@@ -188,7 +180,6 @@ export default function RegisterPage() {
           )}
 
           <form onSubmit={handleSubmit}>
-            {/* Step 1: Account Info */}
             {step === 1 && (
               <div className="space-y-4">
                 <div
@@ -280,7 +271,6 @@ export default function RegisterPage() {
               </div>
             )}
 
-            {/* Step 2: Personal Info */}
             {step === 2 && (
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -341,7 +331,6 @@ export default function RegisterPage() {
               </div>
             )}
 
-            {/* Step 3: Address */}
             {step === 3 && (
               <div className="space-y-4">
                 <div>
@@ -382,7 +371,6 @@ export default function RegisterPage() {
               </div>
             )}
 
-            {/* Navigation Buttons */}
             <div className="mt-8 flex gap-4">
               {step > 1 && (
                 <button

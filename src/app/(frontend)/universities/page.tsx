@@ -66,7 +66,6 @@ export default function UniversitiesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-30 h-20 flex items-center">
         <div className="px-6 w-full">
           <div className="flex items-center justify-between">
@@ -88,9 +87,7 @@ export default function UniversitiesPage() {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="p-6">
-        {/* Filters */}
         <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
@@ -125,8 +122,6 @@ export default function UniversitiesPage() {
             </button>
           </div>
         </div>
-
-        {/* Universities Grid */}
         {loading ? (
           <div className="flex justify-center items-center h-64">
             <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
@@ -200,7 +195,7 @@ export default function UniversitiesPage() {
                         </Link>
                         <Link
                           href={`/universities/edit/${uni.id}`}
-                          className="p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                          className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                         >
                           <Edit size={18} />
                         </Link>
@@ -217,7 +212,6 @@ export default function UniversitiesPage() {
               ))}
             </div>
 
-            {/* Pagination */}
             {totalPages > 1 && (
               <div className="flex justify-center items-center space-x-4 mt-8">
                 <button

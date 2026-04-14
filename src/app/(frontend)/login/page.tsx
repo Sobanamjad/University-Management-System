@@ -113,17 +113,14 @@ export default function LoginPage() {
       ref={containerRef}
       className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-950 to-fuchsia-950 flex items-center justify-center p-5 relative overflow-hidden"
     >
-      {/* Subtle animated background shapes */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="floating-shape absolute -left-20 top-20 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-3xl"></div>
         <div className="floating-shape absolute -right-32 bottom-10 w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-3xl"></div>
         <div className="floating-shape absolute left-1/3 top-1/2 w-[400px] h-[400px] bg-pink-600/8 rounded-full blur-3xl -translate-x-1/2"></div>
       </div>
 
-      {/* Card */}
       <div ref={formRef} className="relative w-full max-w-md z-10">
         <div className="backdrop-blur-2xl bg-white/5 rounded-3xl shadow-2xl p-9 border border-white/10 ring-1 ring-white/5">
-          {/* Header */}
           <div className="text-center mb-10">
             <h1
               ref={titleRef}
@@ -143,7 +140,6 @@ export default function LoginPage() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-7">
-            {/* Email */}
             <div
               ref={(el) => {
                 fieldsRef.current[0] = el
@@ -166,7 +162,6 @@ export default function LoginPage() {
               </span>
             </div>
 
-            {/* Password */}
             <div
               ref={(el) => {
                 fieldsRef.current[1] = el
@@ -189,7 +184,6 @@ export default function LoginPage() {
               </span>
             </div>
 
-            {/* Options */}
             <div className="flex items-center justify-between text-sm">
               <label className="flex items-center gap-2.5 text-white/70">
                 <input
@@ -214,8 +208,6 @@ export default function LoginPage() {
               <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-purple-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </button>
           </form>
-
-          {/* Register link */}
           <div ref={linkRef} className="mt-8 text-center text-white/60 text-sm">
             Don’t have an account?{' '}
             <Link
@@ -226,7 +218,6 @@ export default function LoginPage() {
             </Link>
           </div>
 
-          {/* Divider + Social (placeholders) */}
           <div className="mt-10">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">

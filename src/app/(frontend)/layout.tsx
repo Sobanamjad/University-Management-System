@@ -68,17 +68,17 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
           {/* Logo */}
           <div className="h-20 px-6 border-b border-gray-200 flex items-center justify-between">
             <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold">U</span>
-                </div>
-                <span className="font-bold text-xl">UMS</span>
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold">U</span>
               </div>
-              <button
-                onClick={() => setSidebarOpen(true)}
-                className="lg:hidden p-1 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <X size={20} />
-              </button>
+              <span className="font-bold text-xl">UMS</span>
+            </div>
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden p-1 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <X size={20} />
+            </button>
           </div>
 
           {/* User Info */}
@@ -88,7 +88,7 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 overflow-y-auto p-4">
+          <nav className="flex-1 overflow-y-auto p-4 scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             {navigation.map((item) => {
               const isActive = pathname === item.href
               return (

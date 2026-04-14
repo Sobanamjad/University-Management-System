@@ -183,7 +183,6 @@ export default function DashboardPage() {
             <p className="text-sm text-gray-500 mt-1">Academic semesters</p>
           </div>
 
-          {/* Courses Card */}
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-4">
               <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
@@ -195,7 +194,6 @@ export default function DashboardPage() {
             <p className="text-sm text-gray-500 mt-1">Active courses</p>
           </div>
 
-          {/* Classes Card */}
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-4">
               <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
@@ -207,7 +205,6 @@ export default function DashboardPage() {
             <p className="text-sm text-gray-500 mt-1">Scheduled classes</p>
           </div>
 
-          {/* Enrollments Card */}
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-4">
               <div className="w-12 h-12 bg-teal-100 rounded-lg flex items-center justify-center">
@@ -220,7 +217,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Quick Actions */}
         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 mb-8">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -243,7 +239,7 @@ export default function DashboardPage() {
               Create Class
             </Link>
             <Link
-              href="/admin/collections/enrollments/create"
+              href="/enrollments/create"
               className="p-4 bg-orange-50 text-orange-700 rounded-lg hover:bg-orange-100 transition-colors text-center font-medium"
             >
               New Enrollment

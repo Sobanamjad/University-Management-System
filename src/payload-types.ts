@@ -74,6 +74,8 @@ export interface Config {
     courses: Course;
     classes: Class;
     students: Student;
+    enrollments: Enrollment;
+    timetable: Timetable;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -88,6 +90,8 @@ export interface Config {
     courses: CoursesSelect<false> | CoursesSelect<true>;
     classes: ClassesSelect<false> | ClassesSelect<true>;
     students: StudentsSelect<false> | StudentsSelect<true>;
+    enrollments: EnrollmentsSelect<false> | EnrollmentsSelect<true>;
+    timetable: TimetableSelect<false> | TimetableSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -343,6 +347,76 @@ export interface Student {
   createdAt: string;
 }
 /**
+ * Manage student enrollments in class sections
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "enrollments".
+ */
+export interface Enrollment {
+  id: number;
+  /**
+   * Select university first to filter students and classes
+   */
+  university: number | University;
+  /**
+   * Select department to filter students and classes
+   */
+  department?: (number | null) | Department;
+  semester?: (number | null) | Semester;
+  /**
+   * Students filtered by university, department & semester
+   */
+  student?: (number | null) | Student;
+  /**
+   * Classes filtered by university, department & semester
+   */
+  class?: (number | null) | Class;
+  status: 'enrolled' | 'dropped' | 'completed';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Complete timetable - View by class OR by teacher
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "timetable".
+ */
+export interface Timetable {
+  id: number;
+  /**
+   * Auto-generated: Class - Subject - Teacher
+   */
+  displayTitle?: string | null;
+  university: number | University;
+  department?: (number | null) | Department;
+  semester?: (number | null) | Semester;
+  /**
+   * Select class (e.g., CS101 Section A)
+   */
+  class: number | Class;
+  /**
+   * Select teacher
+   */
+  teacher: number | User;
+  subject: number | Course;
+  day: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday';
+  timeSlot:
+    | '08:00-09:00'
+    | '09:00-10:00'
+    | '10:00-11:00'
+    | '11:00-12:00'
+    | '12:00-13:00'
+    | '13:00-14:00'
+    | '14:00-15:00'
+    | '15:00-16:00'
+    | '16:00-17:00';
+  room: string;
+  lectureType: 'theory' | 'lab' | 'tutorial';
+  status: 'active' | 'cancelled' | 'holiday';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -393,6 +467,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'students';
         value: number | Student;
+      } | null)
+    | ({
+        relationTo: 'enrollments';
+        value: number | Enrollment;
+      } | null)
+    | ({
+        relationTo: 'timetable';
+        value: number | Timetable;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -578,6 +660,40 @@ export interface StudentsSelect<T extends boolean = true> {
   batch?: T;
   admissionDate?: T;
   user?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "enrollments_select".
+ */
+export interface EnrollmentsSelect<T extends boolean = true> {
+  university?: T;
+  department?: T;
+  semester?: T;
+  student?: T;
+  class?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "timetable_select".
+ */
+export interface TimetableSelect<T extends boolean = true> {
+  displayTitle?: T;
+  university?: T;
+  department?: T;
+  semester?: T;
+  class?: T;
+  teacher?: T;
+  subject?: T;
+  day?: T;
+  timeSlot?: T;
+  room?: T;
+  lectureType?: T;
+  status?: T;
   updatedAt?: T;
   createdAt?: T;
 }
