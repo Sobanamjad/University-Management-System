@@ -44,12 +44,12 @@ export default function TimetablePage() {
   const [loading, setLoading] = useState(true)
   const [viewType, setViewType] = useState<'class' | 'teacher'>('class')
   const [timetableData, setTimetableData] = useState<any[]>([])
-  
+
   // Filters
   const [semesters, setSemesters] = useState<any[]>([])
   const [classes, setClasses] = useState<any[]>([])
   const [teachers, setTeachers] = useState<any[]>([])
-  
+
   const [selectedSemester, setSelectedSemester] = useState('')
   const [selectedTarget, setSelectedTarget] = useState('') // Can be Class ID or Teacher ID
 
@@ -66,9 +66,9 @@ export default function TimetablePage() {
   const fetchInitialData = async () => {
     try {
       const [semRes, classRes, teacherRes] = await Promise.all([
-        fetch('/api/semesters?limit=100').then(res => res.json()),
-        fetch('/api/classes?limit=100').then(res => res.json()),
-        fetch('/api/users?where[role][equals]=teacher&limit=100').then(res => res.json())
+        fetch('/api/semesters?limit=100').then((res) => res.json()),
+        fetch('/api/classes?limit=100').then((res) => res.json()),
+        fetch('/api/users?where[role][equals]=teacher&limit=100').then((res) => res.json()),
       ])
 
       setSemesters(semRes.docs || [])
@@ -78,7 +78,7 @@ export default function TimetablePage() {
       if (semRes.docs?.length > 0) {
         setSelectedSemester(semRes.docs[0].id)
       }
-      
+
       if (viewType === 'class' && classRes.docs?.length > 0) {
         setSelectedTarget(classRes.docs[0].id)
       } else if (viewType === 'teacher' && teacherRes.docs?.length > 0) {
@@ -95,9 +95,7 @@ export default function TimetablePage() {
     setLoading(true)
     try {
       const where: any = {
-        and: [
-          { semester: { equals: selectedSemester } }
-        ]
+        and: [{ semester: { equals: selectedSemester } }],
       }
 
       if (viewType === 'class') {
@@ -109,7 +107,7 @@ export default function TimetablePage() {
       const query = new URLSearchParams({
         where: JSON.stringify(where),
         limit: '100',
-        depth: '2'
+        depth: '2',
       })
 
       const res = await fetch(`/api/timetable?${query}`)
@@ -123,7 +121,7 @@ export default function TimetablePage() {
   }
 
   const getEntryForSlot = (day: string, slot: string) => {
-    return timetableData.find(item => item.day === day && item.timeSlot === slot)
+    return timetableData.find((item) => item.day === day && item.timeSlot === slot)
   }
 
   // Handle Target selection when switching view type
@@ -146,13 +144,15 @@ export default function TimetablePage() {
               <BookMarked className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">University Timetable</h1>
+              <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">
+                University Timetable
+              </h1>
               <p className="text-sm font-medium text-gray-500">Academic Schedule Management</p>
             </div>
           </div>
 
           <div className="flex items-center space-x-3">
-             <button className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-all font-medium border border-gray-200">
+            <button className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-all font-medium border border-gray-200">
               <Printer size={18} />
               <span>Print Schedule</span>
             </button>
@@ -175,16 +175,23 @@ export default function TimetablePage() {
             <div className="flex flex-wrap items-center gap-4">
               {/* Semester Select */}
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">Semester</label>
+                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">
+                  Semester
+                </label>
                 <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                  <Calendar
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                    size={16}
+                  />
                   <select
                     value={selectedSemester}
                     onChange={(e) => setSelectedSemester(e.target.value)}
                     className="pl-10 pr-8 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none text-sm font-semibold text-gray-700 min-w-[200px]"
                   >
                     {semesters.map((sem) => (
-                      <option key={sem.id} value={sem.id}>{sem.name}</option>
+                      <option key={sem.id} value={sem.id}>
+                        {sem.name}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -192,12 +199,16 @@ export default function TimetablePage() {
 
               {/* View Type Toggle */}
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">View By</label>
+                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">
+                  View By
+                </label>
                 <div className="flex p-1 bg-gray-100 rounded-xl border border-gray-200">
                   <button
                     onClick={() => handleViewTypeChange('class')}
                     className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${
-                      viewType === 'class' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                      viewType === 'class'
+                        ? 'bg-white text-blue-600 shadow-sm'
+                        : 'text-gray-500 hover:text-gray-700'
                     }`}
                   >
                     Class
@@ -205,7 +216,9 @@ export default function TimetablePage() {
                   <button
                     onClick={() => handleViewTypeChange('teacher')}
                     className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${
-                      viewType === 'teacher' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                      viewType === 'teacher'
+                        ? 'bg-white text-blue-600 shadow-sm'
+                        : 'text-gray-500 hover:text-gray-700'
                     }`}
                   >
                     Teacher
@@ -213,30 +226,45 @@ export default function TimetablePage() {
                 </div>
               </div>
 
-              {/* Target Select (Dynamic) */}
               <div className="space-y-1.5">
                 <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">
                   Select {viewType === 'class' ? 'Class' : 'Teacher'}
                 </label>
                 <div className="relative">
-                  {viewType === 'class' ? <Users className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} /> : <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />}
+                  {viewType === 'class' ? (
+                    <Users
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                      size={16}
+                    />
+                  ) : (
+                    <Building2
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                      size={16}
+                    />
+                  )}
                   <select
                     value={selectedTarget}
                     onChange={(e) => setSelectedTarget(e.target.value)}
                     className="pl-10 pr-8 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none text-sm font-semibold text-gray-700 min-w-[240px]"
                   >
-                    {viewType === 'class' ? (
-                      classes.map((cls) => <option key={cls.id} value={cls.id}>{cls.title}</option>)
-                    ) : (
-                      teachers.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)
-                    )}
+                    {viewType === 'class'
+                      ? classes.map((cls) => (
+                          <option key={cls.id} value={cls.id}>
+                            {cls.title}
+                          </option>
+                        ))
+                      : teachers.map((t) => (
+                          <option key={t.id} value={t.id}>
+                            {t.name}
+                          </option>
+                        ))}
                   </select>
                 </div>
               </div>
             </div>
 
             <div className="flex items-center space-x-2">
-               <button className="p-2.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-600 hover:bg-gray-100 transition-all">
+              <button className="p-2.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-600 hover:bg-gray-100 transition-all">
                 <Filter size={20} />
               </button>
               <button className="p-2.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-600 hover:bg-gray-100 transition-all">
@@ -246,7 +274,6 @@ export default function TimetablePage() {
           </div>
         </div>
 
-        {/* Timetable Grid Container */}
         <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
           {loading ? (
             <div className="flex flex-col items-center justify-center h-[600px] space-y-4">
@@ -261,14 +288,21 @@ export default function TimetablePage() {
                     <th className="w-24 p-5 text-center bg-white border-r border-gray-100">
                       <div className="flex flex-col items-center">
                         <Clock className="text-blue-500 mb-1" size={20} />
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Time</span>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">
+                          Time
+                        </span>
                       </div>
                     </th>
                     {DAYS.map((day) => (
-                      <th key={day.value} className="p-5 text-left border-r border-gray-100 last:border-r-0">
+                      <th
+                        key={day.value}
+                        className="p-5 text-left border-r border-gray-100 last:border-r-0"
+                      >
                         <div className="flex flex-col">
                           <span className="text-sm font-extrabold text-gray-900">{day.label}</span>
-                          <span className="text-[10px] text-blue-500 font-semibold uppercase tracking-widest">Full Day</span>
+                          <span className="text-[10px] text-blue-500 font-semibold uppercase tracking-widest">
+                            Full Day
+                          </span>
                         </div>
                       </th>
                     ))}
@@ -285,12 +319,17 @@ export default function TimetablePage() {
                       {DAYS.map((day) => {
                         const entry = getEntryForSlot(day.value, slot)
                         return (
-                          <td key={`${day.value}-${slot}`} className="p-2 border-r border-b border-gray-100 last:border-r-0 align-top min-h-[120px] w-1/6">
+                          <td
+                            key={`${day.value}-${slot}`}
+                            className="p-2 border-r border-b border-gray-100 last:border-r-0 align-top min-h-[120px] w-1/6"
+                          >
                             {entry ? (
                               <TimetableEntry entry={entry} viewType={viewType} />
                             ) : (
                               <div className="h-full min-h-[100px] flex items-center justify-center border-2 border-dashed border-transparent group-hover:border-gray-100 rounded-xl transition-all">
-                                <span className="text-[10px] text-transparent group-hover:text-gray-300 font-medium uppercase tracking-widest">Available</span>
+                                <span className="text-[10px] text-transparent group-hover:text-gray-300 font-medium uppercase tracking-widest">
+                                  Available
+                                </span>
                               </div>
                             )}
                           </td>

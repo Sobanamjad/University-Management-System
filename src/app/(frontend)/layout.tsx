@@ -18,6 +18,7 @@ import {
   UserCheck,
   BookMarked,
   Settings,
+  Banknote,
 } from 'lucide-react'
 
 export default function FrontendLayout({ children }: { children: React.ReactNode }) {
@@ -35,6 +36,7 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
     { name: 'Classes', href: '/classes', icon: Clock },
     { name: 'Enrollments', href: '/enrollments', icon: UserCheck },
     { name: 'Timetable', href: '/timetable', icon: BookMarked },
+    { name: 'Teacher Salary', href: '/teacher-salary', icon: Banknote },
   ]
   const isAuthPage = pathname === '/login' || pathname === '/register'
 

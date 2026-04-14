@@ -76,6 +76,7 @@ export interface Config {
     students: Student;
     enrollments: Enrollment;
     timetable: Timetable;
+    'teacher-salary': TeacherSalary;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -92,6 +93,7 @@ export interface Config {
     students: StudentsSelect<false> | StudentsSelect<true>;
     enrollments: EnrollmentsSelect<false> | EnrollmentsSelect<true>;
     timetable: TimetableSelect<false> | TimetableSelect<true>;
+    'teacher-salary': TeacherSalarySelect<false> | TeacherSalarySelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -418,6 +420,42 @@ export interface Timetable {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "teacher-salary".
+ */
+export interface TeacherSalary {
+  id: number;
+  displayTitle?: string | null;
+  teacher: number | User;
+  /**
+   * Select teacher category
+   */
+  teacherType: 'permanent' | 'visiting';
+  /**
+   * Monthly fixed salary for permanent teacher
+   */
+  fixedSalary?: number | null;
+  /**
+   * Rate per lecture/class
+   */
+  perClassRate?: number | null;
+  /**
+   * Extra bonus for this month
+   */
+  bonus?: number | null;
+  /**
+   * Fixed deductions for permanent teachers
+   */
+  deductions?: {
+    tax?: number | null;
+    otherDeduction?: number | null;
+  };
+  effectiveFrom: string;
+  status?: ('active' | 'inactive') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -475,6 +513,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'timetable';
         value: number | Timetable;
+      } | null)
+    | ({
+        relationTo: 'teacher-salary';
+        value: number | TeacherSalary;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -693,6 +735,28 @@ export interface TimetableSelect<T extends boolean = true> {
   timeSlot?: T;
   room?: T;
   lectureType?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "teacher-salary_select".
+ */
+export interface TeacherSalarySelect<T extends boolean = true> {
+  displayTitle?: T;
+  teacher?: T;
+  teacherType?: T;
+  fixedSalary?: T;
+  perClassRate?: T;
+  bonus?: T;
+  deductions?:
+    | T
+    | {
+        tax?: T;
+        otherDeduction?: T;
+      };
+  effectiveFrom?: T;
   status?: T;
   updatedAt?: T;
   createdAt?: T;

@@ -14,6 +14,7 @@ import { Classes } from './collections/Classes'
 import { Students } from './collections/Students'
 import { Enrollments } from './collections/Enrollments'
 import { TimeTable } from './collections/TimeTable'
+import { TeacherSalary } from './collections/TeacherSalary'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -35,6 +36,7 @@ export default buildConfig({
     Students,
     Enrollments,
     TimeTable,
+    TeacherSalary,
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',

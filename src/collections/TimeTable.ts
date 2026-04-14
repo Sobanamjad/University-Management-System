@@ -135,7 +135,7 @@ export const TimeTable: CollectionConfig = {
       },
     },
 
-    // ===== 3. TEACHER (Teacher Timetable ke liye) =====
+    // ===== 3. TEACHER  =====
     {
       name: 'teacher',
       type: 'relationship',
