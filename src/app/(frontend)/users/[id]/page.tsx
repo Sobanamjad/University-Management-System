@@ -312,11 +312,21 @@ export default function UserViewPage() {
                       </div>
                       <div>
                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">
-                          Department
+                          Assigned Departments
                         </p>
-                        <p className="text-xl font-black text-gray-900">
-                          {user.coordinatorInfo?.department?.name || 'N/A'}
-                        </p>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {user.coordinatorInfo?.departments?.map((dept: any) => (
+                            <span 
+                              key={typeof dept === 'object' ? dept.id : dept} 
+                              className="px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-sm font-bold border border-blue-100"
+                            >
+                              {typeof dept === 'object' ? dept.name : dept}
+                            </span>
+                          ))}
+                          {(!user.coordinatorInfo?.departments || user.coordinatorInfo.departments.length === 0) && (
+                            <p className="text-xl font-black text-gray-900">N/A</p>
+                          )}
+                        </div>
                       </div>
                     </div>
 

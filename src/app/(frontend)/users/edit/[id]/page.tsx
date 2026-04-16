@@ -39,7 +39,7 @@ export default function UserEditPage() {
       joiningDate: '',
     },
     coordinatorInfo: {
-      department: '',
+      departments: [] as string[],
       qualification: '',
       joiningDate: '',
     },
@@ -79,7 +79,9 @@ export default function UserEditPage() {
               joiningDate: userRes.teacherInfo?.joiningDate ? new Date(userRes.teacherInfo.joiningDate).toISOString().split('T')[0] : '',
             },
             coordinatorInfo: {
-              department: userRes.coordinatorInfo?.department || '',
+              departments: Array.isArray(userRes.coordinatorInfo?.departments) 
+                ? userRes.coordinatorInfo.departments.map((d: any) => typeof d === 'object' ? d.id : d)
+                : [],
               qualification: userRes.coordinatorInfo?.qualification || '',
               joiningDate: userRes.coordinatorInfo?.joiningDate ? new Date(userRes.coordinatorInfo.joiningDate).toISOString().split('T')[0] : '',
             },
@@ -119,6 +121,23 @@ export default function UserEditPage() {
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }))
     }
+  }
+
+  const handleDepartmentChange = (deptId: string) => {
+    setFormData((prev: any) => {
+      const currentDepts = prev.coordinatorInfo.departments || []
+      const newDepts = currentDepts.includes(deptId)
+        ? currentDepts.filter((id: string) => id !== deptId)
+        : [...currentDepts, deptId]
+      
+      return {
+        ...prev,
+        coordinatorInfo: {
+          ...prev.coordinatorInfo,
+          departments: newDepts
+        }
+      }
+    })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -272,22 +291,51 @@ export default function UserEditPage() {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-2">
-                      <label className="text-sm font-bold text-gray-700 ml-1">Assigned Department</label>
-                      <select
-                        name={formData.role === 'teacher' ? 'teacherInfo.department' : 'coordinatorInfo.department'}
-                        required
-                        value={formData.role === 'teacher' ? formData.teacherInfo.department : formData.coordinatorInfo.department}
-                        onChange={handleInputChange}
-                        className="w-full px-5 py-3.5 bg-white border border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all font-semibold text-gray-800"
-                      >
-                        <option value="">Select Department...</option>
-                        {departments.map((dept) => (
-                          <option key={dept.id} value={dept.id}>
-                            {dept.name}
-                          </option>
-                        ))}
-                      </select>
+                    <div className="space-y-4">
+                      <label className="text-sm font-bold text-gray-700 ml-1">
+                        {formData.role === 'teacher' ? 'Assigned Department' : 'Assigned Departments'}
+                      </label>
+                      
+                      {formData.role === 'teacher' ? (
+                        <select
+                          name="teacherInfo.department"
+                          required
+                          value={formData.teacherInfo.department}
+                          onChange={handleInputChange}
+                          className="w-full px-5 py-3.5 bg-white border border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all font-semibold text-gray-800"
+                        >
+                          <option value="">Select Department...</option>
+                          {departments.map((dept) => (
+                            <option key={dept.id} value={dept.id}>
+                              {dept.name}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white p-6 rounded-2xl border border-gray-100">
+                          {departments.map((dept) => (
+                            <label 
+                              key={dept.id} 
+                              className={`flex items-center p-3 rounded-xl border transition-all cursor-pointer hover:bg-blue-50/50 ${
+                                formData.coordinatorInfo.departments.includes(dept.id) 
+                                  ? 'border-blue-200 bg-blue-50' 
+                                  : 'border-gray-50 bg-gray-50/30'
+                              }`}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={formData.coordinatorInfo.departments.includes(dept.id)}
+                                onChange={() => handleDepartmentChange(dept.id)}
+                                className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-3"
+                              />
+                              <span className="text-sm font-semibold text-gray-700">{dept.name}</span>
+                            </label>
+                          ))}
+                          {departments.length === 0 && (
+                            <p className="text-gray-400 text-xs font-medium italic col-span-full">No departments found</p>
+                          )}
+                        </div>
+                      )}
                     </div>
 
                     <div className="space-y-2">

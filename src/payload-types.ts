@@ -149,7 +149,7 @@ export interface User {
     joiningDate: string;
   };
   coordinatorInfo?: {
-    department: number | Department;
+    departments: (number | Department)[];
     /**
      * e.g., PhD Computer Science, M.Sc Mathematics
      */
@@ -579,7 +579,7 @@ export interface UsersSelect<T extends boolean = true> {
   coordinatorInfo?:
     | T
     | {
-        department?: T;
+        departments?: T;
         qualification?: T;
         joiningDate?: T;
       };

@@ -124,11 +124,12 @@ export const Users: CollectionConfig = {
       },
       fields: [
         {
-          name: 'department',
+          name: 'departments',
           type: 'relationship',
           relationTo: 'departments',
-          label: 'Department',
+          label: 'Departments',
           required: true,
+          hasMany: true,
           admin: {
             allowCreate: false,
           },
