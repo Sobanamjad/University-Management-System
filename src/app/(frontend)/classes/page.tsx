@@ -19,6 +19,7 @@ import {
   MapPin,
   User,
   BookOpen,
+  X,
 } from 'lucide-react'
 
 export default function ClassesPage() {
@@ -28,20 +29,44 @@ export default function ClassesPage() {
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [dayFilter, setDayFilter] = useState('all')
+  const [statusFilter, setStatusFilter] = useState('all')
 
   useEffect(() => {
     fetchClasses()
-  }, [page, search, dayFilter])
+  }, [page, search, dayFilter, statusFilter])
 
   const fetchClasses = async () => {
     setLoading(true)
     try {
+      // Build where conditions
+      const conditions: any[] = []
+
+      if (search) {
+        conditions.push({
+          or: [
+            { title: { like: search } },
+            { section: { like: search } },
+            { 'course.title': { like: search } },
+            { 'teacher.name': { like: search } },
+          ],
+        })
+      }
+
+      if (dayFilter !== 'all') {
+        conditions.push({ days: { contains: dayFilter } })
+      }
+
+      if (statusFilter !== 'all') {
+        conditions.push({ status: { equals: statusFilter } })
+      }
+
+      const where = conditions.length > 0 ? { and: conditions } : {}
+
       const query = new URLSearchParams({
         page: page.toString(),
-        limit: '10',
+        limit: '9',
         depth: '2',
-        ...(search && { where: { title: { like: search } } }),
-        ...(dayFilter !== 'all' && { where: { days: { contains: dayFilter } } }),
+        ...(Object.keys(where).length && { where: JSON.stringify(where) }),
       })
 
       const res = await fetch(`/api/classes?${query}`)
@@ -65,6 +90,13 @@ export default function ClassesPage() {
       saturday: 'bg-indigo-100 text-indigo-700',
     }
     return colors[day] || 'bg-gray-100 text-gray-700'
+  }
+
+  const clearFilters = () => {
+    setSearch('')
+    setDayFilter('all')
+    setStatusFilter('all')
+    setPage(1)
   }
 
   return (
@@ -95,7 +127,7 @@ export default function ClassesPage() {
       <div className="p-6">
         {/* Filters */}
         <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="relative">
               <Search
                 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -103,7 +135,7 @@ export default function ClassesPage() {
               />
               <input
                 type="text"
-                placeholder="Search classes..."
+                placeholder="Search by class, course or teacher..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -122,16 +154,79 @@ export default function ClassesPage() {
               <option value="friday">Friday</option>
               <option value="saturday">Saturday</option>
             </select>
-            <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center space-x-2">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="all">All Status</option>
+              <option value="scheduled">Scheduled</option>
+              <option value="ongoing">Ongoing</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            <button
+              onClick={fetchClasses}
+              className="px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center space-x-2"
+            >
               <Filter size={20} />
-              <span>More Filters</span>
+              <span>Refresh</span>
             </button>
           </div>
+
+          {/* Active Filters Display */}
+          {(search || dayFilter !== 'all' || statusFilter !== 'all') && (
+            <div className="flex flex-wrap gap-2 mt-4">
+              {search && (
+                <span className="inline-flex items-center px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-full">
+                  Search: {search}
+                  <button onClick={() => setSearch('')} className="ml-2 hover:text-blue-900">
+                    ×
+                  </button>
+                </span>
+              )}
+              {dayFilter !== 'all' && (
+                <span className="inline-flex items-center px-3 py-1 text-sm bg-green-100 text-green-700 rounded-full">
+                  Day: {dayFilter}
+                  <button onClick={() => setDayFilter('all')} className="ml-2 hover:text-green-900">
+                    ×
+                  </button>
+                </span>
+              )}
+              {statusFilter !== 'all' && (
+                <span className="inline-flex items-center px-3 py-1 text-sm bg-yellow-100 text-yellow-700 rounded-full">
+                  Status: {statusFilter}
+                  <button
+                    onClick={() => setStatusFilter('all')}
+                    className="ml-2 hover:text-yellow-900"
+                  >
+                    ×
+                  </button>
+                </span>
+              )}
+              <button
+                onClick={clearFilters}
+                className="inline-flex items-center px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200"
+              >
+                <X size={14} className="mr-1" />
+                Clear all
+              </button>
+            </div>
+          )}
         </div>
 
         {loading ? (
           <div className="flex justify-center items-center h-64">
             <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : classes.length === 0 ? (
+          <div className="bg-white rounded-xl shadow-sm p-12 text-center">
+            <Clock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No classes found</h3>
+            <p className="text-gray-600 mb-4">Try changing your filters or create a new class</p>
+            <button onClick={clearFilters} className="text-blue-600 hover:text-blue-700">
+              Clear all filters
+            </button>
           </div>
         ) : (
           <>
@@ -148,7 +243,9 @@ export default function ClassesPage() {
                           <Clock className="w-6 h-6 text-blue-600" />
                         </div>
                         <div>
-                          <h3 className="font-semibold text-gray-900">{cls.title}</h3>
+                          <h3 className="font-semibold text-gray-900">
+                            {cls.title || `${cls.course?.code} - Section ${cls.section}`}
+                          </h3>
                           <p className="text-sm text-gray-500">Section {cls.section}</p>
                         </div>
                       </div>
@@ -157,7 +254,7 @@ export default function ClassesPage() {
                     <div className="space-y-2 mb-4">
                       <div className="flex items-center text-sm text-gray-600">
                         <BookOpen size={16} className="mr-2" />
-                        Course: {cls.course?.title || 'N/A'}
+                        Course: {cls.course?.title || cls.course?.code || 'N/A'}
                       </div>
                       <div className="flex items-center text-sm text-gray-600">
                         <User size={16} className="mr-2" />
@@ -168,8 +265,8 @@ export default function ClassesPage() {
                         Semester: {cls.semester?.name || 'N/A'}
                       </div>
                       <div className="flex items-center text-sm text-gray-600">
-                        <MapPin size={16} className="mr-2" />
-                        Room: {cls.room || 'N/A'} | Time: {cls.timeSlot}
+                        <Clock size={16} className="mr-2" />
+                        Time: {cls.timeSlot}
                       </div>
                     </div>
 
@@ -201,18 +298,18 @@ export default function ClassesPage() {
                         >
                           {cls.status}
                         </span>
-                        <span className="text-sm text-gray-500">Type: {cls.lectureType}</span>
+                        <span className="text-sm text-gray-500">{cls.lectureType}</span>
                       </div>
                       <div className="flex space-x-2">
                         <Link
                           href={`/classes/${cls.id}`}
-                          className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
+                          className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                         >
                           <Eye size={18} />
                         </Link>
                         <Link
                           href={`/classes/edit/${cls.id}`}
-                          className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
+                          className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
                         >
                           <Edit size={18} />
                         </Link>
@@ -228,7 +325,7 @@ export default function ClassesPage() {
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="p-2 border rounded-lg disabled:opacity-50"
+                  className="p-2 border rounded-lg disabled:opacity-50 hover:bg-gray-50"
                 >
                   <ChevronLeft size={20} />
                 </button>
@@ -238,7 +335,7 @@ export default function ClassesPage() {
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  className="p-2 border rounded-lg disabled:opacity-50"
+                  className="p-2 border rounded-lg disabled:opacity-50 hover:bg-gray-50"
                 >
                   <ChevronRight size={20} />
                 </button>

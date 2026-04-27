@@ -18,6 +18,7 @@ import {
   Clock,
   Award,
   GraduationCap,
+  X,
 } from 'lucide-react'
 
 export default function CoursesPage() {
@@ -27,20 +28,54 @@ export default function CoursesPage() {
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [departmentFilter, setDepartmentFilter] = useState('all')
+  const [departments, setDepartments] = useState([])
+
+  useEffect(() => {
+    fetchDepartments()
+  }, [])
 
   useEffect(() => {
     fetchCourses()
   }, [page, search, departmentFilter])
 
+  const fetchDepartments = async () => {
+    try {
+      const res = await fetch('/api/departments?limit=100')
+      const data = await res.json()
+      setDepartments(data.docs || [])
+    } catch (error) {
+      console.error('Error fetching departments:', error)
+    }
+  }
+
   const fetchCourses = async () => {
     setLoading(true)
     try {
+      // Build where conditions
+      const conditions: any[] = []
+
+      if (search) {
+        conditions.push({
+          or: [
+            { title: { like: search } },
+            { code: { like: search } },
+            { 'department.name': { like: search } },
+            { 'teacher.name': { like: search } },
+          ],
+        })
+      }
+
+      if (departmentFilter !== 'all') {
+        conditions.push({ department: { equals: departmentFilter } })
+      }
+
+      const where = conditions.length > 0 ? { and: conditions } : {}
+
       const query = new URLSearchParams({
         page: page.toString(),
-        limit: '10',
+        limit: '9',
         depth: '2',
-        ...(search && { where: { title: { like: search } } }),
-        ...(departmentFilter !== 'all' && { where: { department: { equals: departmentFilter } } }),
+        ...(Object.keys(where).length && { where: JSON.stringify(where) }),
       })
 
       const res = await fetch(`/api/courses?${query}`)
@@ -52,6 +87,12 @@ export default function CoursesPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const clearFilters = () => {
+    setSearch('')
+    setDepartmentFilter('all')
+    setPage(1)
   }
 
   return (
@@ -90,7 +131,7 @@ export default function CoursesPage() {
               />
               <input
                 type="text"
-                placeholder="Search courses..."
+                placeholder="Search by title, code, department or teacher..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -102,19 +143,67 @@ export default function CoursesPage() {
               className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="all">All Departments</option>
-              {/* Add department options dynamically */}
+              {departments.map((dept: any) => (
+                <option key={dept.id} value={dept.id}>
+                  {dept.name}
+                </option>
+              ))}
             </select>
-            <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center space-x-2">
+            <button
+              onClick={fetchCourses}
+              className="px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center space-x-2"
+            >
               <Filter size={20} />
-              <span>More Filters</span>
+              <span>Refresh</span>
             </button>
           </div>
+
+          {/* Active Filters Display */}
+          {(search || departmentFilter !== 'all') && (
+            <div className="flex flex-wrap gap-2 mt-4">
+              {search && (
+                <span className="inline-flex items-center px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-full">
+                  Search: {search}
+                  <button onClick={() => setSearch('')} className="ml-2 hover:text-blue-900">
+                    ×
+                  </button>
+                </span>
+              )}
+              {departmentFilter !== 'all' && (
+                <span className="inline-flex items-center px-3 py-1 text-sm bg-green-100 text-green-700 rounded-full">
+                  Department: {departments.find((d: any) => d.id === departmentFilter)?.name}
+                  <button
+                    onClick={() => setDepartmentFilter('all')}
+                    className="ml-2 hover:text-green-900"
+                  >
+                    ×
+                  </button>
+                </span>
+              )}
+              <button
+                onClick={clearFilters}
+                className="inline-flex items-center px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200"
+              >
+                <X size={14} className="mr-1" />
+                Clear all
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Courses Grid */}
         {loading ? (
           <div className="flex justify-center items-center h-64">
             <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : courses.length === 0 ? (
+          <div className="bg-white rounded-xl shadow-sm p-12 text-center">
+            <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No courses found</h3>
+            <p className="text-gray-600 mb-4">Try changing your filters or create a new course</p>
+            <button onClick={clearFilters} className="text-blue-600 hover:text-blue-700">
+              Clear all filters
+            </button>
           </div>
         ) : (
           <>
@@ -161,7 +250,7 @@ export default function CoursesPage() {
                         className={`px-2 py-1 text-xs font-medium rounded-full ${
                           course.status === 'active'
                             ? 'bg-green-100 text-green-700'
-                            : 'bg-red-100 text-red-700'
+                            : 'bg-gray-100 text-gray-700'
                         }`}
                       >
                         {course.status || 'Active'}
@@ -169,13 +258,13 @@ export default function CoursesPage() {
                       <div className="flex space-x-2">
                         <Link
                           href={`/courses/${course.id}`}
-                          className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
+                          className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                         >
                           <Eye size={18} />
                         </Link>
                         <Link
                           href={`/courses/edit/${course.id}`}
-                          className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
+                          className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
                         >
                           <Edit size={18} />
                         </Link>
@@ -192,7 +281,7 @@ export default function CoursesPage() {
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="p-2 border rounded-lg disabled:opacity-50"
+                  className="p-2 border rounded-lg disabled:opacity-50 hover:bg-gray-50"
                 >
                   <ChevronLeft size={20} />
                 </button>
@@ -202,7 +291,7 @@ export default function CoursesPage() {
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  className="p-2 border rounded-lg disabled:opacity-50"
+                  className="p-2 border rounded-lg disabled:opacity-50 hover:bg-gray-50"
                 >
                   <ChevronRight size={20} />
                 </button>
