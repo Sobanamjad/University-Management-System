@@ -234,11 +234,11 @@ export interface Semester {
    */
   university: number | University;
   /**
-   * Auto-generated from session, semester number, and university
+   * Auto-generated from session, semester number, department and university
    */
   name: string;
   /**
-   * Auto-generated unique code
+   * Auto-generated unique code including department
    */
   code?: string | null;
   /**

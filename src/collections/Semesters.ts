@@ -71,23 +71,32 @@ export const Semesters: CollectionConfig = {
       label: 'Semester Name',
       admin: {
         readOnly: true,
-        description: 'Auto-generated from session, semester number, and university',
+        description: 'Auto-generated from session, semester number, department and university',
       },
       hooks: {
         beforeValidate: [
           async ({ data, req }) => {
-            if (data?.session && data?.semesterNumber && data?.university) {
+            if (data?.session && data?.semesterNumber && data?.university && data?.department) {
               const semesterText = getSemesterText(data.semesterNumber)
 
-              // University ka naam fetch karo
               try {
+                // Fetch university name
                 const uni = await req.payload.findByID({
                   collection: 'universities',
                   id: String(data.university),
                   depth: 0,
                 })
                 const uniName = uni?.name || 'Unknown'
-                return `${data.session} - ${semesterText} - ${uniName}`
+
+                // Fetch department code
+                const dept = await req.payload.findByID({
+                  collection: 'departments',
+                  id: String(data.department),
+                  depth: 0,
+                })
+                const deptCode = dept?.code || 'DEP'
+
+                return `${data.session} - ${semesterText} - ${deptCode} - ${uniName}`
               } catch (error) {
                 return `${data.session} - ${semesterText}`
               }
@@ -106,24 +115,33 @@ export const Semesters: CollectionConfig = {
       label: 'Semester Code',
       admin: {
         readOnly: true,
-        description: 'Auto-generated unique code',
+        description: 'Auto-generated unique code including department',
       },
       hooks: {
         beforeValidate: [
           async ({ data, req }) => {
-            if (data?.session && data?.semesterNumber && data?.university) {
+            if (data?.session && data?.semesterNumber && data?.university && data?.department) {
               const sessionCode = data.session.replace(/\s+/g, '').toUpperCase()
               const semesterSuffix = getSemesterSuffix(data.semesterNumber)
 
-              // University ka code bhi include karo
               try {
+                // Fetch university code
                 const uni = await req.payload.findByID({
                   collection: 'universities',
                   id: String(data.university),
                   depth: 0,
                 })
                 const uniCode = uni?.name?.slice(0, 3).toUpperCase() || 'UNI'
-                return `${sessionCode}-${semesterSuffix}-${uniCode}`
+
+                // Fetch department code
+                const dept = await req.payload.findByID({
+                  collection: 'departments',
+                  id: String(data.department),
+                  depth: 0,
+                })
+                const deptCode = dept?.code?.toUpperCase() || 'DEP'
+
+                return `${sessionCode}-${semesterSuffix}-${deptCode}-${uniCode}`
               } catch (error) {
                 return `${sessionCode}-${semesterSuffix}`
               }

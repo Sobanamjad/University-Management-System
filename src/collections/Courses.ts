@@ -84,7 +84,7 @@ export const Courses: CollectionConfig = {
             department: { equals: deptId },
           }
         }
-        return false
+        return true
       },
       admin: {
         condition: (data) => Boolean(data?.department),
@@ -97,7 +97,7 @@ export const Courses: CollectionConfig = {
       name: 'teacher',
       type: 'relationship',
       relationTo: 'users',
-      required: true,
+      required: false,
       label: 'Course Teacher',
       filterOptions: ({ data }) => {
         const deptId =
@@ -108,7 +108,7 @@ export const Courses: CollectionConfig = {
             'teacherInfo.department': { equals: deptId },
           }
         }
-        return false
+        return true
       },
       admin: {
         condition: (data) => Boolean(data?.department),

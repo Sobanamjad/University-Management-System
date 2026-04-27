@@ -62,7 +62,7 @@ export const Students: CollectionConfig = {
             university: { equals: data.university },
           }
         }
-        return false
+        return true
       },
     },
     {
