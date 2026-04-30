@@ -38,7 +38,7 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
     { name: 'Timetable', href: '/timetable', icon: BookMarked },
     { name: 'Teacher Salary', href: '/teacher-salary', icon: Banknote },
   ]
-  const isAuthPage = pathname === '/login' || pathname === '/register'
+  const isAuthPage = pathname === '/login' || pathname === '/register' || pathname === '/'
 
   if (isAuthPage) {
     return <>{children}</>
