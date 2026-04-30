@@ -136,11 +136,7 @@ export default function HomePage() {
 
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
 
-    tl.fromTo(
-      heroRef.current,
-      { opacity: 0 },
-      { opacity: 1, duration: 0.8 },
-    )
+    tl.fromTo(heroRef.current, { opacity: 0 }, { opacity: 1, duration: 0.8 })
       .fromTo(
         titleRef.current,
         { y: -50, opacity: 0 },
@@ -153,18 +149,8 @@ export default function HomePage() {
         { y: 0, opacity: 1, duration: 0.6 },
         '-=0.4',
       )
-      .fromTo(
-        ctaRef.current,
-        { y: 20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.6 },
-        '-=0.3',
-      )
-      .fromTo(
-        scrollIndicatorRef.current,
-        { opacity: 0 },
-        { opacity: 1, duration: 0.5 },
-        '-=0.2',
-      )
+      .fromTo(ctaRef.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6 }, '-=0.3')
+      .fromTo(scrollIndicatorRef.current, { opacity: 0 }, { opacity: 1, duration: 0.5 }, '-=0.2')
 
     gsap.to(scrollIndicatorRef.current, {
       y: 8,
@@ -242,12 +228,10 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
       <div
         ref={heroRef}
         className="relative min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-indigo-950 via-purple-950 to-fuchsia-950 overflow-hidden px-6"
       >
-        {/* Floating Background Elements */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="floating-orb absolute -left-32 top-16 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-3xl"></div>
           <div className="floating-orb absolute -right-40 bottom-20 w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-3xl"></div>
@@ -255,7 +239,6 @@ export default function HomePage() {
           <div className="floating-orb absolute right-1/4 top-1/4 w-[250px] h-[250px] bg-indigo-400/8 rounded-full blur-3xl"></div>
         </div>
 
-        {/* Nav bar */}
         <nav className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-8 py-6">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-white/10 backdrop-blur-xl rounded-xl flex items-center justify-center border border-white/20">
@@ -319,7 +302,10 @@ export default function HomePage() {
               : 'A comprehensive platform to manage universities, departments, students, courses, enrollments, timetables, and everything in between.'}
           </p>
 
-          <div ref={ctaRef} className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div
+            ref={ctaRef}
+            className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
+          >
             {user ? (
               <Link
                 href="/dashboard"
@@ -350,7 +336,6 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Scroll Indicator */}
         <div
           ref={scrollIndicatorRef}
           className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center text-white/40"
@@ -380,14 +365,10 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Modules Section */}
       <div className="bg-gray-50 py-20 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-14">
-            <h2
-              ref={sectionTitleRef}
-              className="text-3xl md:text-4xl font-bold text-gray-900"
-            >
+            <h2 ref={sectionTitleRef} className="text-3xl md:text-4xl font-bold text-gray-900">
               Everything You Need
             </h2>
             <p className="mt-4 text-gray-600 text-lg max-w-2xl mx-auto">
@@ -425,12 +406,9 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Footer CTA */}
       <div className="bg-gradient-to-r from-indigo-950 via-purple-950 to-fuchsia-950 py-16 px-6">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Ready to Get Started?
-          </h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Ready to Get Started?</h2>
           <p className="text-white/60 text-lg mb-8">
             {user
               ? 'Head to the dashboard to manage your university.'
@@ -446,7 +424,6 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Footer */}
       <footer className="bg-gray-900 py-8 px-6">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between text-sm text-gray-500">
           <div className="flex items-center space-x-2 mb-4 md:mb-0">
@@ -454,12 +431,12 @@ export default function HomePage() {
             <span>University Management System</span>
           </div>
           <div className="flex items-center space-x-6">
-            <Link href="/admin" className="hover:text-gray-300 transition-colors">
+            {/* <Link href="/admin" className="hover:text-gray-300 transition-colors">
               Admin Panel
-            </Link>
-            <Link href="/dashboard" className="hover:text-gray-300 transition-colors">
+            </Link> */}
+            {/* <Link href="/dashboard" className="hover:text-gray-300 transition-colors">
               Dashboard
-            </Link>
+            </Link> */}
           </div>
         </div>
       </footer>
