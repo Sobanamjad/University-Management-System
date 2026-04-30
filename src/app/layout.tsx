@@ -1,6 +1,6 @@
 // src/app/layout.tsx
 import React from 'react'
-import './(frontend)/styles.css' // Make sure this path is correct
+import './(frontend)/styles.css'
 
 export const metadata = {
   title: 'UMS - University Management System',
@@ -9,8 +9,8 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body suppressHydrationWarning>{children}</body>
     </html>
   )
 }
