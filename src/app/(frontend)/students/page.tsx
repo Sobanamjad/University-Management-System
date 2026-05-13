@@ -20,7 +20,7 @@ import {
 } from 'lucide-react'
 
 export default function StudentsPage() {
-  const [students, setStudents] = useState([])
+  const [students, setStudents] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
@@ -34,12 +34,19 @@ export default function StudentsPage() {
   const fetchStudents = async () => {
     setLoading(true)
     try {
+      const where: any = {}
+      if (search || departmentFilter !== 'all') {
+        const and: any[] = []
+        if (search) and.push({ rollNo: { like: search } })
+        if (departmentFilter !== 'all') and.push({ department: { equals: departmentFilter } })
+        where.and = and
+      }
+
       const query = new URLSearchParams({
         page: page.toString(),
         limit: '10',
         depth: '2',
-        ...(search && { where: { rollNo: { like: search } } }),
-        ...(departmentFilter !== 'all' && { where: { department: { equals: departmentFilter } } }),
+        ...(Object.keys(where).length && { where: JSON.stringify(where) }),
       })
 
       const res = await fetch(`/api/students?${query}`)

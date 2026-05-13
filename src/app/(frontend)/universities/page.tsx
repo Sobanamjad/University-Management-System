@@ -21,7 +21,7 @@ import {
 } from 'lucide-react'
 
 export default function UniversitiesPage() {
-  const [universities, setUniversities] = useState([])
+  const [universities, setUniversities] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
@@ -35,11 +35,18 @@ export default function UniversitiesPage() {
   const fetchUniversities = async () => {
     setLoading(true)
     try {
+      const where: any = {}
+      if (search || filterStatus !== 'all') {
+        const and: any[] = []
+        if (search) and.push({ name: { like: search } })
+        if (filterStatus !== 'all') and.push({ status: { equals: filterStatus } })
+        where.and = and
+      }
+
       const query = new URLSearchParams({
         page: page.toString(),
         limit: '10',
-        ...(search && { where: { name: { like: search } } }),
-        ...(filterStatus !== 'all' && { where: { status: { equals: filterStatus } } }),
+        ...(Object.keys(where).length && { where: JSON.stringify(where) }),
       })
 
       const res = await fetch(`/api/universities?${query}`)

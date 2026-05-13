@@ -20,7 +20,7 @@ import {
 } from 'lucide-react'
 
 export default function EnrollmentsPage() {
-  const [enrollments, setEnrollments] = useState([])
+  const [enrollments, setEnrollments] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
@@ -38,7 +38,7 @@ export default function EnrollmentsPage() {
         page: page.toString(),
         limit: '10',
         depth: '2',
-        ...(statusFilter !== 'all' && { where: { status: { equals: statusFilter } } }),
+        ...(statusFilter !== 'all' && { where: JSON.stringify({ status: { equals: statusFilter } }) }),
         // Searching by student name via nested query if supported, or just filtering by status
       })
 

@@ -22,13 +22,13 @@ import {
 } from 'lucide-react'
 
 export default function CoursesPage() {
-  const [courses, setCourses] = useState([])
+  const [courses, setCourses] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [departmentFilter, setDepartmentFilter] = useState('all')
-  const [departments, setDepartments] = useState([])
+  const [departments, setDepartments] = useState<any[]>([])
 
   useEffect(() => {
     fetchDepartments()

@@ -89,7 +89,7 @@ export const Classes: CollectionConfig = {
           return {
             department: { equals: deptId },
             university: { equals: uniId },
-          }
+          } as any
         }
         return true
       },
@@ -116,7 +116,7 @@ export const Classes: CollectionConfig = {
           return {
             department: { equals: deptId },
             university: { equals: uniId },
-          }
+          } as any
         }
         return true // allow all when context unavailable (prevents server-side rejection)
       },
@@ -140,7 +140,7 @@ export const Classes: CollectionConfig = {
           return {
             role: { equals: 'teacher' },
             'teacherInfo.department': { equals: deptId },
-          }
+          } as any
         }
         return true // allow all when context unavailable (prevents server-side rejection)
       },

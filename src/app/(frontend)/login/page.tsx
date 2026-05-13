@@ -96,7 +96,7 @@ export default function LoginPage() {
       } else {
         setError(data.errors?.[0]?.message || 'Invalid credentials')
         gsap.to(formRef.current, {
-          x: [-8, 8, -8, 8, 0],
+          x: [-8, 8, -8, 8, 0] as any,
           duration: 0.35,
           ease: 'power2.out',
         })

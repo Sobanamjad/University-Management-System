@@ -41,17 +41,17 @@ export const TimeTable: CollectionConfig = {
               try {
                 const classDoc = await req.payload.findByID({
                   collection: 'classes',
-                  id: classId,
+                  id: classId as any,
                   depth: 0,
                 })
                 const subjectDoc = await req.payload.findByID({
                   collection: 'courses',
-                  id: subjectId,
+                  id: subjectId as any,
                   depth: 0,
                 })
                 const teacherDoc = await req.payload.findByID({
                   collection: 'users',
-                  id: teacherId,
+                  id: teacherId as any,
                   depth: 0,
                 })
 
@@ -102,7 +102,7 @@ export const TimeTable: CollectionConfig = {
         if (deptId && uniId) {
           return {
             and: [{ department: { equals: deptId } }, { university: { equals: uniId } }],
-          }
+          } as any
         }
         return true
       },
@@ -148,9 +148,9 @@ export const TimeTable: CollectionConfig = {
           return {
             role: { equals: 'teacher' },
             'teacherInfo.department': { equals: deptId },
-          }
+          } as any
         }
-        return { role: { equals: 'teacher' } }
+        return { role: { equals: 'teacher' } } as any
       },
       admin: {
         description: 'Select teacher',
@@ -171,7 +171,7 @@ export const TimeTable: CollectionConfig = {
         if (deptId && uniId) {
           return {
             and: [{ department: { equals: deptId } }, { university: { equals: uniId } }],
-          }
+          } as any
         }
         return true
       },
@@ -297,7 +297,7 @@ export const TimeTable: CollectionConfig = {
         if (data?.class && (!data?.university || !data?.department || !data?.semester)) {
           const classDoc = await req.payload.findByID({
             collection: 'classes',
-            id: toId(data.class),
+            id: toId(data.class) as any,
             depth: 0,
             req,
           })
