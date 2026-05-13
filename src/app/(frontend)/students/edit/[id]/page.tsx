@@ -2,18 +2,18 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Users, Save } from 'lucide-react'
 
-export default function EditStudentPage({ params }: { params: { id: string } }) {
+export default function EditStudentPage() {
   const router = useRouter()
-  const { id } = params
+  const { id } = useParams() as { id: string }
 
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
   const [error, setError] = useState('')
-  
+
   const [universities, setUniversities] = useState<any[]>([])
   const [departments, setDepartments] = useState<any[]>([])
   const [semesters, setSemesters] = useState<any[]>([])
@@ -37,9 +37,9 @@ export default function EditStudentPage({ params }: { params: { id: string } }) 
           fetch('/api/departments?limit=100'),
           fetch('/api/semesters?limit=100'),
           fetch('/api/users?limit=100&where[role][equals]=student'),
-          fetch(`/api/students/${id}`)
+          fetch(`/api/students/${id}`),
         ])
-        
+
         if (uniRes.ok) setUniversities((await uniRes.json()).docs || [])
         if (deptRes.ok) setDepartments((await deptRes.json()).docs || [])
         if (semRes.ok) setSemesters((await semRes.json()).docs || [])
@@ -51,8 +51,10 @@ export default function EditStudentPage({ params }: { params: { id: string } }) 
             rollNo: data.rollNo || '',
             batch: data.batch || '',
             admissionDate: data.admissionDate ? data.admissionDate.split('T')[0] : '',
-            university: typeof data.university === 'object' ? data.university?.id : data.university || '',
-            department: typeof data.department === 'object' ? data.department?.id : data.department || '',
+            university:
+              typeof data.university === 'object' ? data.university?.id : data.university || '',
+            department:
+              typeof data.department === 'object' ? data.department?.id : data.department || '',
             semester: typeof data.semester === 'object' ? data.semester?.id : data.semester || '',
             user: typeof data.user === 'object' ? data.user?.id : data.user || '',
           })
@@ -193,9 +195,13 @@ export default function EditStudentPage({ params }: { params: { id: string } }) 
                       onChange={handleChange}
                       className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                     >
-                      <option value="" disabled>Select Student Account</option>
-                      {users.map(u => (
-                        <option key={u.id} value={u.id}>{u.name || u.email}</option>
+                      <option value="" disabled>
+                        Select Student Account
+                      </option>
+                      {users.map((u) => (
+                        <option key={u.id} value={u.id}>
+                          {u.name || u.email}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -214,9 +220,13 @@ export default function EditStudentPage({ params }: { params: { id: string } }) 
                       onChange={handleChange}
                       className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                     >
-                      <option value="" disabled>Select University</option>
-                      {universities.map(uni => (
-                        <option key={uni.id} value={uni.id}>{uni.name}</option>
+                      <option value="" disabled>
+                        Select University
+                      </option>
+                      {universities.map((uni) => (
+                        <option key={uni.id} value={uni.id}>
+                          {uni.name}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -231,9 +241,13 @@ export default function EditStudentPage({ params }: { params: { id: string } }) 
                       onChange={handleChange}
                       className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                     >
-                      <option value="" disabled>Select Department</option>
-                      {departments.map(dept => (
-                        <option key={dept.id} value={dept.id}>{dept.name}</option>
+                      <option value="" disabled>
+                        Select Department
+                      </option>
+                      {departments.map((dept) => (
+                        <option key={dept.id} value={dept.id}>
+                          {dept.name}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -251,9 +265,13 @@ export default function EditStudentPage({ params }: { params: { id: string } }) 
                     onChange={handleChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                   >
-                    <option value="" disabled>Select Semester</option>
-                    {semesters.map(sem => (
-                      <option key={sem.id} value={sem.id}>{sem.name}</option>
+                    <option value="" disabled>
+                      Select Semester
+                    </option>
+                    {semesters.map((sem) => (
+                      <option key={sem.id} value={sem.id}>
+                        {sem.name}
+                      </option>
                     ))}
                   </select>
                 </div>

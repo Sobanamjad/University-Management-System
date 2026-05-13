@@ -19,7 +19,7 @@ const seed = async () => {
     { name: 'Lahore University of Management Sciences', status: 'active' },
     { name: 'National University of Sciences & Technology', status: 'active' },
     { name: 'COMSATS University Islamabad', status: 'active' },
-  ]
+  ] as const
 
   const uniMap = new Map()
   for (const uni of universities) {
@@ -117,7 +117,7 @@ const seed = async () => {
       endDate: '2024-12-31',
       isActive: true,
     },
-  ]
+  ] as const
 
   const semMap = new Map()
   for (const sem of semesters) {
@@ -284,7 +284,7 @@ const seed = async () => {
         role: 'coordinator',
         status: 'active',
         coordinatorInfo: {
-          departments: [csDeptId, seDeptId, itDeptId], // ✅ ARRAY for multiple departments
+          departments: [csDeptId, seDeptId, itDeptId],
           qualification: 'PhD Computer Science',
           joiningDate: '2023-08-01',
         },
@@ -341,7 +341,7 @@ const seed = async () => {
       department: 'MATH',
       joiningDate: '2024-08-01',
     },
-  ]
+  ] as const
 
   const teacherMap = new Map()
   for (const teacher of teachers) {
@@ -453,7 +453,7 @@ const seed = async () => {
       maxStudents: 25,
       lectureType: 'theory',
     },
-  ]
+  ] as const
 
   const classMap = new Map()
   for (const classItem of classes) {

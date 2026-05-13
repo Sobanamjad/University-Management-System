@@ -2,12 +2,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Building2, Edit, Phone, Mail, MapPin, Hash, Activity } from 'lucide-react'
 
-export default function ViewUniversityPage({ params }: { params: { id: string } }) {
-  const { id } = params
+export default function ViewUniversityPage() {
+  const { id } = useParams()
   const [university, setUniversity] = useState<any>(null)
   const [fetching, setFetching] = useState(true)
   const [error, setError] = useState('')

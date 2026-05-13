@@ -2,6 +2,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import {
   ArrowLeft,
@@ -16,8 +17,8 @@ import {
   Calendar,
 } from 'lucide-react'
 
-export default function ViewEnrollmentPage({ params }: { params: { id: string } }) {
-  const { id } = params
+export default function ViewEnrollmentPage() {
+  const { id } = useParams()
   const [enrollment, setEnrollment] = useState<any>(null)
   const [fetching, setFetching] = useState(true)
   const [error, setError] = useState('')

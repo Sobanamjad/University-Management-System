@@ -2,13 +2,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Layers, Save } from 'lucide-react'
 
-export default function EditDepartmentPage({ params }: { params: { id: string } }) {
+export default function EditDepartmentPage() {
   const router = useRouter()
-  const { id } = params
+  const { id } = useParams()
 
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)

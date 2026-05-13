@@ -2,12 +2,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Layers, Edit, Activity, Hash } from 'lucide-react'
 
-export default function ViewDepartmentPage({ params }: { params: { id: string } }) {
-  const { id } = params
+export default function ViewDepartmentPage() {
+  const { id } = useParams()
   const [department, setDepartment] = useState<any>(null)
   const [fetching, setFetching] = useState(true)
   const [error, setError] = useState('')
