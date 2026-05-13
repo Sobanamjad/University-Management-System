@@ -58,10 +58,10 @@ export const Enrollments: CollectionConfig = {
         if (deptId && uniId) {
           return {
             and: [{ department: { equals: deptId } }, { university: { equals: uniId } }],
-          }
+          } as any
         }
         if (deptId) {
-          return { department: { equals: deptId } }
+          return { department: { equals: deptId } } as any
         }
         return true
       },
@@ -86,7 +86,7 @@ export const Enrollments: CollectionConfig = {
         if (deptId) where.and.push({ department: { equals: deptId } })
         if (semId) where.and.push({ semester: { equals: semId } })
 
-        return where.and.length > 0 ? where : true
+        return where.and.length > 0 ? (where as any) : true
       },
       admin: {
         condition: (data) => Boolean(data?.university && data?.department && data?.semester),
@@ -110,7 +110,7 @@ export const Enrollments: CollectionConfig = {
         if (deptId) where.and.push({ department: { equals: deptId } })
         if (semId) where.and.push({ semester: { equals: semId } })
 
-        return where.and.length > 0 ? where : true
+        return where.and.length > 0 ? (where as any) : true
       },
       admin: {
         condition: (data) => Boolean(data?.university && data?.department && data?.semester),

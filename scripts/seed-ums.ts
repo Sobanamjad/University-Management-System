@@ -29,7 +29,7 @@ const seed = async () => {
     })
 
     if (existing.docs.length === 0) {
-      const created = await payload.create({ collection: 'universities', data: uni })
+      const created = await payload.create({ collection: 'universities', data: uni as any })
       uniMap.set(uni.name, created.id)
       console.log(`  ✅ ${uni.name}`)
     } else {
@@ -66,7 +66,7 @@ const seed = async () => {
     })
 
     if (existing.docs.length === 0) {
-      const created = await payload.create({ collection: 'departments', data: dept })
+      const created = await payload.create({ collection: 'departments', data: dept as any })
       deptMap.set(dept.code, created.id)
       console.log(`  ✅ ${dept.name} (${dept.code})`)
     } else {
@@ -149,7 +149,7 @@ const seed = async () => {
           startDate: sem.startDate,
           endDate: sem.endDate,
           isActive: sem.isActive,
-        },
+        } as any,
       })
       const key = `${sem.department}-${sem.session}-${sem.semesterNumber}`
       semMap.set(key, created.id)
@@ -209,7 +209,7 @@ const seed = async () => {
           university: uniId,
           semester: semId,
           teacher: null,
-        },
+        } as any,
       })
       courseMap.set(course.code, created.id)
       console.log(`  ✅ ${course.code}: ${course.title}`)
@@ -250,7 +250,7 @@ const seed = async () => {
           city: 'Lahore',
           state: 'Punjab',
         },
-      },
+      } as any,
     })
     adminId = admin.id
     console.log('  ✅ Admin: admin@ums.edu.pk / admin123')
@@ -299,7 +299,7 @@ const seed = async () => {
           city: 'Lahore',
           state: 'Punjab',
         },
-      },
+      } as any,
     })
     coordinatorId = coordinator.id
     console.log('  ✅ Coordinator: coordinator@ums.edu.pk / coord123 (CS, SE, IT)')
@@ -383,7 +383,7 @@ const seed = async () => {
             city: 'Lahore',
             state: 'Punjab',
           },
-        },
+        } as any,
       })
       userId = created.id
       teacherMap.set(teacher.email, userId)
@@ -492,13 +492,13 @@ const seed = async () => {
           course: courseId,
           semester: semId,
           teacher: teacherId,
-          days: classItem.days,
+          days: classItem.days as any,
           timeSlot: classItem.timeSlot,
           maxStudents: classItem.maxStudents,
           currentStudents: 0,
           lectureType: classItem.lectureType,
           status: 'scheduled',
-        },
+        } as any,
       })
       const key = `${classItem.course}-${classItem.section}`
       classMap.set(key, created.id)
@@ -583,7 +583,7 @@ const seed = async () => {
             city: 'Lahore',
             state: 'Punjab',
           },
-        },
+        } as any,
       })
       userId = user.id
     } else {
@@ -607,7 +607,7 @@ const seed = async () => {
           semester: semId,
           batch: student.batch,
           admissionDate: '2024-01-15',
-        },
+        } as any,
       })
       studentMap.set(student.email, createdStudentRecord.id)
       console.log(`  ✅ ${student.name} (${student.rollNo})`)
@@ -660,7 +660,7 @@ const seed = async () => {
           department: deptId,
           semester: semId,
           status: 'enrolled',
-        },
+        } as any,
       })
       console.log(`  ✅ ${enrollment.student.split('@')[0]} enrolled in ${enrollment.class}`)
     } else {
@@ -766,7 +766,7 @@ const seed = async () => {
           subject: courseId,
           lectureType: tt.lectureType,
           status: 'active',
-        },
+        } as any,
       })
       console.log(`  ✅ ${tt.class} - ${tt.day} ${tt.timeSlot}`)
     } else {
@@ -800,7 +800,7 @@ const seed = async () => {
           },
           effectiveFrom: '2024-01-01',
           status: 'active',
-        },
+        } as any,
       })
       console.log('  ✅ Dr. Ali Raza - Permanent Teacher Salary configured')
     } else {

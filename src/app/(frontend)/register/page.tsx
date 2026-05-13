@@ -90,7 +90,7 @@ export default function RegisterPage() {
       setError('Passwords do not match')
       setLoading(false)
       gsap.to(formRef.current, {
-        x: [-10, 10, -10, 10, 0],
+        x: [-10, 10, -10, 10, 0] as any,
         duration: 0.4,
       })
       return

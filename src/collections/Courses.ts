@@ -82,7 +82,7 @@ export const Courses: CollectionConfig = {
         if (isValidId(deptId)) {
           return {
             department: { equals: deptId },
-          }
+          } as any
         }
         return true
       },
@@ -106,7 +106,7 @@ export const Courses: CollectionConfig = {
           return {
             role: { equals: 'teacher' },
             'teacherInfo.department': { equals: deptId },
-          }
+          } as any
         }
         return true
       },

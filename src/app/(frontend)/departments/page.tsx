@@ -20,7 +20,7 @@ import {
 } from 'lucide-react'
 
 export default function DepartmentsPage() {
-  const [departments, setDepartments] = useState([])
+  const [departments, setDepartments] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
@@ -36,7 +36,7 @@ export default function DepartmentsPage() {
       const query = new URLSearchParams({
         page: page.toString(),
         limit: '10',
-        ...(search && { where: { name: { like: search } } }),
+        ...(search && { where: JSON.stringify({ name: { like: search } }) }),
       })
 
       const res = await fetch(`/api/departments?${query}`)

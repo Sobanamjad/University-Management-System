@@ -60,7 +60,7 @@ export const Students: CollectionConfig = {
           return {
             department: { equals: data.department },
             university: { equals: data.university },
-          }
+          } as any
         }
         return true
       },
