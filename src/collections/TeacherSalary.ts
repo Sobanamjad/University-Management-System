@@ -9,7 +9,7 @@ export const TeacherSalary: CollectionConfig = {
     defaultColumns: [
       'teacher',
       'teacherType',
-      'salaryAmount',
+      'fixedSalary',
       'perClassRate',
       'effectiveFrom',
       'status',
@@ -24,14 +24,21 @@ export const TeacherSalary: CollectionConfig = {
       hooks: {
         beforeValidate: [
           async ({ data, req }) => {
-            if (data?.teacher) {
-              const teacher = await req.payload.findByID({
-                collection: 'users',
-                id: data.teacher,
-              })
-              return `${teacher?.name} - ${data.teacherType || 'Unknown'}`
+            if (!data) return ''
+            const teacherId = typeof data.teacher === 'object' ? data.teacher?.id : data.teacher
+            if (teacherId) {
+              try {
+                const teacher = await req.payload.findByID({
+                  collection: 'users',
+                  id: teacherId,
+                  depth: 0,
+                })
+                return `${teacher?.name || 'Unknown'} - ${data.teacherType || 'Unknown'}`
+              } catch (err) {
+                return `Teacher #${teacherId} - ${data.teacherType || 'Unknown'}`
+              }
             }
-            return data?.displayTitle
+            return data.displayTitle || ''
           },
         ],
       },
@@ -42,6 +49,7 @@ export const TeacherSalary: CollectionConfig = {
       type: 'relationship',
       relationTo: 'users',
       required: true,
+      label: 'Teacher',
       filterOptions: { role: { equals: 'teacher' } },
     },
 
@@ -158,6 +166,27 @@ export const TeacherSalary: CollectionConfig = {
 
   // ===== HOOKS =====
   hooks: {
+    beforeValidate: [
+      async ({ data, req, operation, originalDoc }) => {
+        if (data?.teacher) {
+          const teacherId = typeof data.teacher === 'object' ? data.teacher?.id : data.teacher
+
+          const existing = await req.payload.find({
+            collection: 'teacher-salary',
+            where: {
+              teacher: { equals: teacherId },
+              id: { not_equals: originalDoc?.id || '0' },
+            },
+            req,
+          })
+
+          if (existing.docs.length > 0) {
+            throw new Error('This teacher already has a salary record initialized.')
+          }
+        }
+        return data
+      },
+    ],
     beforeChange: [
       ({ data }) => {
         if (data?.teacherType === 'permanent') {
