@@ -24,7 +24,8 @@ export const TeacherSalary: CollectionConfig = {
       hooks: {
         beforeValidate: [
           async ({ data, req }) => {
-            const teacherId = typeof data?.teacher === 'object' ? data.teacher?.id : data?.teacher
+            if (!data) return ''
+            const teacherId = typeof data.teacher === 'object' ? data.teacher?.id : data.teacher
             if (teacherId) {
               try {
                 const teacher = await req.payload.findByID({
@@ -37,7 +38,7 @@ export const TeacherSalary: CollectionConfig = {
                 return `Teacher #${teacherId} - ${data.teacherType || 'Unknown'}`
               }
             }
-            return data?.displayTitle
+            return data.displayTitle || ''
           },
         ],
       },
@@ -168,7 +169,7 @@ export const TeacherSalary: CollectionConfig = {
     beforeValidate: [
       async ({ data, req, operation, originalDoc }) => {
         if (data?.teacher) {
-          const teacherId = typeof data.teacher === 'object' ? data.teacher.id : data.teacher
+          const teacherId = typeof data.teacher === 'object' ? data.teacher?.id : data.teacher
 
           const existing = await req.payload.find({
             collection: 'teacher-salary',
