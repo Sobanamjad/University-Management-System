@@ -165,6 +165,27 @@ export const TeacherSalary: CollectionConfig = {
 
   // ===== HOOKS =====
   hooks: {
+    beforeValidate: [
+      async ({ data, req, operation, originalDoc }) => {
+        if (data?.teacher) {
+          const teacherId = typeof data.teacher === 'object' ? data.teacher.id : data.teacher
+
+          const existing = await req.payload.find({
+            collection: 'teacher-salary',
+            where: {
+              teacher: { equals: teacherId },
+              id: { not_equals: originalDoc?.id || '0' },
+            },
+            req,
+          })
+
+          if (existing.docs.length > 0) {
+            throw new Error('This teacher already has a salary record initialized.')
+          }
+        }
+        return data
+      },
+    ],
     beforeChange: [
       ({ data }) => {
         if (data?.teacherType === 'permanent') {
