@@ -35,7 +35,7 @@ export default function CreateTeacherSalaryPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
-    
+
     if (name.includes('.')) {
       const [parent, child] = name.split('.')
       setFormData((prev: any) => ({
@@ -46,9 +46,14 @@ export default function CreateTeacherSalaryPage() {
         },
       }))
     } else {
-      setFormData((prev) => ({ 
-        ...prev, 
-        [name]: name === 'teacher' || name === 'teacherType' || name === 'status' || name === 'effectiveFrom' ? value : Number(value) 
+      setFormData((prev) => ({
+        ...prev,
+        [name]:
+          name === 'teacher'
+            ? Number(value)
+            : name === 'teacherType' || name === 'status' || name === 'effectiveFrom'
+              ? value
+              : Number(value),
       }))
     }
   }
@@ -95,7 +100,9 @@ export default function CreateTeacherSalaryPage() {
             </div>
             <div>
               <h1 className="text-xl font-black text-gray-900 leading-tight">Add Salary Record</h1>
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-0.5">Payroll Setup</p>
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-0.5">
+                Payroll Setup
+              </p>
             </div>
           </div>
         </div>
@@ -119,9 +126,11 @@ export default function CreateTeacherSalaryPage() {
                   <div className="w-8 h-8 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center">
                     <User size={18} />
                   </div>
-                  <h2 className="text-sm font-black text-gray-400 uppercase tracking-widest">Faculty Selection</h2>
+                  <h2 className="text-sm font-black text-gray-400 uppercase tracking-widest">
+                    Faculty Selection
+                  </h2>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-gray-700 ml-1">Select Teacher</label>
@@ -146,14 +155,18 @@ export default function CreateTeacherSalaryPage() {
                     <div className="grid grid-cols-2 gap-3 p-1.5 bg-gray-100 rounded-2xl">
                       <button
                         type="button"
-                        onClick={() => setFormData(prev => ({ ...prev, teacherType: 'permanent' }))}
+                        onClick={() =>
+                          setFormData((prev) => ({ ...prev, teacherType: 'permanent' }))
+                        }
                         className={`py-2.5 rounded-xl text-sm font-bold transition-all ${formData.teacherType === 'permanent' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                       >
                         Permanent
                       </button>
                       <button
                         type="button"
-                        onClick={() => setFormData(prev => ({ ...prev, teacherType: 'visiting' }))}
+                        onClick={() =>
+                          setFormData((prev) => ({ ...prev, teacherType: 'visiting' }))
+                        }
                         className={`py-2.5 rounded-xl text-sm font-bold transition-all ${formData.teacherType === 'visiting' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                       >
                         Visiting
@@ -169,13 +182,17 @@ export default function CreateTeacherSalaryPage() {
                   <div className="w-8 h-8 bg-green-50 text-green-600 rounded-lg flex items-center justify-center">
                     <CreditCard size={18} />
                   </div>
-                  <h2 className="text-sm font-black text-gray-400 uppercase tracking-widest">Pay Scale Details</h2>
+                  <h2 className="text-sm font-black text-gray-400 uppercase tracking-widest">
+                    Pay Scale Details
+                  </h2>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   {formData.teacherType === 'permanent' ? (
                     <div className="space-y-2">
-                      <label className="text-sm font-bold text-gray-700 ml-1">Fixed Monthly Salary (Rs.)</label>
+                      <label className="text-sm font-bold text-gray-700 ml-1">
+                        Fixed Monthly Salary (Rs.)
+                      </label>
                       <input
                         type="number"
                         name="fixedSalary"
@@ -188,7 +205,9 @@ export default function CreateTeacherSalaryPage() {
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <label className="text-sm font-bold text-gray-700 ml-1">Per Class Rate (Rs.)</label>
+                      <label className="text-sm font-bold text-gray-700 ml-1">
+                        Per Class Rate (Rs.)
+                      </label>
                       <input
                         type="number"
                         name="perClassRate"
@@ -202,7 +221,9 @@ export default function CreateTeacherSalaryPage() {
                   )}
 
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-gray-700 ml-1">Monthly Bonus (Rs.)</label>
+                    <label className="text-sm font-bold text-gray-700 ml-1">
+                      Monthly Bonus (Rs.)
+                    </label>
                     <input
                       type="number"
                       name="bonus"
@@ -219,11 +240,15 @@ export default function CreateTeacherSalaryPage() {
               {formData.teacherType === 'permanent' && (
                 <section className="p-6 bg-red-50/30 rounded-[1.5rem] border border-red-50">
                   <div className="flex items-center space-x-3 mb-6">
-                    <h2 className="text-xs font-black text-red-500 uppercase tracking-widest">Deductions (Monthly)</h2>
+                    <h2 className="text-xs font-black text-red-500 uppercase tracking-widest">
+                      Deductions (Monthly)
+                    </h2>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-2">
-                      <label className="text-sm font-bold text-gray-700 ml-1">Income Tax (Rs.)</label>
+                      <label className="text-sm font-bold text-gray-700 ml-1">
+                        Income Tax (Rs.)
+                      </label>
                       <input
                         type="number"
                         name="deductions.tax"
@@ -233,7 +258,9 @@ export default function CreateTeacherSalaryPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-bold text-gray-700 ml-1">Other Deductions (Rs.)</label>
+                      <label className="text-sm font-bold text-gray-700 ml-1">
+                        Other Deductions (Rs.)
+                      </label>
                       <input
                         type="number"
                         name="deductions.otherDeduction"
@@ -252,7 +279,9 @@ export default function CreateTeacherSalaryPage() {
                   <div className="w-8 h-8 bg-orange-50 text-orange-600 rounded-lg flex items-center justify-center">
                     <Calendar size={18} />
                   </div>
-                  <h2 className="text-sm font-black text-gray-400 uppercase tracking-widest">Administration</h2>
+                  <h2 className="text-sm font-black text-gray-400 uppercase tracking-widest">
+                    Administration
+                  </h2>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
