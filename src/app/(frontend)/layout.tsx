@@ -4,6 +4,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import ChatBot from '@/components/ChatBot'
 import {
   Menu,
   X,
@@ -125,6 +126,7 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
       </div>
 
       <div className="lg:ml-64 min-h-screen">{children}</div>
+      <ChatBot />
     </div>
   )
 }
