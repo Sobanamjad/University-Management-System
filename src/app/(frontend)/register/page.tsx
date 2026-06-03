@@ -1,10 +1,20 @@
 // src/app/(frontend)/register/page.tsx
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import gsap from 'gsap'
+import {
+  UserPlus,
+  Mail,
+  Lock,
+  User,
+  Phone,
+  Calendar,
+  MapPin,
+  Shield,
+  UserCheck,
+} from 'lucide-react'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -26,60 +36,26 @@ export default function RegisterPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const containerRef = useRef(null)
-  const formRef = useRef(null)
-  const stepRef = useRef(null)
-  const fieldsRef = useRef<(HTMLDivElement | null)[]>([])
-
-  useEffect(() => {
-    gsap.fromTo(
-      containerRef.current,
-      { opacity: 0, y: 50 },
-      { opacity: 1, y: 0, duration: 1, ease: 'power3.out' },
-    )
-
-    gsap.to('.progress-bar', {
-      width: `${step * 33.33}%`,
-      duration: 0.5,
-      ease: 'power2.out',
-    })
-  }, [step])
-
-  const animateStepTransition = (direction: 'next' | 'prev') => {
-    gsap.to(formRef.current, {
-      x: direction === 'next' ? -50 : 50,
-      opacity: 0,
-      duration: 0.3,
-      onComplete: () => {
-        setStep(direction === 'next' ? step + 1 : step - 1)
-        gsap.fromTo(
-          formRef.current,
-          { x: direction === 'next' ? 50 : -50, opacity: 0 },
-          { x: 0, opacity: 1, duration: 0.5 },
-        )
-      },
-    })
-  }
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     })
+  }
 
-    gsap.to(e.target, {
-      scale: 1.02,
-      duration: 0.1,
-      yoyo: true,
-      repeat: 1,
-    })
+  const nextStep = () => {
+    setStep(step + 1)
+  }
+
+  const prevStep = () => {
+    setStep(step - 1)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (step < 3) {
-      animateStepTransition('next')
+      nextStep()
       return
     }
 
@@ -90,7 +66,7 @@ export default function RegisterPage() {
       setError('Passwords do not match')
       setLoading(false)
       gsap.to(formRef.current, {
-        x: [-10, 10, -10, 10, 0] as any,
+        x: [-10, 10, -10, 10, 0],
         duration: 0.4,
       })
       return
@@ -123,15 +99,7 @@ export default function RegisterPage() {
       const data = await res.json()
 
       if (res.ok) {
-        // Success animation
-        gsap.to(formRef.current, {
-          scale: 1.1,
-          opacity: 0,
-          duration: 0.5,
-          onComplete: () => {
-            router.push('/login?registered=true')
-          },
-        })
+        router.push('/login?registered=true')
       } else {
         setError(data.errors?.[0]?.message || 'Registration failed')
       }
@@ -143,240 +111,311 @@ export default function RegisterPage() {
   }
 
   return (
-    <div
-      ref={containerRef}
-      className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center p-4"
-    >
-      <div className="relative w-full max-w-2xl">
-        <div ref={stepRef} className="mb-8">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-5">
+      <div className="w-full max-w-2xl">
+        {/* Logo/Brand */}
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <span className="text-white font-bold text-2xl">U</span>
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900">Create Account</h1>
+          <p className="mt-2 text-gray-500">Join the University Management System</p>
+        </div>
+
+        {/* Progress Steps */}
+        <div className="mb-8">
           <div className="flex justify-between mb-2">
             {['Account', 'Personal', 'Address'].map((label, i) => (
               <div
                 key={i}
-                className={`text-sm font-medium transition-colors duration-300 ${
-                  step > i + 1 ? 'text-green-400' : step === i + 1 ? 'text-white' : 'text-white/40'
+                className={`text-sm font-medium transition-colors ${
+                  step > i + 1
+                    ? 'text-blue-600'
+                    : step === i + 1
+                      ? 'text-blue-600'
+                      : 'text-gray-400'
                 }`}
               >
                 {label}
               </div>
             ))}
           </div>
-          <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-            <div className="progress-bar h-full bg-gradient-to-r from-green-400 to-blue-500 rounded-full w-0"></div>
+          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-blue-600 rounded-full transition-all duration-300"
+              style={{ width: `${((step - 1) / 2) * 100}%` }}
+            ></div>
           </div>
         </div>
 
-        <div
-          ref={formRef}
-          className="backdrop-blur-xl bg-white/10 rounded-3xl shadow-2xl p-8 border border-white/20"
-        >
-          <h2 className="text-4xl font-bold text-white text-center mb-2">Create Account</h2>
-          <p className="text-white/60 text-center mb-8">Join our academic community</p>
-
+        {/* Form Card */}
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
           {error && (
-            <div className="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-xl">
-              <p className="text-white text-sm text-center">{error}</p>
+            <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-xl text-center text-red-600 text-sm">
+              {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit}>
+            {/* Step 1: Account Info */}
             {step === 1 && (
-              <div className="space-y-4">
-                <div
-                  ref={(el) => {
-                    fieldsRef.current[0] = el
-                  }}
-                >
-                  <input
-                    type="text"
-                    name="name"
-                    placeholder="Full Name"
-                    required
-                    value={formData.name}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                  />
+              <div className="space-y-5">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Full Name <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <User className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      type="text"
+                      name="name"
+                      required
+                      value={formData.name}
+                      onChange={handleChange}
+                      className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="John Doe"
+                    />
+                  </div>
                 </div>
-                <div
-                  ref={(el) => {
-                    fieldsRef.current[1] = el
-                  }}
-                >
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="Email Address"
-                    required
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                  />
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Email Address <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Mail className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      type="email"
+                      name="email"
+                      required
+                      value={formData.email}
+                      onChange={handleChange}
+                      className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="you@example.com"
+                    />
+                  </div>
                 </div>
+
                 <div className="grid grid-cols-2 gap-4">
-                  <div
-                    ref={(el) => {
-                      fieldsRef.current[2] = el
-                    }}
-                  >
-                    <input
-                      type="password"
-                      name="password"
-                      placeholder="Password"
-                      required
-                      minLength={6}
-                      value={formData.password}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                    />
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Password <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Lock className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <input
+                        type="password"
+                        name="password"
+                        required
+                        minLength={6}
+                        value={formData.password}
+                        onChange={handleChange}
+                        className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="••••••••"
+                      />
+                    </div>
                   </div>
-                  <div
-                    ref={(el) => {
-                      fieldsRef.current[3] = el
-                    }}
-                  >
-                    <input
-                      type="password"
-                      name="confirmPassword"
-                      placeholder="Confirm Password"
-                      required
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                    />
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Confirm Password <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Lock className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <input
+                        type="password"
+                        name="confirmPassword"
+                        required
+                        value={formData.confirmPassword}
+                        onChange={handleChange}
+                        className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="••••••••"
+                      />
+                    </div>
                   </div>
                 </div>
-                <div
-                  ref={(el) => {
-                    fieldsRef.current[4] = el
-                  }}
-                >
-                  <select
-                    name="role"
-                    required
-                    value={formData.role}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                  >
-                    <option value="student" className="bg-gray-800">
-                      Student
-                    </option>
-                    <option value="teacher" className="bg-gray-800">
-                      Teacher
-                    </option>
-                    <option value="coordinator" className="bg-gray-800">
-                      Coordinator
-                    </option>
-                  </select>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Role <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <UserCheck className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <select
+                      name="role"
+                      required
+                      value={formData.role}
+                      onChange={handleChange}
+                      className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                    >
+                      <option value="student">Student</option>
+                      <option value="teacher">Teacher</option>
+                      <option value="coordinator">Coordinator</option>
+                    </select>
+                  </div>
                 </div>
               </div>
             )}
 
+            {/* Step 2: Personal Info */}
             {step === 2 && (
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <input
-                      type="text"
-                      name="phone"
-                      placeholder="Phone Number"
-                      required
-                      value={formData.phone}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40"
-                    />
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Phone Number <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Phone className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <input
+                        type="text"
+                        name="phone"
+                        required
+                        value={formData.phone}
+                        onChange={handleChange}
+                        className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="+92 300 1234567"
+                      />
+                    </div>
                   </div>
+
                   <div>
-                    <input
-                      type="date"
-                      name="dateOfBirth"
-                      required
-                      value={formData.dateOfBirth}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white"
-                    />
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Date of Birth <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Calendar className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <input
+                        type="date"
+                        name="dateOfBirth"
+                        required
+                        value={formData.dateOfBirth}
+                        onChange={handleChange}
+                        className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                      />
+                    </div>
                   </div>
                 </div>
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <select
-                      name="gender"
-                      required
-                      value={formData.gender}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white"
-                    >
-                      <option value="" className="bg-gray-800">
-                        Select Gender
-                      </option>
-                      <option value="male" className="bg-gray-800">
-                        Male
-                      </option>
-                      <option value="female" className="bg-gray-800">
-                        Female
-                      </option>
-                    </select>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Gender <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Shield className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <select
+                        name="gender"
+                        required
+                        value={formData.gender}
+                        onChange={handleChange}
+                        className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                      >
+                        <option value="">Select Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                      </select>
+                    </div>
                   </div>
+
                   <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      CNIC Number <span className="text-red-500">*</span>
+                    </label>
                     <input
                       type="text"
                       name="cnic"
-                      placeholder="CNIC (36300-5419772-3)"
                       required
                       value={formData.cnic}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 font-mono"
+                      className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                      placeholder="36300-5419772-3"
                     />
                   </div>
                 </div>
               </div>
             )}
 
+            {/* Step 3: Address Info */}
             {step === 3 && (
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <div>
-                  <input
-                    type="text"
-                    name="street"
-                    placeholder="Street Address"
-                    required
-                    value={formData.street}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40"
-                  />
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Street Address <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <MapPin className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      type="text"
+                      name="street"
+                      required
+                      value={formData.street}
+                      onChange={handleChange}
+                      className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="House No, Street, Area"
+                    />
+                  </div>
                 </div>
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      City <span className="text-red-500">*</span>
+                    </label>
                     <input
                       type="text"
                       name="city"
-                      placeholder="City"
                       required
                       value={formData.city}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40"
+                      className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Lahore"
                     />
                   </div>
+
                   <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      State <span className="text-red-500">*</span>
+                    </label>
                     <input
                       type="text"
                       name="state"
-                      placeholder="State"
                       required
                       value={formData.state}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40"
+                      className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Punjab"
                     />
                   </div>
                 </div>
               </div>
             )}
 
+            {/* Buttons */}
             <div className="mt-8 flex gap-4">
               {step > 1 && (
                 <button
                   type="button"
-                  onClick={() => animateStepTransition('prev')}
-                  className="flex-1 py-3 px-4 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-all"
+                  onClick={prevStep}
+                  className="flex-1 py-2.5 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors"
                 >
                   Back
                 </button>
@@ -384,19 +423,26 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl font-semibold hover:shadow-lg transform hover:scale-[1.02] transition-all disabled:opacity-50"
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all duration-200 disabled:opacity-60 shadow-md"
               >
-                {loading ? 'Processing...' : step === 3 ? 'Create Account' : 'Next Step'}
+                {loading ? (
+                  'Processing...'
+                ) : step === 3 ? (
+                  <>
+                    <UserPlus className="h-5 w-5" />
+                    Create Account
+                  </>
+                ) : (
+                  'Next Step'
+                )}
               </button>
             </div>
 
-            <div className="mt-6 text-center">
-              <p className="text-white/60">
-                Already have an account?{' '}
-                <Link href="/login" className="text-white font-semibold hover:underline">
-                  Sign In
-                </Link>
-              </p>
+            <div className="mt-6 text-center text-sm text-gray-600">
+              Already have an account?{' '}
+              <Link href="/login" className="text-blue-600 font-medium hover:text-blue-700">
+                Sign In
+              </Link>
             </div>
           </form>
         </div>
