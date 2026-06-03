@@ -1,16 +1,16 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* Fix for backdrop-blur in Safari/macOS (your main issue) */
 @layer utilities {
   .backdrop-blur-2xl,
   .backdrop-blur-xl {
     -webkit-backdrop-filter: blur(24px) !important;
-            backdrop-filter: blur(24px) !important;
+    backdrop-filter: blur(24px) !important;
   }
   /* Stronger version for more obvious glass effect */
   .backdrop-blur-strong {
     -webkit-backdrop-filter: blur(40px) !important;
-            backdrop-filter: blur(40px) !important;
+    backdrop-filter: blur(40px) !important;
   }
 }
 

@@ -1,7 +1,7 @@
 // src/app/(frontend)/dashboard/page.tsx
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
@@ -13,12 +13,18 @@ import {
   Layers,
   UserCheck,
   GraduationCap,
+  User,
+  LogOut,
+  Settings,
+  ChevronDown,
 } from 'lucide-react'
 
 export default function DashboardPage() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [showDropdown, setShowDropdown] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
   const [stats, setStats] = useState({
     universities: 0,
     departments: 0,
@@ -46,6 +52,17 @@ export default function DashboardPage() {
       .catch(() => router.push('/login'))
       .finally(() => setLoading(false))
   }, [router])
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   const fetchStats = async () => {
     try {
@@ -81,6 +98,35 @@ export default function DashboardPage() {
     }
   }
 
+  const handleLogout = async () => {
+    await fetch('/api/users/logout', { method: 'POST' })
+    router.push('/login')
+  }
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2)
+  }
+
+  const getRoleBadgeColor = (role: string) => {
+    switch (role) {
+      case 'admin':
+        return 'bg-purple-100 text-purple-700'
+      case 'coordinator':
+        return 'bg-blue-100 text-blue-700'
+      case 'teacher':
+        return 'bg-green-100 text-green-700'
+      case 'student':
+        return 'bg-orange-100 text-orange-700'
+      default:
+        return 'bg-gray-100 text-gray-700'
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -102,13 +148,90 @@ export default function DashboardPage() {
               <h1 className="text-2xl font-bold text-gray-900 leading-tight">Dashboard</h1>
               <p className="text-sm text-gray-600">Welcome back, {user?.name}</p>
             </div>
-            <div className="text-sm text-gray-600">
-              {new Date().toLocaleDateString('en-US', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })}
+
+            <div className="flex items-center space-x-6">
+              {/* Date */}
+              <div className="hidden md:block text-sm text-gray-600">
+                {new Date().toLocaleDateString('en-US', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </div>
+
+              {/* Profile Avatar Dropdown */}
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setShowDropdown(!showDropdown)}
+                  className="flex items-center space-x-3 focus:outline-none"
+                >
+                  {/* Avatar */}
+                  <div className="relative">
+                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md">
+                      {getInitials(user?.name || 'User')}
+                    </div>
+                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+                  </div>
+
+                  {/* User Info (Hidden on mobile) */}
+                  <div className="hidden md:block text-left">
+                    <p className="text-sm font-medium text-gray-900">{user?.name}</p>
+                    <p className="text-xs text-gray-500 capitalize">{user?.role}</p>
+                  </div>
+
+                  <ChevronDown
+                    className={`hidden md:block w-4 h-4 text-gray-400 transition-transform duration-200 ${
+                      showDropdown ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+
+                {/* Dropdown Menu */}
+                {showDropdown && (
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50 animate-fade-in">
+                    {/* User Info Section */}
+                    <div className="px-4 py-3 border-b border-gray-100">
+                      <p className="text-sm font-semibold text-gray-900">{user?.name}</p>
+                      <p className="text-xs text-gray-500">{user?.email}</p>
+                      <span
+                        className={`inline-block mt-2 px-2 py-0.5 text-xs font-medium rounded-full ${getRoleBadgeColor(
+                          user?.role,
+                        )}`}
+                      >
+                        {user?.role}
+                      </span>
+                    </div>
+
+                    {/* Menu Items */}
+                    <Link
+                      href="/profile"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      <User className="w-4 h-4 mr-3 text-gray-400" />
+                      Your Profile
+                    </Link>
+
+                    <Link
+                      href="/settings"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      <Settings className="w-4 h-4 mr-3 text-gray-400" />
+                      Settings
+                    </Link>
+
+                    <div className="border-t border-gray-100 my-1"></div>
+
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4 mr-3 text-red-400" />
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -116,7 +239,7 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <div className="p-6">
-        {/* Stats Grid */}
+        {/* Stats Grid - Same as before */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Universities Card */}
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
@@ -217,6 +340,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* Quick Actions */}
         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 mb-8">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
