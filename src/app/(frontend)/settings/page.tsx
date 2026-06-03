@@ -18,6 +18,7 @@ import {
   Smartphone,
   Mail,
   Key,
+  Settings,
 } from 'lucide-react'
 
 export default function SettingsPage() {
