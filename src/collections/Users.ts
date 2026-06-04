@@ -1,4 +1,10 @@
-import { CollectionConfig } from 'payload'
+import type { Access, CollectionConfig } from 'payload'
+
+// Allow anyone to self-register
+const publicCreate: Access = () => true
+
+// Only the user themselves or an admin can read/update
+const authenticatedOnly: Access = ({ req: { user } }) => Boolean(user)
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -6,6 +12,12 @@ export const Users: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
     group: 'System',
+  },
+  access: {
+    create: publicCreate,    // Anyone can register
+    read: authenticatedOnly, // Must be logged in to read
+    update: authenticatedOnly,
+    delete: authenticatedOnly,
   },
   fields: [
     // ========== BASIC FIELDS (Sabke liye) ==========
