@@ -74,42 +74,38 @@ export default function RegisterPage() {
       return
     }
 
-    try {
-      const res = await fetch('/api/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          role: formData.role,
-          status: 'active',
-          personalInfo: {
-            phone: formData.phone,
-            dateOfBirth: formData.dateOfBirth,
-            gender: formData.gender,
-            cnic: formData.cnic,
-          },
-          address: {
-            street: formData.street,
-            city: formData.city,
-            state: formData.state,
-          },
-        }),
-      })
+    const res = await fetch('/api/users/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        role: formData.role,
+        status: 'active',
+        personalInfo: {
+          phone: formData.phone,
+          dateOfBirth: formData.dateOfBirth,
+          gender: formData.gender,
+          cnic: formData.cnic,
+        },
+        address: {
+          street: formData.street,
+          city: formData.city,
+          state: formData.state,
+        },
+      }),
+    })
 
-      const data = await res.json()
+    const data = await res.json()
 
-      if (res.ok) {
-        router.push('/login?registered=true')
-      } else {
-        setError(data.errors?.[0]?.message || 'Registration failed')
-      }
-    } catch (err) {
-      setError('Something went wrong')
-    } finally {
-      setLoading(false)
+    if (res.ok) {
+      router.push('/login?registered=true')
+    } else {
+      setError(data.errors?.[0]?.message || 'Registration failed')
     }
+
+    setLoading(false)
   }
 
   return (
