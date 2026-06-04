@@ -65,10 +65,12 @@ export default function RegisterPage() {
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match')
       setLoading(false)
-      gsap.to(formRef.current, {
-        x: [-10, 10, -10, 10, 0],
-        duration: 0.4,
-      })
+      return
+    }
+
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters')
+      setLoading(false)
       return
     }
 
