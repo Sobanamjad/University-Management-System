@@ -142,18 +142,10 @@ export default function ViewEnrollmentPage() {
                         <Calendar className="w-4 h-4 mr-2" />
                         Semester
                       </h3>
-                      <p className="text-gray-900 font-bold">{enrollment.semester?.name || 'N/A'}</p>
-                      <p className="text-xs text-gray-500">{enrollment.semester?.session}</p>
-                    </div>
-
-                    <div>
-                      <h3 className="text-sm font-semibold text-gray-400 flex items-center mb-3">
-                        <Building2 className="w-4 h-4 mr-2" />
-                        Campus
-                      </h3>
-                      <p className="text-gray-900 font-medium">
-                        {enrollment.university?.name || enrollment.student?.university?.name || 'N/A'}
+                      <p className="text-gray-900 font-bold">
+                        {enrollment.semester?.name || 'N/A'}
                       </p>
+                      <p className="text-xs text-gray-500">{enrollment.semester?.session}</p>
                     </div>
 
                     <div>
@@ -162,7 +154,9 @@ export default function ViewEnrollmentPage() {
                         Department
                       </h3>
                       <p className="text-gray-900 font-medium">
-                        {enrollment.department?.name || enrollment.student?.department?.name || 'N/A'}
+                        {enrollment.department?.name ||
+                          enrollment.student?.department?.name ||
+                          'N/A'}
                       </p>
                     </div>
                   </div>

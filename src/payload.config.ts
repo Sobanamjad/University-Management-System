@@ -7,7 +7,6 @@ import sharp from 'sharp'
 
 import { Users } from './collections/Users'
 import { Departments } from './collections/Departments'
-import { Universities } from './collections/Universities'
 import { Semesters } from './collections/Semesters'
 import { Courses } from './collections/Courses'
 import { Classes } from './collections/Classes'
@@ -29,7 +28,6 @@ export default buildConfig({
   collections: [
     Users,
     Departments,
-    Universities,
     Semesters,
     Courses,
     Classes,

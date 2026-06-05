@@ -213,18 +213,6 @@ export default function CourseViewPage() {
                     <p className="text-sm text-gray-500">Code: {course.department?.code}</p>
                   </div>
                 </div>
-
-                <div className="flex items-start">
-                  <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center mr-4">
-                    <Building2 size={20} className="text-gray-600" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      University
-                    </p>
-                    <p className="text-lg font-semibold text-gray-900">{course.university?.name}</p>
-                  </div>
-                </div>
               </div>
             </div>
           </div>

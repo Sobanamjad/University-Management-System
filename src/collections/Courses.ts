@@ -8,15 +8,7 @@ export const Courses: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     group: 'Academic',
-    defaultColumns: [
-      'title',
-      'code',
-      'creditHours',
-      'university',
-      'department',
-      'teacher',
-      'semester',
-    ],
+    defaultColumns: ['title', 'code', 'creditHours', 'department', 'teacher', 'semester'],
   },
   fields: [
     // ===== BASIC INFO =====
@@ -58,15 +50,6 @@ export const Courses: CollectionConfig = {
       admin: {
         description: 'Select the department (subject)',
       },
-    },
-
-    // ===== UNIVERSITY (ADD THIS) =====
-    {
-      name: 'university',
-      type: 'relationship',
-      relationTo: 'universities',
-      required: true,
-      label: 'University',
     },
 
     // ===== SEMESTER (Filtered by department) =====
@@ -122,9 +105,6 @@ export const Courses: CollectionConfig = {
     {
       fields: ['code'],
       unique: true,
-    },
-    {
-      fields: ['university'],
     },
     {
       fields: ['department'],

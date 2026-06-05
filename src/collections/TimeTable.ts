@@ -70,24 +70,13 @@ export const TimeTable: CollectionConfig = {
       },
     },
 
-    // ===== 1. UNIVERSITY & DEPARTMENT (Context) =====
-    {
-      name: 'university',
-      type: 'relationship',
-      relationTo: 'universities',
-      required: true,
-      label: 'University',
-    },
-
+    // ===== 1. DEPARTMENT (Context) =====
     {
       name: 'department',
       type: 'relationship',
       relationTo: 'departments',
       required: true,
       label: 'Department',
-      admin: {
-        condition: (data) => Boolean(data?.university),
-      },
     },
 
     {
@@ -98,10 +87,9 @@ export const TimeTable: CollectionConfig = {
       label: 'Semester',
       filterOptions: ({ data }) => {
         const deptId = toId(data?.department)
-        const uniId = toId(data?.university)
-        if (deptId && uniId) {
+        if (deptId) {
           return {
-            and: [{ department: { equals: deptId } }, { university: { equals: uniId } }],
+            department: { equals: deptId },
           } as any
         }
         return true
@@ -119,12 +107,10 @@ export const TimeTable: CollectionConfig = {
       required: true,
       label: 'Class/Section',
       filterOptions: ({ data }) => {
-        const uniId = toId(data?.university)
         const deptId = toId(data?.department)
         const semId = toId(data?.semester)
 
         const where: any = { and: [] }
-        if (uniId) where.and.push({ university: { equals: uniId } })
         if (deptId) where.and.push({ department: { equals: deptId } })
         if (semId) where.and.push({ semester: { equals: semId } })
 
@@ -166,11 +152,10 @@ export const TimeTable: CollectionConfig = {
       label: 'Subject/Course',
       filterOptions: ({ data }) => {
         const deptId = toId(data?.department)
-        const uniId = toId(data?.university)
 
-        if (deptId && uniId) {
+        if (deptId) {
           return {
-            and: [{ department: { equals: deptId } }, { university: { equals: uniId } }],
+            department: { equals: deptId },
           } as any
         }
         return true
@@ -294,7 +279,7 @@ export const TimeTable: CollectionConfig = {
     beforeValidate: [
       // Auto-fill university, department, semester from class
       async ({ data, req }) => {
-        if (data?.class && (!data?.university || !data?.department || !data?.semester)) {
+        if (data?.class && (!data?.department || !data?.semester)) {
           const classDoc = await req.payload.findByID({
             collection: 'classes',
             id: toId(data.class) as any,
@@ -303,7 +288,6 @@ export const TimeTable: CollectionConfig = {
           })
 
           if (classDoc) {
-            if (!data?.university) data.university = classDoc.university
             if (!data?.department) data.department = classDoc.department
             if (!data?.semester) data.semester = classDoc.semester
           }

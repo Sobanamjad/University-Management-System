@@ -28,7 +28,6 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'Universities', href: '/universities', icon: Building2 },
     { name: 'Departments', href: '/departments', icon: Layers },
     { name: 'Users', href: '/users', icon: Users },
     { name: 'Students', href: '/students', icon: GraduationCap },
@@ -87,7 +86,7 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
           {/* User Info */}
           <div className="p-4 border-b bg-gray-50">
             <p className="text-sm text-gray-600">Welcome to</p>
-            <p className="font-semibold text-gray-900">University Management System</p>
+            <p className="font-semibold text-gray-900">Academic Management System</p>
           </div>
 
           {/* Navigation */}

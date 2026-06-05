@@ -18,14 +18,12 @@ export default function CourseEditPage() {
     code: '',
     creditHours: 3,
     department: '',
-    university: '',
     semester: '',
     teacher: '',
     status: 'active',
   })
 
   const [departments, setDepartments] = useState([])
-  const [universities, setUniversities] = useState([])
   const [semesters, setSemesters] = useState([])
   const [teachers, setTeachers] = useState([])
 
@@ -44,7 +42,6 @@ export default function CourseEditPage() {
           code: data.code || '',
           creditHours: data.creditHours || 3,
           department: data.department?.id || '',
-          university: data.university?.id || '',
           semester: data.semester?.id || '',
           teacher: data.teacher?.id || '',
           status: data.status || 'active',
@@ -61,20 +58,17 @@ export default function CourseEditPage() {
 
   const fetchOptions = async () => {
     try {
-      const [deptRes, uniRes, semRes, teacherRes] = await Promise.all([
+      const [deptRes, semRes, teacherRes] = await Promise.all([
         fetch('/api/departments?limit=100'),
-        fetch('/api/universities?limit=100'),
         fetch('/api/semesters?limit=100'),
         fetch('/api/users?where[role][equals]=teacher&limit=100'),
       ])
 
       const departmentsData = await deptRes.json()
-      const universitiesData = await uniRes.json()
       const semestersData = await semRes.json()
       const teachersData = await teacherRes.json()
 
       setDepartments(departmentsData.docs || [])
-      setUniversities(universitiesData.docs || [])
       setSemesters(semestersData.docs || [])
       setTeachers(teachersData.docs || [])
     } catch (err) {
@@ -213,24 +207,6 @@ export default function CourseEditPage() {
                   <option value="inactive">Inactive</option>
                 </select>
               </div>
-            </div>
-
-            {/* University */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">University *</label>
-              <select
-                value={formData.university}
-                onChange={(e) => setFormData({ ...formData, university: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                required
-              >
-                <option value="">Select University</option>
-                {universities.map((uni: any) => (
-                  <option key={uni.id} value={uni.id}>
-                    {uni.name}
-                  </option>
-                ))}
-              </select>
             </div>
 
             {/* Department */}

@@ -145,7 +145,7 @@ export default function TimetablePage() {
             </div>
             <div>
               <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">
-                University Timetable
+                Academic Timetable
               </h1>
               <p className="text-sm font-medium text-gray-500">Academic Schedule Management</p>
             </div>

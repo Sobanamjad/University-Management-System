@@ -69,7 +69,6 @@ export interface Config {
   collections: {
     users: User;
     departments: Department;
-    universities: University;
     semesters: Semester;
     courses: Course;
     classes: Class;
@@ -86,7 +85,6 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     departments: DepartmentsSelect<false> | DepartmentsSelect<true>;
-    universities: UniversitiesSelect<false> | UniversitiesSelect<true>;
     semesters: SemestersSelect<false> | SemestersSelect<true>;
     courses: CoursesSelect<false> | CoursesSelect<true>;
     classes: ClassesSelect<false> | ClassesSelect<true>;
@@ -206,17 +204,6 @@ export interface Department {
   createdAt: string;
 }
 /**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "universities".
- */
-export interface University {
-  id: number;
-  name: string;
-  status: 'active' | 'inactive';
-  updatedAt: string;
-  createdAt: string;
-}
-/**
  * Manage academic semesters for each department
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -230,11 +217,7 @@ export interface Semester {
   session: string;
   semesterNumber: '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8';
   /**
-   * Select university first
-   */
-  university: number | University;
-  /**
-   * Auto-generated from session, semester number, department and university
+   * Auto-generated from session, semester number, and department
    */
   name: string;
   /**
@@ -271,7 +254,6 @@ export interface Course {
    * Select the department (subject)
    */
   department: number | Department;
-  university: number | University;
   /**
    * Semesters filtered by department
    */
@@ -296,7 +278,6 @@ export interface Class {
    */
   title?: string | null;
   section: string;
-  university: number | University;
   department: number | Department;
   course?: (number | null) | Course;
   semester?: (number | null) | Semester;
@@ -336,8 +317,7 @@ export interface Student {
    */
   displayTitle?: string | null;
   rollNo: string;
-  university: number | University;
-  department?: (number | null) | Department;
+  department: number | Department;
   semester: number | Semester;
   batch: string;
   admissionDate: string;
@@ -357,20 +337,16 @@ export interface Student {
 export interface Enrollment {
   id: number;
   /**
-   * Select university first to filter students and classes
-   */
-  university: number | University;
-  /**
    * Select department to filter students and classes
    */
-  department?: (number | null) | Department;
+  department: number | Department;
   semester?: (number | null) | Semester;
   /**
-   * Students filtered by university, department & semester
+   * Students filtered by department & semester
    */
   student?: (number | null) | Student;
   /**
-   * Classes filtered by university, department & semester
+   * Classes filtered by department & semester
    */
   class?: (number | null) | Class;
   status: 'enrolled' | 'dropped' | 'completed';
@@ -389,8 +365,7 @@ export interface Timetable {
    * Auto-generated: Class - Subject - Teacher
    */
   displayTitle?: string | null;
-  university: number | University;
-  department?: (number | null) | Department;
+  department: number | Department;
   semester?: (number | null) | Semester;
   /**
    * Select class (e.g., CS101 Section A)
@@ -485,10 +460,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'departments';
         value: number | Department;
-      } | null)
-    | ({
-        relationTo: 'universities';
-        value: number | University;
       } | null)
     | ({
         relationTo: 'semesters';
@@ -627,22 +598,11 @@ export interface DepartmentsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "universities_select".
- */
-export interface UniversitiesSelect<T extends boolean = true> {
-  name?: T;
-  status?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "semesters_select".
  */
 export interface SemestersSelect<T extends boolean = true> {
   session?: T;
   semesterNumber?: T;
-  university?: T;
   name?: T;
   code?: T;
   department?: T;
@@ -662,7 +622,6 @@ export interface CoursesSelect<T extends boolean = true> {
   code?: T;
   creditHours?: T;
   department?: T;
-  university?: T;
   semester?: T;
   teacher?: T;
   updatedAt?: T;
@@ -675,7 +634,6 @@ export interface CoursesSelect<T extends boolean = true> {
 export interface ClassesSelect<T extends boolean = true> {
   title?: T;
   section?: T;
-  university?: T;
   department?: T;
   course?: T;
   semester?: T;
@@ -696,7 +654,6 @@ export interface ClassesSelect<T extends boolean = true> {
 export interface StudentsSelect<T extends boolean = true> {
   displayTitle?: T;
   rollNo?: T;
-  university?: T;
   department?: T;
   semester?: T;
   batch?: T;
@@ -710,7 +667,6 @@ export interface StudentsSelect<T extends boolean = true> {
  * via the `definition` "enrollments_select".
  */
 export interface EnrollmentsSelect<T extends boolean = true> {
-  university?: T;
   department?: T;
   semester?: T;
   student?: T;
@@ -725,7 +681,6 @@ export interface EnrollmentsSelect<T extends boolean = true> {
  */
 export interface TimetableSelect<T extends boolean = true> {
   displayTitle?: T;
-  university?: T;
   department?: T;
   semester?: T;
   class?: T;

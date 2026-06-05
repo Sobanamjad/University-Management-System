@@ -10,8 +10,7 @@ export default function CreateStudentPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  
-  const [universities, setUniversities] = useState<any[]>([])
+
   const [departments, setDepartments] = useState<any[]>([])
   const [semesters, setSemesters] = useState<any[]>([])
   const [users, setUsers] = useState<any[]>([])
@@ -20,7 +19,6 @@ export default function CreateStudentPage() {
     rollNo: '',
     batch: '',
     admissionDate: '',
-    university: '',
     department: '',
     semester: '',
     user: '',
@@ -29,14 +27,12 @@ export default function CreateStudentPage() {
   useEffect(() => {
     const fetchRelations = async () => {
       try {
-        const [uniRes, deptRes, semRes, userRes] = await Promise.all([
-          fetch('/api/universities?limit=100'),
+        const [deptRes, semRes, userRes] = await Promise.all([
           fetch('/api/departments?limit=100'),
           fetch('/api/semesters?limit=100'),
-          fetch('/api/users?limit=100&where[role][equals]=student') // only fetching student role users
+          fetch('/api/users?limit=100&where[role][equals]=student'), // only fetching student role users
         ])
-        
-        if (uniRes.ok) setUniversities((await uniRes.json()).docs || [])
+
         if (deptRes.ok) setDepartments((await deptRes.json()).docs || [])
         if (semRes.ok) setSemesters((await semRes.json()).docs || [])
         if (userRes.ok) setUsers((await userRes.json()).docs || [])
@@ -168,9 +164,13 @@ export default function CreateStudentPage() {
                     onChange={handleChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                   >
-                    <option value="" disabled>Select Student Account</option>
-                    {users.map(u => (
-                      <option key={u.id} value={u.id}>{u.name || u.email}</option>
+                    <option value="" disabled>
+                      Select Student Account
+                    </option>
+                    {users.map((u) => (
+                      <option key={u.id} value={u.id}>
+                        {u.name || u.email}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -178,24 +178,7 @@ export default function CreateStudentPage() {
 
               {/* Relationships */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    University <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    name="university"
-                    required
-                    value={formData.university}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                  >
-                    <option value="" disabled>Select University</option>
-                    {universities.map(uni => (
-                      <option key={uni.id} value={uni.id}>{uni.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
+                <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Department <span className="text-red-500">*</span>
                   </label>
@@ -206,9 +189,13 @@ export default function CreateStudentPage() {
                     onChange={handleChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                   >
-                    <option value="" disabled>Select Department</option>
-                    {departments.map(dept => (
-                      <option key={dept.id} value={dept.id}>{dept.name}</option>
+                    <option value="" disabled>
+                      Select Department
+                    </option>
+                    {departments.map((dept) => (
+                      <option key={dept.id} value={dept.id}>
+                        {dept.name}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -226,13 +213,16 @@ export default function CreateStudentPage() {
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                 >
-                  <option value="" disabled>Select Semester</option>
-                  {semesters.map(sem => (
-                    <option key={sem.id} value={sem.id}>{sem.name}</option>
+                  <option value="" disabled>
+                    Select Semester
+                  </option>
+                  {semesters.map((sem) => (
+                    <option key={sem.id} value={sem.id}>
+                      {sem.name}
+                    </option>
                   ))}
                 </select>
               </div>
-
             </div>
 
             <div className="mt-8 pt-6 border-t border-gray-100 flex justify-end space-x-4">
