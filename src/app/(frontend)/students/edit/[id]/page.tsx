@@ -14,7 +14,6 @@ export default function EditStudentPage() {
   const [fetching, setFetching] = useState(true)
   const [error, setError] = useState('')
 
-  const [universities, setUniversities] = useState<any[]>([])
   const [departments, setDepartments] = useState<any[]>([])
   const [semesters, setSemesters] = useState<any[]>([])
   const [users, setUsers] = useState<any[]>([])
@@ -23,7 +22,6 @@ export default function EditStudentPage() {
     rollNo: '',
     batch: '',
     admissionDate: '',
-    university: '',
     department: '',
     semester: '',
     user: '',
@@ -32,15 +30,13 @@ export default function EditStudentPage() {
   useEffect(() => {
     const fetchRelationsAndData = async () => {
       try {
-        const [uniRes, deptRes, semRes, userRes, studentRes] = await Promise.all([
-          fetch('/api/universities?limit=100'),
+        const [deptRes, semRes, userRes, studentRes] = await Promise.all([
           fetch('/api/departments?limit=100'),
           fetch('/api/semesters?limit=100'),
           fetch('/api/users?limit=100&where[role][equals]=student'),
           fetch(`/api/students/${id}`),
         ])
 
-        if (uniRes.ok) setUniversities((await uniRes.json()).docs || [])
         if (deptRes.ok) setDepartments((await deptRes.json()).docs || [])
         if (semRes.ok) setSemesters((await semRes.json()).docs || [])
         if (userRes.ok) setUsers((await userRes.json()).docs || [])
@@ -51,8 +47,6 @@ export default function EditStudentPage() {
             rollNo: data.rollNo || '',
             batch: data.batch || '',
             admissionDate: data.admissionDate ? data.admissionDate.split('T')[0] : '',
-            university:
-              typeof data.university === 'object' ? data.university?.id : data.university || '',
             department:
               typeof data.department === 'object' ? data.department?.id : data.department || '',
             semester: typeof data.semester === 'object' ? data.semester?.id : data.semester || '',
@@ -209,27 +203,6 @@ export default function EditStudentPage() {
 
                 {/* Relationships */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      University <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      name="university"
-                      required
-                      value={formData.university}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                    >
-                      <option value="" disabled>
-                        Select University
-                      </option>
-                      {universities.map((uni) => (
-                        <option key={uni.id} value={uni.id}>
-                          {uni.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Department <span className="text-red-500">*</span>

@@ -28,7 +28,6 @@ export default function ClassEditPage() {
   const [success, setSuccess] = useState('')
   const [formData, setFormData] = useState({
     section: '',
-    university: '',
     department: '',
     course: '',
     semester: '',
@@ -40,7 +39,6 @@ export default function ClassEditPage() {
     status: 'scheduled',
   })
 
-  const [universities, setUniversities] = useState([])
   const [departments, setDepartments] = useState([])
   const [courses, setCourses] = useState([])
   const [semesters, setSemesters] = useState([])
@@ -58,7 +56,6 @@ export default function ClassEditPage() {
         const data = await res.json()
         setFormData({
           section: data.section || '',
-          university: data.university?.id || '',
           department: data.department?.id || '',
           course: data.course?.id || '',
           semester: data.semester?.id || '',
@@ -81,21 +78,18 @@ export default function ClassEditPage() {
 
   const fetchOptions = async () => {
     try {
-      const [uniRes, deptRes, courseRes, semRes, teacherRes] = await Promise.all([
-        fetch('/api/universities?limit=100'),
+      const [deptRes, courseRes, semRes, teacherRes] = await Promise.all([
         fetch('/api/departments?limit=100'),
         fetch('/api/courses?limit=100'),
         fetch('/api/semesters?limit=100'),
         fetch('/api/users?where[role][equals]=teacher&limit=100'),
       ])
 
-      const universitiesData = await uniRes.json()
       const departmentsData = await deptRes.json()
       const coursesData = await courseRes.json()
       const semestersData = await semRes.json()
       const teachersData = await teacherRes.json()
 
-      setUniversities(universitiesData.docs || [])
       setDepartments(departmentsData.docs || [])
       setCourses(coursesData.docs || [])
       setSemesters(semestersData.docs || [])
@@ -251,27 +245,26 @@ export default function ClassEditPage() {
                 Academic Relations
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* University */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    University <span className="text-red-500">*</span>
+                    Department <span className="text-red-500">*</span>
                   </label>
                   <select
-                    value={formData.university}
-                    onChange={(e) => setFormData({ ...formData, university: e.target.value })}
+                    value={formData.department}
+                    onChange={(e) => setFormData({ ...formData, department: e.target.value })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     required
                   >
-                    <option value="">Select University</option>
-                    {universities.map((uni: any) => (
-                      <option key={uni.id} value={uni.id}>
-                        {uni.name}
+                    <option value="">Select Department</option>
+                    {departments.map((dept: any) => (
+                      <option key={dept.id} value={dept.id}>
+                        {dept.name}
                       </option>
                     ))}
                   </select>
                 </div>
 
-                {/* Department */}
+                {/* Course */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Department <span className="text-red-500">*</span>

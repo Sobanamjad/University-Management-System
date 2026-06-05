@@ -33,21 +33,11 @@ export const Students: CollectionConfig = {
       },
     },
     {
-      name: 'university',
-      type: 'relationship',
-      relationTo: 'universities',
-      required: true,
-      label: 'University',
-    },
-    {
       name: 'department',
       type: 'relationship',
       relationTo: 'departments',
       required: true,
       label: 'Department',
-      admin: {
-        condition: (data) => Boolean(data?.university),
-      },
     },
     {
       name: 'semester',
@@ -56,10 +46,9 @@ export const Students: CollectionConfig = {
       required: true,
       label: 'Current Semester',
       filterOptions: ({ data }) => {
-        if (data?.department && data?.university) {
+        if (data?.department) {
           return {
             department: { equals: data.department },
-            university: { equals: data.university },
           } as any
         }
         return true
@@ -107,9 +96,6 @@ export const Students: CollectionConfig = {
     {
       fields: ['user'],
       unique: true,
-    },
-    {
-      fields: ['university'],
     },
     {
       fields: ['department'],

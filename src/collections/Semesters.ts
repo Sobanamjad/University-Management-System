@@ -52,17 +52,6 @@ export const Semesters: CollectionConfig = {
         width: '50%',
       },
     },
-    {
-      name: 'university',
-      type: 'relationship',
-      relationTo: 'universities',
-      required: true,
-      label: 'University',
-      admin: {
-        description: 'Select university first',
-      },
-    },
-
     // ===== 3. SEMESTER NAME (Auto-generated) =====
     {
       name: 'name',
@@ -71,24 +60,15 @@ export const Semesters: CollectionConfig = {
       label: 'Semester Name',
       admin: {
         readOnly: true,
-        description: 'Auto-generated from session, semester number, department and university',
+        description: 'Auto-generated from session, semester number, and department',
       },
       hooks: {
         beforeValidate: [
           async ({ data, req }) => {
-            if (data?.session && data?.semesterNumber && data?.university && data?.department) {
+            if (data?.session && data?.semesterNumber && data?.department) {
               const semesterText = getSemesterText(data.semesterNumber)
 
               try {
-                // Fetch university name
-                const uni = await req.payload.findByID({
-                  collection: 'universities',
-                  id: String(data.university),
-                  depth: 0,
-                })
-                const uniName = uni?.name || 'Unknown'
-
-                // Fetch department code
                 const dept = await req.payload.findByID({
                   collection: 'departments',
                   id: String(data.department),
@@ -96,7 +76,7 @@ export const Semesters: CollectionConfig = {
                 })
                 const deptCode = dept?.code || 'DEP'
 
-                return `${data.session} - ${semesterText} - ${deptCode} - ${uniName}`
+                return `${data.session} - ${semesterText} - ${deptCode}`
               } catch (error) {
                 return `${data.session} - ${semesterText}`
               }
@@ -120,20 +100,11 @@ export const Semesters: CollectionConfig = {
       hooks: {
         beforeValidate: [
           async ({ data, req }) => {
-            if (data?.session && data?.semesterNumber && data?.university && data?.department) {
+            if (data?.session && data?.semesterNumber && data?.department) {
               const sessionCode = data.session.replace(/\s+/g, '').toUpperCase()
               const semesterSuffix = getSemesterSuffix(data.semesterNumber)
 
               try {
-                // Fetch university code
-                const uni = await req.payload.findByID({
-                  collection: 'universities',
-                  id: String(data.university),
-                  depth: 0,
-                })
-                const uniCode = uni?.name?.slice(0, 3).toUpperCase() || 'UNI'
-
-                // Fetch department code
                 const dept = await req.payload.findByID({
                   collection: 'departments',
                   id: String(data.department),
@@ -141,7 +112,7 @@ export const Semesters: CollectionConfig = {
                 })
                 const deptCode = dept?.code?.toUpperCase() || 'DEP'
 
-                return `${sessionCode}-${semesterSuffix}-${deptCode}-${uniCode}`
+                return `${sessionCode}-${semesterSuffix}-${deptCode}`
               } catch (error) {
                 return `${sessionCode}-${semesterSuffix}`
               }
@@ -224,7 +195,7 @@ export const Semesters: CollectionConfig = {
   // ===== INDEXES =====
   indexes: [
     {
-      fields: ['session', 'semesterNumber', 'department', 'university'],
+      fields: ['session', 'semesterNumber', 'department'],
       unique: true,
     },
     {
@@ -276,7 +247,6 @@ export const Semesters: CollectionConfig = {
             collection: 'semesters',
             where: {
               department: { equals: data.department },
-              university: { equals: data.university },
               isActive: { equals: true },
               id: { not_equals: originalDoc?.id || '0' },
             },

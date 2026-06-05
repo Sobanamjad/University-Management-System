@@ -22,24 +22,12 @@ export const Enrollments: CollectionConfig = {
   },
   fields: [
     {
-      name: 'university',
-      type: 'relationship',
-      relationTo: 'universities',
-      required: true,
-      label: 'University',
-      admin: {
-        description: 'Select university first to filter students and classes',
-      },
-    },
-
-    {
       name: 'department',
       type: 'relationship',
       relationTo: 'departments',
       required: true,
       label: 'Department',
       admin: {
-        condition: (data) => Boolean(data?.university),
         description: 'Select department to filter students and classes',
       },
     },
@@ -53,15 +41,10 @@ export const Enrollments: CollectionConfig = {
       label: 'Semester',
       filterOptions: ({ data }) => {
         const deptId = toId(data?.department)
-        const uniId = toId(data?.university)
-
-        if (deptId && uniId) {
-          return {
-            and: [{ department: { equals: deptId } }, { university: { equals: uniId } }],
-          } as any
-        }
         if (deptId) {
-          return { department: { equals: deptId } } as any
+          return {
+            department: { equals: deptId },
+          } as any
         }
         return true
       },
@@ -77,20 +60,18 @@ export const Enrollments: CollectionConfig = {
       required: true,
       label: 'Student',
       filterOptions: ({ data }) => {
-        const uniId = toId(data?.university)
         const deptId = toId(data?.department)
         const semId = toId(data?.semester)
 
         const where: any = { and: [] }
-        if (uniId) where.and.push({ university: { equals: uniId } })
         if (deptId) where.and.push({ department: { equals: deptId } })
         if (semId) where.and.push({ semester: { equals: semId } })
 
         return where.and.length > 0 ? (where as any) : true
       },
       admin: {
-        condition: (data) => Boolean(data?.university && data?.department && data?.semester),
-        description: 'Students filtered by university, department & semester',
+        condition: (data) => Boolean(data?.department && data?.semester),
+        description: 'Students filtered by department & semester',
       },
     },
 
@@ -101,20 +82,18 @@ export const Enrollments: CollectionConfig = {
       required: true,
       label: 'Class',
       filterOptions: ({ data }) => {
-        const uniId = toId(data?.university)
         const deptId = toId(data?.department)
         const semId = toId(data?.semester)
 
         const where: any = { and: [] }
-        if (uniId) where.and.push({ university: { equals: uniId } })
         if (deptId) where.and.push({ department: { equals: deptId } })
         if (semId) where.and.push({ semester: { equals: semId } })
 
         return where.and.length > 0 ? (where as any) : true
       },
       admin: {
-        condition: (data) => Boolean(data?.university && data?.department && data?.semester),
-        description: 'Classes filtered by university, department & semester',
+        condition: (data) => Boolean(data?.department && data?.semester),
+        description: 'Classes filtered by department & semester',
       },
     },
 

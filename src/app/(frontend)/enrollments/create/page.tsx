@@ -11,14 +11,12 @@ export default function CreateEnrollmentPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const [universities, setUniversities] = useState<any[]>([])
   const [departments, setDepartments] = useState<any[]>([])
   const [semesters, setSemesters] = useState<any[]>([])
   const [students, setStudents] = useState<any[]>([])
   const [classes, setClasses] = useState<any[]>([])
 
   const [formData, setFormData] = useState({
-    university: '',
     department: '',
     semester: '',
     student: '',
@@ -26,33 +24,17 @@ export default function CreateEnrollmentPage() {
     status: 'enrolled',
   })
 
-  // Initial fetch: Universities
   useEffect(() => {
-    fetch('/api/universities?limit=100')
+    fetch('/api/departments?limit=100')
       .then((res) => res.json())
-      .then((data) => setUniversities(data.docs || []))
+      .then((data) => setDepartments(data.docs || []))
   }, [])
 
-  // Depend fetch: Departments when University changes
   useEffect(() => {
-    if (formData.university) {
-      fetch('/api/departments?limit=100')
-        .then((res) => res.json())
-        .then((data) => setDepartments(data.docs || []))
-    }
-  }, [formData.university])
-
-  // Depend fetch: Semesters when University or Department changes
-  useEffect(() => {
-    if (formData.university && formData.department) {
+    if (formData.department) {
       const q = new URLSearchParams({
         limit: '100',
-        where: JSON.stringify({
-          and: [
-            { university: { equals: formData.university } },
-            { department: { equals: formData.department } },
-          ],
-        }),
+        where: JSON.stringify({ department: { equals: formData.department } }),
       })
       fetch(`/api/semesters?${q}`)
         .then((res) => res.json())
@@ -60,16 +42,14 @@ export default function CreateEnrollmentPage() {
     } else {
       setSemesters([])
     }
-  }, [formData.university, formData.department])
+  }, [formData.department])
 
-  // Depend fetch: Students and Classes when Uni, Dept, AND Semester are selected
   useEffect(() => {
-    if (formData.university && formData.department && formData.semester) {
+    if (formData.department && formData.semester) {
       const q = new URLSearchParams({
         limit: '100',
         where: JSON.stringify({
           and: [
-            { university: { equals: formData.university } },
             { department: { equals: formData.department } },
             { semester: { equals: formData.semester } },
           ],
@@ -86,21 +66,16 @@ export default function CreateEnrollmentPage() {
         .then((res) => res.json())
         .then((data) => setClasses(data.docs || []))
     }
-  }, [formData.university, formData.department, formData.semester])
+  }, [formData.department, formData.semester])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
 
     // Reset dependant fields
-    if (name === 'university') {
-      setFormData((prev) => ({ ...prev, department: '', semester: '', student: '', class: '' }))
-      setSemesters([])
-      setStudents([])
-      setClasses([])
-    }
     if (name === 'department') {
       setFormData((prev) => ({ ...prev, semester: '', student: '', class: '' }))
+      setSemesters([])
       setStudents([])
       setClasses([])
     }
@@ -118,7 +93,6 @@ export default function CreateEnrollmentPage() {
       // Ensure we send IDs as numbers if possible, though Payload REST handles strings
       const payload = {
         ...formData,
-        university: Number(formData.university),
         department: Number(formData.department),
         semester: Number(formData.semester),
         student: Number(formData.student),
@@ -187,33 +161,15 @@ export default function CreateEnrollmentPage() {
               {/* Filter Selection Grid */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-blue-50/50 rounded-xl border border-blue-100 text-sm mb-2">
                 <div>
-                  <label className="block font-semibold text-blue-900 mb-1">University</label>
-                  <select
-                    name="university"
-                    required
-                    value={formData.university}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white transition-all text-gray-700"
-                  >
-                    <option value="">Select University</option>
-                    {universities.map((uni) => (
-                      <option key={uni.id} value={uni.id}>
-                        {uni.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
                   <label className="block font-semibold text-blue-900 mb-1">Department</label>
                   <select
                     name="department"
                     required
-                    disabled={!formData.university}
                     value={formData.department}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white disabled:opacity-50 transition-all text-gray-700"
+                    className="w-full px-3 py-2 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white transition-all text-gray-700"
                   >
-                    <option value="">Select Dept</option>
+                    <option value="">Select Department</option>
                     {departments.map((dept) => (
                       <option key={dept.id} value={dept.id}>
                         {dept.name}
@@ -264,7 +220,7 @@ export default function CreateEnrollmentPage() {
                   </select>
                   {!formData.semester && (
                     <p className="text-[10px] text-gray-400 mt-1 italic">
-                       Complete filters above to see students
+                      Complete filters above to see students
                     </p>
                   )}
                 </div>

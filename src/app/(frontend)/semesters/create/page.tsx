@@ -10,8 +10,7 @@ export default function CreateSemesterPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  
-  const [universities, setUniversities] = useState<any[]>([])
+
   const [departments, setDepartments] = useState<any[]>([])
 
   const [formData, setFormData] = useState({
@@ -19,7 +18,6 @@ export default function CreateSemesterPage() {
     code: '',
     session: '',
     semesterNumber: '1',
-    university: '',
     department: '',
     startDate: '',
     endDate: '',
@@ -30,15 +28,7 @@ export default function CreateSemesterPage() {
   useEffect(() => {
     const fetchRelations = async () => {
       try {
-        const [uniRes, deptRes] = await Promise.all([
-          fetch('/api/universities?limit=100'),
-          fetch('/api/departments?limit=100')
-        ])
-        
-        if (uniRes.ok) {
-          const uData = await uniRes.json()
-          setUniversities(uData.docs || [])
-        }
+        const deptRes = await fetch('/api/departments?limit=100')
         if (deptRes.ok) {
           const dData = await deptRes.json()
           setDepartments(dData.docs || [])
@@ -51,7 +41,8 @@ export default function CreateSemesterPage() {
   }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const value = e.target.type === 'checkbox' ? (e.target as HTMLInputElement).checked : e.target.value
+    const value =
+      e.target.type === 'checkbox' ? (e.target as HTMLInputElement).checked : e.target.value
     setFormData((prev) => ({ ...prev, [e.target.name]: value }))
   }
 
@@ -173,8 +164,10 @@ export default function CreateSemesterPage() {
                     onChange={handleChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                   >
-                    {[1,2,3,4,5,6,7,8].map(n => (
-                      <option key={n} value={n.toString()}>{n}</option>
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+                      <option key={n} value={n.toString()}>
+                        {n}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -182,24 +175,7 @@ export default function CreateSemesterPage() {
 
               {/* Relationships */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    University <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    name="university"
-                    required
-                    value={formData.university}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                  >
-                    <option value="" disabled>Select University</option>
-                    {universities.map(uni => (
-                      <option key={uni.id} value={uni.id}>{uni.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
+                <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Department <span className="text-red-500">*</span>
                   </label>
@@ -210,9 +186,13 @@ export default function CreateSemesterPage() {
                     onChange={handleChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                   >
-                    <option value="" disabled>Select Department</option>
-                    {departments.map(dept => (
-                      <option key={dept.id} value={dept.id}>{dept.name}</option>
+                    <option value="" disabled>
+                      Select Department
+                    </option>
+                    {departments.map((dept) => (
+                      <option key={dept.id} value={dept.id}>
+                        {dept.name}
+                      </option>
                     ))}
                   </select>
                 </div>

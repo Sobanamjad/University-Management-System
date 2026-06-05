@@ -53,16 +53,7 @@ export const Classes: CollectionConfig = {
       },
     },
 
-    // ===== 2. UNIVERSITY =====
-    {
-      name: 'university',
-      type: 'relationship',
-      relationTo: 'universities',
-      required: true,
-      label: 'University',
-    },
-
-    // ===== 3. DEPARTMENT =====
+    // ===== 2. DEPARTMENT =====
     {
       name: 'department',
       type: 'relationship',
@@ -81,20 +72,16 @@ export const Classes: CollectionConfig = {
       filterOptions: ({ data }) => {
         const rawDept =
           typeof data?.department === 'object' ? data.department?.value : data?.department
-        const rawUni =
-          typeof data?.university === 'object' ? data.university?.value : data?.university
         const deptId = toId(rawDept)
-        const uniId = toId(rawUni)
-        if (deptId && uniId) {
+        if (deptId) {
           return {
             department: { equals: deptId },
-            university: { equals: uniId },
           } as any
         }
         return true
       },
       admin: {
-        condition: (data) => Boolean(data?.department && data?.university),
+        condition: (data) => Boolean(data?.department),
       },
     },
 
@@ -108,20 +95,16 @@ export const Classes: CollectionConfig = {
       filterOptions: ({ data }) => {
         const rawDept =
           typeof data?.department === 'object' ? data.department?.value : data?.department
-        const rawUni =
-          typeof data?.university === 'object' ? data.university?.value : data?.university
         const deptId = toId(rawDept)
-        const uniId = toId(rawUni)
-        if (deptId && uniId) {
+        if (deptId) {
           return {
             department: { equals: deptId },
-            university: { equals: uniId },
           } as any
         }
         return true // allow all when context unavailable (prevents server-side rejection)
       },
       admin: {
-        condition: (data) => Boolean(data?.department && data?.university),
+        condition: (data) => Boolean(data?.department),
       },
     },
 
@@ -274,7 +257,6 @@ export const Classes: CollectionConfig = {
             const extractId = (val: unknown) =>
               val && typeof val === 'object' && 'id' in val ? (val as { id: number }).id : val
             data.department = extractId(course.department)
-            data.university = extractId(course.university)
           }
         }
         return data

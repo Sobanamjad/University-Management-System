@@ -9,7 +9,6 @@ import {
   BookOpen,
   Calendar,
   Clock,
-  University,
   Layers,
   UserCheck,
   GraduationCap,
@@ -26,7 +25,6 @@ export default function DashboardPage() {
   const [showDropdown, setShowDropdown] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const [stats, setStats] = useState({
-    universities: 0,
     departments: 0,
     users: 0,
     students: 0,
@@ -66,9 +64,8 @@ export default function DashboardPage() {
 
   const fetchStats = async () => {
     try {
-      const [universities, departments, users, students, semesters, courses, classes, enrollments] =
+      const [departments, users, students, semesters, courses, classes, enrollments] =
         await Promise.all([
-          fetch('/api/universities?limit=0').then((res) => res.json()),
           fetch('/api/departments?limit=0').then((res) => res.json()),
           fetch('/api/users?limit=0').then((res) => res.json()),
           fetch('/api/students?limit=0').then((res) => res.json()),
@@ -82,7 +79,6 @@ export default function DashboardPage() {
       const coordinators = users.docs.filter((u: any) => u.role === 'coordinator').length
 
       setStats({
-        universities: universities.totalDocs || 0,
         departments: departments.totalDocs || 0,
         users: users.totalDocs || 0,
         students: students.totalDocs || 0,
@@ -241,18 +237,6 @@ export default function DashboardPage() {
       <div className="p-6">
         {/* Stats Grid - Same as before */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {/* Universities Card */}
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <University className="w-6 h-6 text-blue-600" />
-              </div>
-              <span className="text-3xl font-bold text-gray-900">{stats.universities}</span>
-            </div>
-            <h3 className="text-gray-600 font-medium">Universities</h3>
-            <p className="text-sm text-gray-500 mt-1">Total registered universities</p>
-          </div>
-
           {/* Departments Card */}
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-4">

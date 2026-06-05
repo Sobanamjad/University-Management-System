@@ -4,7 +4,19 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Calendar, Edit, Activity, Hash, Building2, Layers, Clock, AlertCircle, CheckCircle, XCircle } from 'lucide-react'
+import {
+  ArrowLeft,
+  Calendar,
+  Edit,
+  Activity,
+  Hash,
+  Building2,
+  Layers,
+  Clock,
+  AlertCircle,
+  CheckCircle,
+  XCircle,
+} from 'lucide-react'
 
 export default function ViewSemesterPage() {
   const { id } = useParams()
@@ -115,7 +127,9 @@ export default function ViewSemesterPage() {
                           className={`inline-flex items-center space-x-2 px-2.5 py-1 rounded-full text-xs font-medium ${getStatusColor(semester.status)}`}
                         >
                           {getStatusIcon(semester.status)}
-                          <span>{semester.status.charAt(0).toUpperCase() + semester.status.slice(1)}</span>
+                          <span>
+                            {semester.status.charAt(0).toUpperCase() + semester.status.slice(1)}
+                          </span>
                         </span>
                         {semester.isActive && (
                           <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
@@ -134,27 +148,22 @@ export default function ViewSemesterPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                     <div>
                       <h3 className="text-sm font-medium text-gray-500 flex items-center mb-2">
-                        <Building2 className="w-4 h-4 mr-2" />
-                        University
-                      </h3>
-                      <p className="text-gray-900 font-medium">{semester.university?.name || 'N/A'}</p>
-                    </div>
-
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-500 flex items-center mb-2">
                         <Layers className="w-4 h-4 mr-2" />
                         Department
                       </h3>
-                      <p className="text-gray-900 font-medium">{semester.department?.name || 'N/A'}</p>
+                      <p className="text-gray-900 font-medium">
+                        {semester.department?.name || 'N/A'}
+                      </p>
                     </div>
-                    
+
                     <div>
                       <h3 className="text-sm font-medium text-gray-500 flex items-center mb-2">
                         <Calendar className="w-4 h-4 mr-2" />
                         Duration
                       </h3>
                       <p className="text-gray-900 font-medium">
-                        {new Date(semester.startDate).toLocaleDateString()} &mdash; {new Date(semester.endDate).toLocaleDateString()}
+                        {new Date(semester.startDate).toLocaleDateString()} &mdash;{' '}
+                        {new Date(semester.endDate).toLocaleDateString()}
                       </p>
                     </div>
 
@@ -181,7 +190,9 @@ export default function ViewSemesterPage() {
                   <div className="space-y-4">
                     <div>
                       <span className="block text-xs text-gray-500 mb-1">Semester ID</span>
-                      <span className="text-sm font-medium font-mono text-gray-900">{semester.id}</span>
+                      <span className="text-sm font-medium font-mono text-gray-900">
+                        {semester.id}
+                      </span>
                     </div>
                     <div>
                       <span className="block text-xs text-gray-500 mb-1">Created At</span>

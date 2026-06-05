@@ -22,13 +22,6 @@ import {
 
 const features = [
   {
-    icon: Building2,
-    title: 'Universities',
-    description: 'Manage university profiles, campuses, and institutional data in one place.',
-    href: '/universities',
-    color: 'blue',
-  },
-  {
     icon: Layers,
     title: 'Departments',
     description: 'Organize academic departments, assign heads, and track programs.',
@@ -278,7 +271,7 @@ export default function HomePage() {
         <div className="relative z-10 text-center max-w-4xl mx-auto">
           <div className="inline-flex items-center space-x-2 px-4 py-2 bg-white/10 backdrop-blur-xl rounded-full border border-white/20 mb-8">
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-            <span className="text-white/70 text-sm font-medium">University Management System</span>
+            <span className="text-white/70 text-sm font-medium">Academic Management System</span>
           </div>
 
           <h1
@@ -288,9 +281,9 @@ export default function HomePage() {
             Manage Your
             <br />
             <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-              University
+              Academic
             </span>{' '}
-            Seamlessly
+            Workflow
           </h1>
 
           <p
@@ -298,8 +291,8 @@ export default function HomePage() {
             className="mt-6 text-lg md:text-xl text-white/60 max-w-2xl mx-auto leading-relaxed"
           >
             {user
-              ? `Welcome back, ${user.name || user.email}. Access your dashboard to manage universities, students, courses, and more.`
-              : 'A comprehensive platform to manage universities, departments, students, courses, enrollments, timetables, and everything in between.'}
+              ? `Welcome back, ${user.name || user.email}. Access your dashboard to manage students, courses, departments, and more.`
+              : 'A comprehensive platform to manage academic operations, departments, students, courses, enrollments, timetables, and everything in between.'}
           </p>
 
           <div
@@ -372,7 +365,8 @@ export default function HomePage() {
               Everything You Need
             </h2>
             <p className="mt-4 text-gray-600 text-lg max-w-2xl mx-auto">
-              Manage every aspect of your university with dedicated modules designed for efficiency.
+              Manage every aspect of academic operations with dedicated modules designed for
+              efficiency.
             </p>
           </div>
 
@@ -411,8 +405,8 @@ export default function HomePage() {
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Ready to Get Started?</h2>
           <p className="text-white/60 text-lg mb-8">
             {user
-              ? 'Head to the dashboard to manage your university.'
-              : 'Sign in to start managing your university today.'}
+              ? 'Head to the dashboard to manage your academic operations.'
+              : 'Sign in to start managing your academic workflow today.'}
           </p>
           <Link
             href={user ? '/dashboard' : '/login'}
@@ -428,7 +422,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between text-sm text-gray-500">
           <div className="flex items-center space-x-2 mb-4 md:mb-0">
             <GraduationCap className="w-4 h-4" />
-            <span>University Management System</span>
+            <span>Academic Management System</span>
           </div>
           <div className="flex items-center space-x-6">
             {/* <Link href="/admin" className="hover:text-gray-300 transition-colors">

@@ -189,12 +189,6 @@ export default function SemestersPage() {
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">University:</span>
-                        <span className="text-sm font-medium text-gray-900">
-                          {semester.university?.name || 'N/A'}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600">Department:</span>
                         <span className="text-sm font-medium text-gray-900">
                           {semester.department?.name || 'N/A'}
