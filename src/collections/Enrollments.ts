@@ -16,7 +16,7 @@ export const Enrollments: CollectionConfig = {
   slug: 'enrollments',
   admin: {
     useAsTitle: 'id',
-    group: 'Academic',
+    group: 'University',
     defaultColumns: ['student', 'semester', 'class', 'status', 'createdAt'],
     description: 'Manage student enrollments in class sections',
   },

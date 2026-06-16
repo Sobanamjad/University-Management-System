@@ -61,7 +61,7 @@ export default function CreateDepartmentPage() {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Add Department</h1>
-              <p className="text-sm text-gray-600">Register a new academic department</p>
+              <p className="text-sm text-gray-600">Register a new university department</p>
             </div>
           </div>
         </div>

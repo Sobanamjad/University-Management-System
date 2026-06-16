@@ -70,7 +70,7 @@ export default function DepartmentsPage() {
               <Layers className="w-8 h-8 text-blue-600" />
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Departments</h1>
-                <p className="text-sm text-gray-600">Manage academic departments</p>
+                <p className="text-sm text-gray-600">Manage university departments</p>
               </div>
             </div>
             <Link

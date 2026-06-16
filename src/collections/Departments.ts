@@ -4,7 +4,7 @@ export const Departments: CollectionConfig = {
   slug: 'departments',
   admin: {
     useAsTitle: 'name',
-    group: 'Academic',
+    group: 'University',
     description: 'Manage university departments',
   },
   fields: [

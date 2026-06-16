@@ -111,7 +111,7 @@ export default function EditSemesterPage() {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Edit Semester</h1>
-              <p className="text-sm text-gray-600">Update academic semester information</p>
+              <p className="text-sm text-gray-600">Update university semester information</p>
             </div>
           </div>
         </div>
@@ -167,7 +167,7 @@ export default function EditSemesterPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Academic Session <span className="text-red-500">*</span>
+                      University Session <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"

@@ -15,7 +15,7 @@ export const TimeTable: CollectionConfig = {
   slug: 'timetable',
   admin: {
     useAsTitle: 'displayTitle',
-    group: 'Academic',
+    group: 'University',
     defaultColumns: ['displayTitle', 'class', 'teacher', 'day', 'timeSlot', 'subject', 'room'],
     description: 'Complete timetable - View by class OR by teacher',
   },

@@ -88,7 +88,7 @@ export default function CreateSemesterPage() {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Add Semester</h1>
-              <p className="text-sm text-gray-600">Create a new academic semester</p>
+              <p className="text-sm text-gray-600">Create a new university semester</p>
             </div>
           </div>
         </div>
@@ -141,7 +141,7 @@ export default function CreateSemesterPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Academic Session <span className="text-red-500">*</span>
+                    University Session <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"

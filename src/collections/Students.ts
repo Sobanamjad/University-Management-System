@@ -5,9 +5,9 @@ export const Students: CollectionConfig = {
   slug: 'students',
   admin: {
     useAsTitle: 'displayTitle',
-    group: 'Academic',
+    group: 'University',
     defaultColumns: ['displayTitle', 'department', 'semester', 'batch'],
-    description: 'Manage student academic records',
+    description: 'Manage student University records',
   },
   fields: [
     // ===== DISPLAY TITLE (Auto: rollNo - Name) =====
@@ -21,7 +21,7 @@ export const Students: CollectionConfig = {
       },
     },
 
-    // ===== ACADEMIC INFO ONLY =====
+    // ===== University INFO ONLY =====
     {
       name: 'rollNo',
       type: 'text',
