@@ -7,7 +7,7 @@ export const Courses: CollectionConfig = {
   slug: 'courses',
   admin: {
     useAsTitle: 'title',
-    group: 'Academic',
+    group: 'University',
     defaultColumns: ['title', 'code', 'creditHours', 'department', 'teacher', 'semester'],
   },
   fields: [

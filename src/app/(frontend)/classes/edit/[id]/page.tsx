@@ -238,11 +238,11 @@ export default function ClassEditPage() {
               </div>
             </div>
 
-            {/* Academic Relations Section */}
+            {/* University Relations Section */}
             <div className="border-b border-gray-200 pb-6">
               <h3 className="text-sm font-medium text-gray-900 mb-4 flex items-center">
                 <Building2 size={16} className="mr-2 text-blue-500" />
-                Academic Relations
+                University Relations
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>

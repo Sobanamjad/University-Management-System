@@ -117,7 +117,7 @@ export default function RegisterPage() {
             <span className="text-white font-bold text-2xl">U</span>
           </div>
           <h1 className="text-3xl font-bold text-gray-900">Create Account</h1>
-          <p className="mt-2 text-gray-500">Join the Academic Management System</p>
+          <p className="mt-2 text-gray-500">Join the University Management System</p>
         </div>
 
         {/* Progress Steps */}

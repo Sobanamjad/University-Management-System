@@ -204,7 +204,7 @@ export interface Department {
   createdAt: string;
 }
 /**
- * Manage academic semesters for each department
+ * Manage University semesters for each department
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "semesters".
@@ -212,7 +212,7 @@ export interface Department {
 export interface Semester {
   id: number;
   /**
-   * Enter academic session (e.g., Fall 2024)
+   * Enter University session (e.g., Fall 2024)
    */
   session: string;
   semesterNumber: '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8';
@@ -305,7 +305,7 @@ export interface Class {
   createdAt: string;
 }
 /**
- * Manage student academic records
+ * Manage student University records
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "students".

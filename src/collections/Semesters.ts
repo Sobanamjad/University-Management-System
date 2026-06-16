@@ -5,7 +5,7 @@ export const Semesters: CollectionConfig = {
   slug: 'semesters',
   admin: {
     useAsTitle: 'name',
-    group: 'Academic',
+    group: 'University',
     defaultColumns: [
       'session',
       'name',
@@ -16,7 +16,7 @@ export const Semesters: CollectionConfig = {
       'isActive',
       'status',
     ],
-    description: 'Manage academic semesters for each department',
+    description: 'Manage University semesters for each department',
   },
   fields: [
     // ===== 1. SESSION =====
@@ -27,7 +27,7 @@ export const Semesters: CollectionConfig = {
       label: 'Session',
       admin: {
         placeholder: 'e.g., Fall 2024, Spring 2024',
-        description: 'Enter academic session (e.g., Fall 2024)',
+        description: 'Enter University session (e.g., Fall 2024)',
         width: '50%',
       },
     },

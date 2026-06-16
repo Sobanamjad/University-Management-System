@@ -246,7 +246,7 @@ export default function DashboardPage() {
               <span className="text-3xl font-bold text-gray-900">{stats.departments}</span>
             </div>
             <h3 className="text-gray-600 font-medium">Departments</h3>
-            <p className="text-sm text-gray-500 mt-1">Academic departments</p>
+            <p className="text-sm text-gray-500 mt-1">University departments</p>
           </div>
 
           {/* Users Card */}
@@ -287,7 +287,7 @@ export default function DashboardPage() {
               <span className="text-3xl font-bold text-gray-900">{stats.semesters}</span>
             </div>
             <h3 className="text-gray-600 font-medium">Semesters</h3>
-            <p className="text-sm text-gray-500 mt-1">Academic semesters</p>
+            <p className="text-sm text-gray-500 mt-1">University semesters</p>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">

@@ -137,7 +137,7 @@ const seed = async () => {
     { title: 'Calculus I', code: 'MATH101', creditHours: 3, department: 'MATH' },
     { title: 'Linear Algebra', code: 'MATH201', creditHours: 3, department: 'MATH' },
     { title: 'Mechanics', code: 'PHY101', creditHours: 3, department: 'PHY' },
-    { title: 'Academic Writing', code: 'ENG101', creditHours: 2, department: 'ENG' },
+    { title: 'University Writing', code: 'ENG101', creditHours: 2, department: 'ENG' },
   ]
 
   const courseMap = new Map<string, number>()

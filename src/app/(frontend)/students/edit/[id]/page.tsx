@@ -111,7 +111,7 @@ export default function EditStudentPage() {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Edit Student</h1>
-              <p className="text-sm text-gray-600">Update academic record</p>
+              <p className="text-sm text-gray-600">Update University record</p>
             </div>
           </div>
         </div>

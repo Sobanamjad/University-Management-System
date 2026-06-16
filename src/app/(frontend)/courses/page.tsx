@@ -105,7 +105,7 @@ export default function CoursesPage() {
               <BookOpen className="w-8 h-8 text-blue-600" />
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Courses</h1>
-                <p className="text-sm text-gray-600">Manage academic courses</p>
+                <p className="text-sm text-gray-600">Manage University courses</p>
               </div>
             </div>
             <Link

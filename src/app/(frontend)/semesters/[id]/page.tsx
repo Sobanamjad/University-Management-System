@@ -88,7 +88,7 @@ export default function ViewSemesterPage() {
               <h1 className="text-2xl font-bold text-gray-900">
                 {fetching ? 'Loading...' : semester?.name || 'Semester Details'}
               </h1>
-              <p className="text-sm text-gray-600">View academic semester profile</p>
+              <p className="text-sm text-gray-600">View university semester profile</p>
             </div>
           </div>
           {!fetching && semester && (

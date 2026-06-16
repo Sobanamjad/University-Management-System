@@ -86,7 +86,7 @@ export default function EditDepartmentPage() {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Edit Department</h1>
-              <p className="text-sm text-gray-600">Update academic department information</p>
+              <p className="text-sm text-gray-600">Update university department information</p>
             </div>
           </div>
         </div>

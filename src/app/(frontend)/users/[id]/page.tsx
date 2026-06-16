@@ -134,7 +134,7 @@ export default function UserViewPage() {
                 {getRoleTitle(user.role)}
               </h1>
               <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-0.5">
-                {user.role === 'coordinator' && 'Academic Coordinator'}
+                {user.role === 'coordinator' && 'University Coordinator'}
                 {user.role === 'teacher' && 'Faculty Member'}
                 {user.role === 'student' && 'Student Record'}
                 {user.role === 'admin' && 'System Administrator'}
@@ -198,7 +198,7 @@ export default function UserViewPage() {
               >
                 <ShieldCheck size={18} className="mr-2" />
                 <span className="text-xs font-black uppercase tracking-widest">
-                  {user.role === 'coordinator' && 'Academic Coordinator'}
+                  {user.role === 'coordinator' && 'University Coordinator'}
                   {user.role === 'teacher' && 'Faculty Member'}
                   {user.role === 'student' && 'Student'}
                   {user.role === 'admin' && 'System Admin'}

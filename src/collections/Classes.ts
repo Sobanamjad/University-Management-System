@@ -17,7 +17,7 @@ export const Classes: CollectionConfig = {
   slug: 'classes',
   admin: {
     useAsTitle: 'title',
-    group: 'Academic',
+    group: 'University',
     defaultColumns: ['title', 'course', 'section', 'teacher', 'days', 'timeSlot'],
     description: 'Manage class sections for courses',
   },
