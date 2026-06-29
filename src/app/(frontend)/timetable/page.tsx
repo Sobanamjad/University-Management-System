@@ -63,61 +63,55 @@ export default function TimetablePage() {
     }
   }, [selectedSemester, selectedTarget, viewType])
 
-  const fetchInitialData = async () => {
-    try {
-      const [semRes, classRes, teacherRes] = await Promise.all([
-        fetch('/api/semesters?limit=100').then((res) => res.json()),
-        fetch('/api/classes?limit=100').then((res) => res.json()),
-        fetch('/api/users?where[role][equals]=teacher&limit=100').then((res) => res.json()),
-      ])
+  const fetchInitialData = () => {
+    Promise.all([
+      fetch('/api/semesters?limit=100').then((res) => res.json()),
+      fetch('/api/classes?limit=100').then((res) => res.json()),
+      fetch('/api/users?where[role][equals]=teacher&limit=100').then((res) => res.json()),
+    ])
+      .then(([semRes, classRes, teacherRes]) => {
+        setSemesters(semRes.docs || [])
+        setClasses(classRes.docs || [])
+        setTeachers(teacherRes.docs || [])
 
-      setSemesters(semRes.docs || [])
-      setClasses(classRes.docs || [])
-      setTeachers(teacherRes.docs || [])
+        if (semRes.docs?.length > 0) {
+          setSelectedSemester(semRes.docs[0].id)
+        }
 
-      if (semRes.docs?.length > 0) {
-        setSelectedSemester(semRes.docs[0].id)
-      }
-
-      if (viewType === 'class' && classRes.docs?.length > 0) {
-        setSelectedTarget(classRes.docs[0].id)
-      } else if (viewType === 'teacher' && teacherRes.docs?.length > 0) {
-        setSelectedTarget(teacherRes.docs[0].id)
-      }
-    } catch (error) {
-      console.error('Error fetching initial data:', error)
-    } finally {
-      setLoading(false)
-    }
+        if (viewType === 'class' && classRes.docs?.length > 0) {
+          setSelectedTarget(classRes.docs[0].id)
+        } else if (viewType === 'teacher' && teacherRes.docs?.length > 0) {
+          setSelectedTarget(teacherRes.docs[0].id)
+        }
+      })
+      .catch((error) => console.error('Error fetching initial data:', error))
+      .finally(() => setLoading(false))
   }
 
-  const fetchTimetable = async () => {
+  const fetchTimetable = () => {
     setLoading(true)
-    try {
-      const where: any = {
-        and: [{ semester: { equals: selectedSemester } }],
-      }
-
-      if (viewType === 'class') {
-        where.and.push({ class: { equals: selectedTarget } })
-      } else {
-        where.and.push({ teacher: { equals: selectedTarget } })
-      }
-
-      const query = new URLSearchParams({
-        where: JSON.stringify(where),
-        limit: '100',
-        depth: '2',
-      })
-
-      const res = await fetch(`/api/timetable?${query}`)
-      const data = await res.json()
-      setTimetableData(data.docs || [])
-    } catch (error) {
-      console.error('Error fetching timetable:', error)
-    } finally {
-      setLoading(false)
+    
+    const where: any = {
+      and: [{ semester: { equals: selectedSemester } }],
     }
+
+    if (viewType === 'class') {
+      where.and.push({ class: { equals: selectedTarget } })
+    } else {
+      where.and.push({ teacher: { equals: selectedTarget } })
+    }
+
+    const query = new URLSearchParams({
+      where: JSON.stringify(where),
+      limit: '100',
+      depth: '2',
+    })
+
+    fetch(`/api/timetable?${query}`)
+      .then((res) => res.json())
+      .then((data) => setTimetableData(data.docs || []))
+      .catch((error) => console.error('Error fetching timetable:', error))
+      .finally(() => setLoading(false))
   }
 
   const getEntryForSlot = (day: string, slot: string) => {
@@ -157,7 +151,7 @@ export default function TimetablePage() {
               <span>Print Schedule</span>
             </button>
             <Link
-              href="/admin/collections/timetable/create"
+              href="/timetable/create"
               className="flex items-center space-x-2 px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all font-semibold shadow-md shadow-blue-100"
             >
               <Plus size={20} />
