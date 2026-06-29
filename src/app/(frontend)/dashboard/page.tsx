@@ -335,13 +335,13 @@ export default function DashboardPage() {
               Add Student
             </Link>
             <Link
-              href="/admin/collections/courses/create"
+              href="/courses/create"
               className="p-4 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors text-center font-medium"
             >
               Add Course
             </Link>
             <Link
-              href="/admin/collections/classes/create"
+              href="/classes/create"
               className="p-4 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors text-center font-medium"
             >
               Create Class
