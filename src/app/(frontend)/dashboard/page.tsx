@@ -327,7 +327,7 @@ export default function DashboardPage() {
         {/* Quick Actions */}
         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 mb-8">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <Link
               href="/admin/collections/students/create"
               className="p-4 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors text-center font-medium"
@@ -351,6 +351,12 @@ export default function DashboardPage() {
               className="p-4 bg-orange-50 text-orange-700 rounded-lg hover:bg-orange-100 transition-colors text-center font-medium"
             >
               New Enrollment
+            </Link>
+            <Link
+              href="/timetable/create"
+              className="p-4 bg-pink-50 text-pink-700 rounded-lg hover:bg-pink-100 transition-colors text-center font-medium"
+            >
+              Add Timetable
             </Link>
           </div>
         </div>
