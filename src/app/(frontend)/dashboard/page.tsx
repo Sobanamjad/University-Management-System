@@ -274,6 +274,17 @@ export default function DashboardPage() {
             <h3 className="text-gray-600 font-medium">Students</h3>
             <p className="text-sm text-gray-500 mt-1">Enrolled students</p>
           </div>
+
+          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 bg-teal-100 rounded-lg flex items-center justify-center">
+                <UserCheck className="w-6 h-6 text-teal-600" />
+              </div>
+              <span className="text-3xl font-bold text-gray-900">{stats.enrollments}</span>
+            </div>
+            <h3 className="text-gray-600 font-medium">Enrollments</h3>
+            <p className="text-sm text-gray-500 mt-1">Student enrollments</p>
+          </div>
         </div>
 
         {/* Second Row */}
@@ -310,17 +321,6 @@ export default function DashboardPage() {
             </div>
             <h3 className="text-gray-600 font-medium">Classes</h3>
             <p className="text-sm text-gray-500 mt-1">Scheduled classes</p>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-teal-100 rounded-lg flex items-center justify-center">
-                <UserCheck className="w-6 h-6 text-teal-600" />
-              </div>
-              <span className="text-3xl font-bold text-gray-900">{stats.enrollments}</span>
-            </div>
-            <h3 className="text-gray-600 font-medium">Enrollments</h3>
-            <p className="text-sm text-gray-500 mt-1">Student enrollments</p>
           </div>
         </div>
 
