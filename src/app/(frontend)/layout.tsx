@@ -20,6 +20,7 @@ import {
   BookMarked,
   Settings,
   Banknote,
+  UserCog,
 } from 'lucide-react'
 
 export default function FrontendLayout({ children }: { children: React.ReactNode }) {
@@ -30,6 +31,7 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Departments', href: '/departments', icon: Layers },
     { name: 'Users', href: '/users', icon: Users },
+    { name: 'Teachers', href: '/teachers', icon: UserCog },
     { name: 'Students', href: '/students', icon: GraduationCap },
     { name: 'Semesters', href: '/semesters', icon: Calendar },
     { name: 'Courses', href: '/courses', icon: BookOpen },
