@@ -18,6 +18,7 @@ import {
   LogIn,
   LayoutDashboard,
   ChevronDown,
+  UserCog,
 } from 'lucide-react'
 
 const features = [
@@ -34,6 +35,13 @@ const features = [
     description: 'Maintain student records, admissions, and University progress.',
     href: '/students',
     color: 'orange',
+  },
+  {
+    icon: UserCog,
+    title: 'Teachers',
+    description: 'Manage faculty members, qualifications, assignments, and profiles.',
+    href: '/teachers',
+    color: 'blue',
   },
   {
     icon: Users,
@@ -292,7 +300,7 @@ export default function HomePage() {
           >
             {user
               ? `Welcome back, ${user.name || user.email}. Access your dashboard to manage students, courses, departments, and more.`
-              : 'A comprehensive platform to manage University operations, departments, students, courses, enrollments, timetables, and everything in between.'}
+              : 'A comprehensive platform to manage University operations, departments, students, teachers, courses, enrollments, timetables, and everything in between.'}
           </p>
 
           <div

@@ -16,6 +16,7 @@ import {
   LogOut,
   Settings,
   ChevronDown,
+  UserCog,
 } from 'lucide-react'
 
 export default function DashboardPage() {
@@ -263,6 +264,17 @@ export default function DashboardPage() {
             </p>
           </div>
 
+          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <UserCog className="w-6 h-6 text-blue-600" />
+              </div>
+              <span className="text-3xl font-bold text-gray-900">{stats.teachers}</span>
+            </div>
+            <h3 className="text-gray-600 font-medium">Teachers</h3>
+            <p className="text-sm text-gray-500 mt-1">Faculty members</p>
+          </div>
+
           {/* Students Card */}
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-4">
@@ -274,7 +286,10 @@ export default function DashboardPage() {
             <h3 className="text-gray-600 font-medium">Students</h3>
             <p className="text-sm text-gray-500 mt-1">Enrolled students</p>
           </div>
+        </div>
 
+        {/* Second Row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-4">
               <div className="w-12 h-12 bg-teal-100 rounded-lg flex items-center justify-center">
@@ -285,11 +300,8 @@ export default function DashboardPage() {
             <h3 className="text-gray-600 font-medium">Enrollments</h3>
             <p className="text-sm text-gray-500 mt-1">Student enrollments</p>
           </div>
-        </div>
-
-        {/* Second Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Semesters Card */}
+
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-4">
               <div className="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center">
@@ -329,17 +341,23 @@ export default function DashboardPage() {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <Link
-              href="/admin/collections/students/create"
+              href="/students/create"
               className="p-4 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors text-center font-medium"
             >
               Add Student
             </Link>
             <Link
+              href="/teachers/create"
+              className="p-4 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors text-center font-medium"
+            >
+              Add Teacher
+            </Link>
+            {/* <Link
               href="/courses/create"
               className="p-4 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors text-center font-medium"
             >
               Add Course
-            </Link>
+            </Link> */}
             <Link
               href="/classes/create"
               className="p-4 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors text-center font-medium"
