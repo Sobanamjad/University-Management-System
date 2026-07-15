@@ -14,7 +14,7 @@ export const Users: CollectionConfig = {
     group: 'System',
   },
   access: {
-    create: publicCreate,    // Anyone can register
+    create: publicCreate, // Anyone can register
     read: authenticatedOnly, // Must be logged in to read
     update: authenticatedOnly,
     delete: authenticatedOnly,
@@ -75,17 +75,6 @@ export const Users: CollectionConfig = {
         },
       },
       fields: [
-        {
-          name: 'department',
-          type: 'relationship',
-          relationTo: 'departments',
-          label: 'Department',
-          required: true,
-          admin: {
-            allowCreate: false,
-          },
-        },
-
         // Designation
         {
           name: 'designation',
