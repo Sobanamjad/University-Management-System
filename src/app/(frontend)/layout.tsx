@@ -1,7 +1,7 @@
 // src/app/(frontend)/layout.tsx
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import ChatBot from '@/components/ChatBot'
@@ -21,11 +21,40 @@ import {
   Settings,
   Banknote,
   UserCog,
+  ChevronDown,
+  LogOut,
+  User,
 } from 'lucide-react'
 
 export default function FrontendLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [user, setUser] = useState<any>(null)
   const pathname = usePathname()
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch('/api/me')
+        if (res.ok) {
+          const data = await res.json()
+          setUser(data.user)
+        }
+      } catch (err) {
+        console.error('Failed to fetch user:', err)
+      }
+    }
+    fetchUser()
+  }, [])
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/users/logout', { method: 'POST' })
+      window.location.href = '/login'
+    } catch (err) {
+      console.error('Logout failed:', err)
+    }
+  }
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
@@ -115,13 +144,49 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
 
           {/* Footer */}
           <div className="p-4 border-t">
-            <Link
-              href="/admin"
-              className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <Settings size={20} />
-              <span>Admin Panel</span>
-            </Link>
+            <div className="relative">
+              <button
+                onClick={() => setSettingsOpen(!settingsOpen)}
+                className="flex items-center justify-between w-full px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <div className="flex items-center space-x-3">
+                  <Settings size={20} />
+                  <span>Settings</span>
+                </div>
+                <ChevronDown
+                  size={16}
+                  className={`transition-transform ${settingsOpen ? 'rotate-180' : ''}`}
+                />
+              </button>
+
+              {settingsOpen && (
+                <div className="absolute bottom-full left-0 right-0 mb-2 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+                  <Link
+                    href="/profile"
+                    className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors"
+                    onClick={() => setSettingsOpen(false)}
+                  >
+                    <User size={18} />
+                    <span>Profile</span>
+                  </Link>
+                  <Link
+                    href="/admin"
+                    className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors"
+                    onClick={() => setSettingsOpen(false)}
+                  >
+                    <UserCog size={18} />
+                    <span>Admin Panel</span>
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center space-x-3 px-4 py-3 text-red-600 hover:bg-red-50 transition-colors w-full text-left"
+                  >
+                    <LogOut size={18} />
+                    <span>Logout</span>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

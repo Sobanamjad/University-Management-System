@@ -138,7 +138,6 @@ export interface User {
   role: 'admin' | 'coordinator' | 'teacher' | 'student';
   status: 'active' | 'inactive';
   teacherInfo?: {
-    department: number | Department;
     designation: 'Permanent' | 'visiting';
     /**
      * e.g., PhD Computer Science, M.Sc Mathematics
@@ -542,7 +541,6 @@ export interface UsersSelect<T extends boolean = true> {
   teacherInfo?:
     | T
     | {
-        department?: T;
         designation?: T;
         qualification?: T;
         joiningDate?: T;
