@@ -208,7 +208,13 @@ export const TeacherSalary: CollectionConfig = {
 
   // ===== ACCESS CONTROL =====
   access: {
-    read: () => true,
+    read: ({ req: { user } }) => {
+      if (!user) return false
+      // Student salary data nahi dekh sakta
+      if (user.role === 'student') return false
+      // Admin, coordinator, teacher sab dekh sakte hain
+      return true
+    },
     create: ({ req: { user } }) => user?.role === 'admin',
     update: ({ req: { user } }) => user?.role === 'admin',
     delete: ({ req: { user } }) => user?.role === 'admin',
