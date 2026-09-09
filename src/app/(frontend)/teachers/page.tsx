@@ -3,6 +3,8 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { stringify } from 'qs-esm'
+import type { Where } from 'payload'
 import {
   Plus,
   Search,
@@ -12,77 +14,72 @@ import {
   UserCog,
   Mail,
   Phone,
-  Building2,
   Award,
   Calendar,
   ChevronLeft,
   ChevronRight,
-  Filter,
 } from 'lucide-react'
 
 export default function TeachersPage() {
   const [teachers, setTeachers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [totalDocs, setTotalDocs] = useState(0)
-  const [departments, setDepartments] = useState<any[]>([])
-  const [departmentFilter, setDepartmentFilter] = useState('all')
   const [designationFilter, setDesignationFilter] = useState('all')
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
 
+  // Debounce search — 400ms wait (same pattern as users page)
   useEffect(() => {
-    fetchDepartments()
-  }, [])
+    const t = setTimeout(() => setDebouncedSearch(search.trim()), 400)
+    return () => clearTimeout(t)
+  }, [search])
+
+  // Reset to page 1 when filters/search change
+  useEffect(() => {
+    setPage(1)
+  }, [debouncedSearch, designationFilter])
 
   useEffect(() => {
     fetchTeachers()
-  }, [page, search, departmentFilter, designationFilter])
-
-  const fetchDepartments = async () => {
-    try {
-      const res = await fetch('/api/departments?limit=100')
-      const data = await res.json()
-      setDepartments(data.docs || [])
-    } catch (error) {
-      console.error('Error fetching departments:', error)
-    }
-  }
+  }, [page, debouncedSearch, designationFilter])
 
   const fetchTeachers = async () => {
     setLoading(true)
     try {
-      const and: any[] = [
-        {
-          or: [{ role: { equals: 'teacher' } }, { role: { equals: 'coordinator' } }],
-        },
+      const conditions: Where[] = [
+        // Only teachers
+        { role: { equals: 'teacher' } },
       ]
 
-      if (search) {
-        and.push({
-          or: [{ name: { contains: search } }, { email: { contains: search } }],
+      // Search by name or email
+      if (debouncedSearch) {
+        conditions.push({
+          or: [{ name: { contains: debouncedSearch } }, { email: { contains: debouncedSearch } }],
         })
       }
 
-      if (departmentFilter !== 'all') {
-        and.push({ 'teacherInfo.department': { equals: departmentFilter } })
-      }
-
+      // Designation filter (permanent / visiting)
       if (designationFilter !== 'all') {
-        and.push({ role: { equals: designationFilter } })
+        conditions.push({ 'teacherInfo.designation': { equals: designationFilter } })
       }
 
-      const where = { and }
-      const query = new URLSearchParams({
-        page: page.toString(),
-        limit: '12',
-        depth: '2',
-        where: JSON.stringify(where),
-        sort: 'name',
-      })
+      const where: Where = { and: conditions }
 
-      const res = await fetch(`/api/users?${query}`)
+      const queryString = stringify(
+        {
+          page,
+          limit: 12,
+          depth: 2,
+          sort: 'name',
+          where,
+        },
+        { addQueryPrefix: true },
+      )
+
+      const res = await fetch(`/api/users${queryString}`)
       const data = await res.json()
       setTeachers(data.docs || [])
       setTotalPages(data.totalPages || 1)
@@ -142,9 +139,9 @@ export default function TeachersPage() {
                 <UserCog className="w-5 h-5 text-blue-600" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Teachers & Coordinators</h1>
+                <h1 className="text-2xl font-bold text-gray-900">Teachers</h1>
                 <p className="text-sm text-gray-500">
-                  {totalDocs} staff member{totalDocs !== 1 ? 's' : ''}
+                  {totalDocs} teacher{totalDocs !== 1 ? 's' : ''}
                 </p>
               </div>
             </div>
@@ -171,47 +168,25 @@ export default function TeachersPage() {
                 value={search}
                 onChange={(e) => {
                   setSearch(e.target.value)
-                  setPage(1)
                 }}
                 placeholder="Search by name or email..."
                 className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
-            {/* Department Filter */}
-            <div className="relative">
-              <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <select
-                value={departmentFilter}
-                onChange={(e) => {
-                  setDepartmentFilter(e.target.value)
-                  setPage(1)
-                }}
-                className="pl-9 pr-8 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 bg-white appearance-none min-w-[180px]"
-              >
-                <option value="all">All Departments</option>
-                {departments.map((dept) => (
-                  <option key={dept.id} value={dept.id}>
-                    {dept.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Role Filter */}
+            {/* Designation Filter */}
             <div className="relative">
               <UserCog className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <select
                 value={designationFilter}
                 onChange={(e) => {
                   setDesignationFilter(e.target.value)
-                  setPage(1)
                 }}
-                className="pl-9 pr-8 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 bg-white appearance-none min-w-[160px]"
+                className="pl-9 pr-8 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 bg-white appearance-none min-w-[180px]"
               >
-                <option value="all">All Roles</option>
-                <option value="teacher">Teachers</option>
-                <option value="coordinator">Coordinators</option>
+                <option value="all">All Designations</option>
+                <option value="Permanent">Permanent</option>
+                <option value="visiting">Visiting</option>
               </select>
             </div>
           </div>
@@ -243,9 +218,9 @@ export default function TeachersPage() {
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">No Teachers Found</h3>
             <p className="text-gray-500 mb-6">
-              {search || departmentFilter !== 'all' || designationFilter !== 'all'
-                ? 'No staff match your search criteria.'
-                : 'Get started by adding your first teacher or coordinator.'}
+              {search || designationFilter !== 'all'
+                ? 'No teachers match your search criteria.'
+                : 'Get started by adding your first teacher.'}
             </p>
             <Link
               href="/teachers/create"
@@ -262,14 +237,8 @@ export default function TeachersPage() {
                 key={teacher.id}
                 className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden group"
               >
-                {/* Card Top Accent - color by role */}
-                <div
-                  className={`h-1.5 bg-gradient-to-r ${
-                    teacher.role === 'coordinator'
-                      ? 'from-purple-500 to-violet-600'
-                      : 'from-blue-500 to-indigo-600'
-                  }`}
-                />
+                {/* Card Top Accent */}
+                <div className="h-1.5 bg-gradient-to-r from-blue-500 to-indigo-600" />
 
                 <div className="p-5">
                   {/* Avatar + Name */}
@@ -281,15 +250,13 @@ export default function TeachersPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-gray-900 truncate">{teacher.name}</h3>
-                      <span
-                        className={`inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded-full capitalize ${
-                          teacher.role === 'coordinator'
-                            ? 'bg-purple-100 text-purple-700 border border-purple-200'
-                            : 'bg-blue-100 text-blue-700 border border-blue-200'
-                        }`}
-                      >
-                        {teacher.role}
-                      </span>
+                      {teacher.teacherInfo?.designation && (
+                        <span
+                          className={`inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded-full capitalize ${getDesignationBadge(teacher.teacherInfo.designation)}`}
+                        >
+                          {teacher.teacherInfo.designation}
+                        </span>
+                      )}
                     </div>
                   </div>
 
