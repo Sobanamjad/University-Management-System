@@ -70,13 +70,14 @@ export default function UsersPage() {
         conditions.push({ status: { equals: statusFilter } })
       }
 
-      const where: Where = conditions.length > 1 ? { and: conditions } : conditions[0] || {}
+      const where: Where | undefined =
+        conditions.length > 1 ? { and: conditions } : conditions[0]
 
       const queryString = stringify(
         {
           page,
           limit: 10,
-          where,
+          ...(conditions.length > 0 && where && { where }),
         },
         { addQueryPrefix: true },
       )
