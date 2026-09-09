@@ -3,6 +3,8 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { stringify } from 'qs-esm'
+import type { Where } from 'payload'
 import {
   Plus,
   Search,
@@ -24,23 +26,35 @@ export default function UsersPage() {
   const [users, setUsers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [roleFilter, setRoleFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
 
+  // Debounce search — wait 400ms after user stops typing
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search.trim()), 400)
+    return () => clearTimeout(t)
+  }, [search])
+
+  // Reset to page 1 whenever filters/search change
+  useEffect(() => {
+    setPage(1)
+  }, [debouncedSearch, roleFilter, statusFilter])
+
   useEffect(() => {
     fetchUsers()
-  }, [page, search, roleFilter, statusFilter])
+  }, [page, debouncedSearch, roleFilter, statusFilter])
 
   const fetchUsers = async () => {
     setLoading(true)
     try {
-      const conditions: any[] = []
+      const conditions: Where[] = []
 
-      if (search) {
+      if (debouncedSearch) {
         conditions.push({
-          or: [{ name: { like: search } }, { email: { like: search } }],
+          or: [{ name: { contains: debouncedSearch } }, { email: { contains: debouncedSearch } }],
         })
       }
 
@@ -56,20 +70,21 @@ export default function UsersPage() {
         conditions.push({ status: { equals: statusFilter } })
       }
 
-      const where = conditions.length > 1 ? { and: conditions } : conditions[0] || {}
+      const where: Where | undefined =
+        conditions.length > 1 ? { and: conditions } : conditions[0]
 
-      const query = new URLSearchParams({
-        page: page.toString(),
-        limit: '10',
-        ...(conditions.length && { where: JSON.stringify(where) }),
-      })
+      const queryString = stringify(
+        {
+          page,
+          limit: 10,
+          ...(conditions.length > 0 && where && { where }),
+        },
+        { addQueryPrefix: true },
+      )
 
-      console.log('Fetching users with filter:', roleFilter, statusFilter)
-
-      const res = await fetch(`/api/users?${query}`)
+      const res = await fetch(`/api/users${queryString}`)
       const data = await res.json()
 
-      console.log('Users fetched:', data.docs?.length || 0)
       setUsers(data.docs || [])
       setTotalPages(data.totalPages || 1)
     } catch (error) {
@@ -170,8 +185,8 @@ export default function UsersPage() {
               className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="all">All Status</option>
-              <option value="active">✅ Active Users</option>
-              <option value="inactive">⭕ Inactive Users</option>
+              <option value="active">Active Users</option>
+              <option value="inactive">Inactive Users</option>
             </select>
 
             {/* Refresh Button */}
