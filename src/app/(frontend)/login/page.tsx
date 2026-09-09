@@ -123,25 +123,25 @@ export default function LoginPage() {
           </form>
 
           {/* Sign Up Link */}
-          <div className="mt-6 text-center text-sm text-gray-600">
+          {/* <div className="mt-6 text-center text-sm text-gray-600">
             Don't have an account?{' '}
             <Link href="/register" className="text-blue-600 font-medium hover:text-blue-700">
               Create an account
             </Link>
-          </div>
+          </div> */}
 
           {/* Divider */}
-          <div className="relative my-8">
+          {/* <div className="relative my-8">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-200"></div>
             </div>
             <div className="relative flex justify-center text-xs">
               <span className="px-2 bg-white text-gray-400">Or continue with</span>
             </div>
-          </div>
+          </div> */}
 
           {/* Social Buttons */}
-          <div className="grid grid-cols-3 gap-3">
+          {/* <div className="grid grid-cols-3 gap-3">
             {['Google', 'Facebook', 'Twitter'].map((name) => (
               <button
                 key={name}
@@ -151,7 +151,7 @@ export default function LoginPage() {
                 {name}
               </button>
             ))}
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
