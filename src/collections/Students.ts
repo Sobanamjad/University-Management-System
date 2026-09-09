@@ -36,15 +36,22 @@ export const Students: CollectionConfig = {
       name: 'department',
       type: 'relationship',
       relationTo: 'departments',
-      required: true,
+      required: false,
       label: 'Department',
+      admin: {
+        description: 'Auto-assigned when student is enrolled in a class',
+        readOnly: true,
+      },
     },
     {
       name: 'semester',
       type: 'relationship',
       relationTo: 'semesters',
-      required: true,
+      required: false,
       label: 'Current Semester',
+      admin: {
+        description: 'Assigned automatically when student is enrolled in a class',
+      },
       filterOptions: ({ data }) => {
         if (data?.department) {
           return {

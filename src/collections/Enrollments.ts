@@ -165,7 +165,7 @@ export const Enrollments: CollectionConfig = {
     ],
 
     afterChange: [
-      async ({ doc, req }) => {
+      async ({ doc, req, operation }) => {
         // Sync currentStudents count on the class after any enrollment change
         const classId = toId(doc?.class)
         if (classId) {
@@ -185,6 +185,38 @@ export const Enrollments: CollectionConfig = {
             data: { currentStudents: enrolled.totalDocs },
             req,
           })
+        }
+
+        // Auto-assign department + semester on student from class (on first enrollment)
+        if (operation === 'create' && doc?.student && doc?.class) {
+          const studentId = toId(doc.student)
+          const classId2 = toId(doc.class)
+
+          if (studentId && classId2) {
+            try {
+              const classDoc = await req.payload.findByID({
+                collection: 'classes',
+                id: classId2,
+                depth: 0,
+                req,
+              })
+
+              if (classDoc?.department || classDoc?.semester) {
+                await req.payload.update({
+                  collection: 'students',
+                  id: studentId,
+                  data: {
+                    ...(classDoc.department && { department: toId(classDoc.department) }),
+                    ...(classDoc.semester && { semester: toId(classDoc.semester) }),
+                  },
+                  req,
+                })
+              }
+            } catch (err) {
+              // Non-critical — log but don't throw
+              console.error('Failed to auto-assign department/semester to student:', err)
+            }
+          }
         }
       },
     ],
