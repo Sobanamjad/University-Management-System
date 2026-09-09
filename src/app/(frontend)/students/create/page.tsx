@@ -229,8 +229,8 @@ export default function CreateStudentPage() {
         >
           <ChevronLeft size={20} />
         </Link>
-        <div className="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center mr-3">
-          <GraduationCap size={16} className="text-orange-600" />
+        <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center mr-3">
+          <GraduationCap size={16} className="text-blue-600" />
         </div>
         <div>
           <h1 className="text-base font-semibold text-gray-900 leading-none">Register Student</h1>
