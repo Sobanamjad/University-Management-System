@@ -316,8 +316,14 @@ export interface Student {
    */
   displayTitle?: string | null;
   rollNo: string;
-  department: number | Department;
-  semester: number | Semester;
+  /**
+   * Auto-assigned when student is enrolled in a class
+   */
+  department?: (number | null) | Department;
+  /**
+   * Assigned automatically when student is enrolled in a class
+   */
+  semester?: (number | null) | Semester;
   batch: string;
   admissionDate: string;
   /**
