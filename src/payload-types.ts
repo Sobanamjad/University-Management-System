@@ -263,7 +263,7 @@ export interface Semester {
   /**
    * Auto-generated from session, semester number, and department
    */
-  name: string;
+  name?: string | null;
   /**
    * Auto-generated unique code including department
    */

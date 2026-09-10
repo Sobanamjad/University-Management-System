@@ -56,34 +56,11 @@ export const Semesters: CollectionConfig = {
     {
       name: 'name',
       type: 'text',
-      required: true,
+      required: false,
       label: 'Semester Name',
       admin: {
         readOnly: true,
         description: 'Auto-generated from session, semester number, and department',
-      },
-      hooks: {
-        beforeValidate: [
-          async ({ data, req }) => {
-            if (data?.session && data?.semesterNumber && data?.department) {
-              const semesterText = getSemesterText(data.semesterNumber)
-
-              try {
-                const dept = await req.payload.findByID({
-                  collection: 'departments',
-                  id: String(data.department),
-                  depth: 0,
-                })
-                const deptCode = dept?.code || 'DEP'
-
-                return `${data.session} - ${semesterText} - ${deptCode}`
-              } catch (error) {
-                return `${data.session} - ${semesterText}`
-              }
-            }
-            return data?.name
-          },
-        ],
       },
     },
 
@@ -96,30 +73,6 @@ export const Semesters: CollectionConfig = {
       admin: {
         readOnly: true,
         description: 'Auto-generated unique code including department',
-      },
-      hooks: {
-        beforeValidate: [
-          async ({ data, req }) => {
-            if (data?.session && data?.semesterNumber && data?.department) {
-              const sessionCode = data.session.replace(/\s+/g, '').toUpperCase()
-              const semesterSuffix = getSemesterSuffix(data.semesterNumber)
-
-              try {
-                const dept = await req.payload.findByID({
-                  collection: 'departments',
-                  id: String(data.department),
-                  depth: 0,
-                })
-                const deptCode = dept?.code?.toUpperCase() || 'DEP'
-
-                return `${sessionCode}-${semesterSuffix}-${deptCode}`
-              } catch (error) {
-                return `${sessionCode}-${semesterSuffix}`
-              }
-            }
-            return data?.code
-          },
-        ],
       },
     },
 
@@ -252,6 +205,32 @@ export const Semesters: CollectionConfig = {
     ],
 
     beforeChange: [
+      // Auto-generate name and code from session + semesterNumber + department
+      async ({ data, req }) => {
+        if (data?.session && data?.semesterNumber && data?.department) {
+          try {
+            const dept = await req.payload.findByID({
+              collection: 'departments',
+              id: String(data.department),
+              depth: 0,
+              overrideAccess: true,
+            })
+            const deptCode = dept?.code?.toUpperCase() || 'DEP'
+            const semesterText = getSemesterText(data.semesterNumber)
+            const sessionCode = data.session.replace(/\s+/g, '').toUpperCase()
+            const semesterSuffix = getSemesterSuffix(data.semesterNumber)
+
+            data.name = `${data.session} - ${semesterText} - ${deptCode}`
+            data.code = `${sessionCode}-${semesterSuffix}-${deptCode}`
+          } catch {
+            const semesterText = getSemesterText(data.semesterNumber)
+            data.name = `${data.session} - ${semesterText}`
+            data.code = `${data.session.replace(/\s+/g, '').toUpperCase()}-${getSemesterSuffix(data.semesterNumber)}`
+          }
+        }
+        return data
+      },
+
       // Ensure only one active semester per department
       async ({ data, req, originalDoc }) => {
         if (data.isActive) {

@@ -2,48 +2,85 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Calendar, Save } from 'lucide-react'
 
 export default function CreateSemesterPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-
   const [departments, setDepartments] = useState<any[]>([])
+  const [batches, setBatches] = useState<any[]>([])
 
   const [formData, setFormData] = useState({
-    name: '',
-    code: '',
     session: '',
     semesterNumber: '1',
-    department: '',
+    department: '' as number | string,
+    batch: '' as number | string,
     startDate: '',
     endDate: '',
     isActive: false,
   })
 
-  // Fetch relationships
+  // Pre-fill from URL params (e.g. coming from batch detail page)
   useEffect(() => {
-    const fetchRelations = async () => {
-      try {
-        const deptRes = await fetch('/api/departments?limit=100')
-        if (deptRes.ok) {
-          const dData = await deptRes.json()
-          setDepartments(dData.docs || [])
-        }
-      } catch (err) {
-        console.error('Failed to fetch relationships', err)
-      }
+    const batchParam = searchParams.get('batch')
+    const deptParam = searchParams.get('department')
+    if (batchParam || deptParam) {
+      setFormData((prev) => ({
+        ...prev,
+        ...(batchParam && { batch: Number(batchParam) }),
+        ...(deptParam && { department: Number(deptParam) }),
+      }))
     }
-    fetchRelations()
+  }, [searchParams])
+
+  // Fetch departments and batches
+  useEffect(() => {
+    Promise.all([
+      fetch('/api/departments?limit=100').then((r) => r.json()),
+      fetch('/api/batches?limit=100&where[status][equals]=active&sort=-startYear').then((r) =>
+        r.json(),
+      ),
+    ]).then(([depts, batchData]) => {
+      setDepartments(depts.docs || [])
+      setBatches(batchData.docs || [])
+    })
   }, [])
 
+  // When batch changes → auto-fill department and semesterNumber
+  const handleBatchChange = (batchId: string) => {
+    const batch = batches.find((b) => String(b.id) === batchId)
+    if (batch) {
+      setFormData((prev) => ({
+        ...prev,
+        batch: Number(batchId),
+        department: Number(
+          typeof batch.department === 'object' ? batch.department.id : batch.department,
+        ),
+        semesterNumber: String(batch.currentSemesterNumber || '1'),
+        session: batch.session || prev.session,
+      }))
+    } else {
+      setFormData((prev) => ({ ...prev, batch: batchId ? Number(batchId) : '' }))
+    }
+  }
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const value =
-      e.target.type === 'checkbox' ? (e.target as HTMLInputElement).checked : e.target.value
-    setFormData((prev) => ({ ...prev, [e.target.name]: value }))
+    const { name, type } = e.target
+    const value = type === 'checkbox' ? (e.target as HTMLInputElement).checked : e.target.value
+
+    if (name === 'batch') {
+      handleBatchChange(value as string)
+      return
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === 'department' ? (value ? Number(value) : '') : value,
+    }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -51,50 +88,59 @@ export default function CreateSemesterPage() {
     setLoading(true)
     setError('')
 
+    // Remove empty optional fields
+    const payload: any = {
+      session: formData.session,
+      semesterNumber: formData.semesterNumber,
+      department: formData.department,
+      startDate: formData.startDate,
+      endDate: formData.endDate,
+      isActive: formData.isActive,
+    }
+    if (formData.batch) payload.batch = formData.batch
+
     try {
       const res = await fetch('/api/semesters', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        credentials: 'include',
+        body: JSON.stringify(payload),
       })
 
       if (res.ok) {
         router.push('/semesters')
       } else {
         const data = await res.json()
+        console.error('Semester create error:', JSON.stringify(data, null, 2))
         setError(data.errors?.[0]?.message || 'Failed to create semester')
       }
-    } catch (err) {
+    } catch {
       setError('An error occurred while creating the semester.')
     } finally {
       setLoading(false)
     }
   }
 
+  const selectedBatch = batches.find((b) => String(b.id) === String(formData.batch))
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-30 h-20 flex items-center">
-        <div className="px-6 w-full flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Link
-              href="/semesters"
-              className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors"
-            >
-              <ArrowLeft size={20} />
-            </Link>
-            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Calendar className="w-5 h-5 text-blue-600" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Add Semester</h1>
-              <p className="text-sm text-gray-600">Create a new university semester</p>
-            </div>
+        <div className="px-6 w-full flex items-center space-x-4">
+          <Link href="/semesters" className="p-2 hover:bg-gray-100 rounded-lg text-gray-500">
+            <ArrowLeft size={20} />
+          </Link>
+          <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+            <Calendar className="w-5 h-5 text-blue-600" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Add Semester</h1>
+            <p className="text-sm text-gray-600">Create a new university semester</p>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="flex-1 p-6 flex justify-center items-start">
         <div className="w-full max-w-3xl bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden mt-6">
           <form onSubmit={handleSubmit} className="p-8">
@@ -104,44 +150,49 @@ export default function CreateSemesterPage() {
               </div>
             )}
 
+            {/* Batch preview */}
+            {selectedBatch && (
+              <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                <p className="text-xs text-blue-500 font-medium uppercase tracking-wide mb-1">
+                  Linked Batch
+                </p>
+                <p className="text-base font-bold text-blue-800">{selectedBatch.name}</p>
+                <p className="text-xs text-blue-600 mt-0.5">
+                  Current Semester: {selectedBatch.currentSemesterNumber} /{' '}
+                  {selectedBatch.totalSemesters}
+                </p>
+              </div>
+            )}
+
             <div className="space-y-6">
-              {/* Name & Code */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Semester Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    required
-                    value={formData.name}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="e.g. Fall 2024"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Semester Code <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="code"
-                    required
-                    value={formData.code}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="e.g. FA24"
-                  />
-                </div>
+              {/* Batch — select first, auto-fills rest */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Batch{' '}
+                  <span className="text-gray-400 font-normal text-xs">
+                    (optional but recommended)
+                  </span>
+                </label>
+                <select
+                  name="batch"
+                  value={String(formData.batch)}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                >
+                  <option value="">Select Batch (auto-fills department & semester no.)</option>
+                  {batches.map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {b.name} — Sem {b.currentSemesterNumber}/{b.totalSemesters}
+                    </option>
+                  ))}
+                </select>
               </div>
 
-              {/* Session & Number */}
+              {/* Session & Semester Number */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    University Session <span className="text-red-500">*</span>
+                    Session <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -149,8 +200,8 @@ export default function CreateSemesterPage() {
                     required
                     value={formData.session}
                     onChange={handleChange}
+                    placeholder="e.g. Fall 2024, Spring 2025"
                     className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="e.g. 2024-2025"
                   />
                 </div>
                 <div>
@@ -166,36 +217,34 @@ export default function CreateSemesterPage() {
                   >
                     {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
                       <option key={n} value={n.toString()}>
-                        {n}
+                        {n === 1 ? '1st' : n === 2 ? '2nd' : n === 3 ? '3rd' : `${n}th`} Semester
                       </option>
                     ))}
                   </select>
                 </div>
               </div>
 
-              {/* Relationships */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Department <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    name="department"
-                    required
-                    value={formData.department}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                  >
-                    <option value="" disabled>
-                      Select Department
+              {/* Department */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Department <span className="text-red-500">*</span>
+                </label>
+                <select
+                  name="department"
+                  required
+                  value={String(formData.department)}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                >
+                  <option value="" disabled>
+                    Select Department
+                  </option>
+                  {departments.map((dept) => (
+                    <option key={dept.id} value={dept.id}>
+                      {dept.name}
                     </option>
-                    {departments.map((dept) => (
-                      <option key={dept.id} value={dept.id}>
-                        {dept.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                  ))}
+                </select>
               </div>
 
               {/* Dates */}
@@ -229,7 +278,7 @@ export default function CreateSemesterPage() {
               </div>
 
               {/* Active Toggle */}
-              <div className="pt-4 flex items-center">
+              <div className="flex items-center pt-2">
                 <input
                   type="checkbox"
                   id="isActive"
@@ -254,7 +303,7 @@ export default function CreateSemesterPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="flex items-center space-x-2 px-6 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-all shadow-sm shadow-blue-200"
+                className="flex items-center space-x-2 px-6 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-all shadow-sm"
               >
                 <Save size={18} />
                 <span>{loading ? 'Creating...' : 'Save Semester'}</span>
