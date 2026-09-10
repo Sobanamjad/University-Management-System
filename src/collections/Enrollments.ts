@@ -153,9 +153,7 @@ export const Enrollments: CollectionConfig = {
                 req,
               })
 
-              if (existingCount.totalDocs >= (classDoc.maxStudents || 0)) {
-                throw new Error(`Class is full! Max capacity is ${classDoc.maxStudents} students.`)
-              }
+              // maxStudents field removed — no capacity check needed
             }
           }
         }
