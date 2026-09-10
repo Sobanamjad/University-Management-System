@@ -108,7 +108,7 @@ export default function BatchDetailPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+        <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -118,7 +118,7 @@ export default function BatchDetailPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-xl font-bold text-gray-900 mb-2">Batch not found</h2>
-          <Link href="/batches" className="text-indigo-600 hover:underline">Back to Batches</Link>
+          <Link href="/batches" className="text-blue-600 hover:underline">Back to Batches</Link>
         </div>
       </div>
     )
@@ -138,8 +138,8 @@ export default function BatchDetailPage() {
             <Link href="/batches" className="p-2 hover:bg-gray-100 rounded-lg text-gray-500">
               <ArrowLeft size={20} />
             </Link>
-            <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
-              <Users className="w-5 h-5 text-indigo-600" />
+            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+              <Users className="w-5 h-5 text-blue-600" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">{batch.name}</h1>
@@ -183,7 +183,7 @@ export default function BatchDetailPage() {
               </p>
               <div className="w-full bg-gray-100 rounded-full h-3">
                 <div
-                  className="h-3 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all"
+                  className="h-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all"
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -206,7 +206,7 @@ export default function BatchDetailPage() {
                   className={`flex items-center space-x-2 px-5 py-2.5 rounded-xl font-medium text-sm transition-all ${
                     isLastSem
                       ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                      : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm'
+                      : 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm'
                   }`}
                 >
                   {advancing ? (
@@ -225,7 +225,7 @@ export default function BatchDetailPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white rounded-xl border border-gray-200 p-5">
             <div className="flex items-center space-x-3 mb-2">
-              <Layers className="w-5 h-5 text-indigo-400" />
+              <Layers className="w-5 h-5 text-blue-400" />
               <span className="text-sm font-medium text-gray-500">Department</span>
             </div>
             <p className="text-lg font-semibold text-gray-900">{batch.department?.name || '—'}</p>
@@ -233,14 +233,14 @@ export default function BatchDetailPage() {
           </div>
           <div className="bg-white rounded-xl border border-gray-200 p-5">
             <div className="flex items-center space-x-3 mb-2">
-              <Users className="w-5 h-5 text-indigo-400" />
+              <Users className="w-5 h-5 text-blue-400" />
               <span className="text-sm font-medium text-gray-500">Students</span>
             </div>
             <p className="text-3xl font-bold text-gray-900">{students.length}</p>
           </div>
           <div className="bg-white rounded-xl border border-gray-200 p-5">
             <div className="flex items-center space-x-3 mb-2">
-              <BookOpen className="w-5 h-5 text-indigo-400" />
+              <BookOpen className="w-5 h-5 text-blue-400" />
               <span className="text-sm font-medium text-gray-500">Semesters Created</span>
             </div>
             <p className="text-3xl font-bold text-gray-900">{semesters.length}/{total}</p>
@@ -253,7 +253,7 @@ export default function BatchDetailPage() {
             <h2 className="font-semibold text-gray-900">Semesters</h2>
             <Link
               href={`/semesters/create?batch=${id}&department=${batch.department?.id}`}
-              className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+              className="text-sm text-blue-600 hover:text-blue-700 font-medium"
             >
               + Add Semester
             </Link>
@@ -264,7 +264,7 @@ export default function BatchDetailPage() {
               <p className="text-gray-500 text-sm">No semesters linked to this batch yet.</p>
               <Link
                 href={`/semesters/create?batch=${id}&department=${batch.department?.id}`}
-                className="mt-3 inline-block text-sm text-indigo-600 hover:underline"
+                className="mt-3 inline-block text-sm text-blue-600 hover:underline"
               >
                 Create first semester
               </Link>
@@ -278,7 +278,7 @@ export default function BatchDetailPage() {
                     <div className="flex items-center space-x-4">
                       <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold ${
                         Number(sem.semesterNumber) === current
-                          ? 'bg-indigo-600 text-white'
+                          ? 'bg-blue-600 text-white'
                           : 'bg-gray-100 text-gray-600'
                       }`}>
                         {sem.semesterNumber}
@@ -293,12 +293,12 @@ export default function BatchDetailPage() {
                     </div>
                     <div className="flex items-center space-x-3">
                       {Number(sem.semesterNumber) === current && (
-                        <span className="text-xs font-medium text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">Current</span>
+                        <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">Current</span>
                       )}
                       <span className={`px-2 py-0.5 text-xs font-medium rounded-full capitalize ${getSemStatusColor(sem.status)}`}>
                         {sem.status}
                       </span>
-                      <Link href={`/semesters/${sem.id}`} className="text-gray-400 hover:text-indigo-600 text-xs">
+                      <Link href={`/semesters/${sem.id}`} className="text-gray-400 hover:text-blue-600 text-xs">
                         View
                       </Link>
                     </div>
@@ -326,7 +326,7 @@ export default function BatchDetailPage() {
                     <p className="text-sm font-medium text-gray-900">{stu.user?.name || stu.displayTitle}</p>
                     <p className="text-xs text-gray-500">Roll No: {stu.rollNo}</p>
                   </div>
-                  <Link href={`/students/${stu.id}`} className="text-xs text-indigo-600 hover:underline">
+                  <Link href={`/students/${stu.id}`} className="text-xs text-blue-600 hover:underline">
                     View
                   </Link>
                 </div>

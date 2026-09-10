@@ -154,7 +154,7 @@ export default function BatchesPage() {
   }
 
   const avatarColors = [
-    'from-blue-500 to-indigo-600',
+    'from-blue-500 to-blue-600',
     'from-emerald-500 to-teal-600',
     'from-purple-500 to-violet-600',
     'from-rose-500 to-pink-600',
@@ -168,8 +168,8 @@ export default function BatchesPage() {
       <div className="bg-white border-b border-gray-200 sticky top-0 z-30 h-20 flex items-center">
         <div className="px-6 w-full flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
-              <Users className="w-5 h-5 text-indigo-600" />
+            <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+              <Users className="w-5 h-5 text-blue-600" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Batches</h1>
@@ -180,7 +180,7 @@ export default function BatchesPage() {
           </div>
           <Link
             href="/batches/create"
-            className="flex items-center space-x-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm"
+            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
           >
             <Plus size={18} />
             <span className="font-medium">New Batch</span>
@@ -199,13 +199,13 @@ export default function BatchesPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search by batch name or session..."
-                className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <select
               value={departmentFilter}
               onChange={(e) => setDepartmentFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white min-w-[180px]"
+              className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white min-w-[180px]"
             >
               <option value="all">All Departments</option>
               {departments.map((d) => (
@@ -217,7 +217,7 @@ export default function BatchesPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white min-w-[140px]"
+              className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white min-w-[140px]"
             >
               <option value="all">All Statuses</option>
               <option value="active">Active</option>
@@ -240,8 +240,8 @@ export default function BatchesPage() {
           </div>
         ) : batches.length === 0 ? (
           <div className="bg-white rounded-xl border border-gray-200 p-16 text-center">
-            <div className="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Users className="w-8 h-8 text-indigo-500" />
+            <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Users className="w-8 h-8 text-blue-500" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">No Batches Found</h3>
             <p className="text-gray-500 mb-6">
@@ -251,7 +251,7 @@ export default function BatchesPage() {
             </p>
             <Link
               href="/batches/create"
-              className="inline-flex items-center space-x-2 px-5 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+              className="inline-flex items-center space-x-2 px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               <Plus size={18} />
               <span>New Batch</span>
@@ -311,7 +311,7 @@ export default function BatchesPage() {
                           className={`h-2 rounded-full transition-all ${
                             batch.status === 'completed'
                               ? 'bg-blue-500'
-                              : 'bg-gradient-to-r from-indigo-500 to-purple-500'
+                              : 'bg-gradient-to-r from-blue-500 to-purple-500'
                           }`}
                           style={{ width: `${progress}%` }}
                         />
@@ -357,11 +357,11 @@ export default function BatchesPage() {
                           className={`flex items-center space-x-1 text-xs font-medium px-2.5 py-1.5 rounded-lg transition-colors ${
                             isLastSem
                               ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                              : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
+                              : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
                           }`}
                         >
                           {advancing === batch.id ? (
-                            <div className="w-3 h-3 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                            <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
                           ) : (
                             <ArrowRight size={12} />
                           )}
@@ -375,7 +375,7 @@ export default function BatchesPage() {
                       >
                         <Link
                           href={`/batches/${batch.id}`}
-                          className="p-1.5 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                          className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                         >
                           <Eye size={15} />
                         </Link>
@@ -423,7 +423,7 @@ export default function BatchesPage() {
                     onClick={() => setPage(p)}
                     className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors ${
                       p === page
-                        ? 'bg-indigo-600 text-white shadow-sm'
+                        ? 'bg-blue-600 text-white shadow-sm'
                         : 'border border-gray-200 text-gray-700 hover:bg-gray-50'
                     }`}
                   >

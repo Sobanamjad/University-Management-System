@@ -21,7 +21,6 @@ export default function EditBatchPage() {
     currentSemesterNumber: 1,
     session: '',
     status: 'active',
-    notes: '',
   })
 
   useEffect(() => {
@@ -39,7 +38,6 @@ export default function EditBatchPage() {
           currentSemesterNumber: batch.currentSemesterNumber || 1,
           session: batch.session || '',
           status: batch.status || 'active',
-          notes: batch.notes || '',
         })
       }
       setFetching(false)
@@ -84,7 +82,7 @@ export default function EditBatchPage() {
   if (fetching) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+        <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -97,8 +95,8 @@ export default function EditBatchPage() {
           <Link href={`/batches/${id}`} className="p-2 hover:bg-gray-100 rounded-lg text-gray-500">
             <ArrowLeft size={20} />
           </Link>
-          <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
-            <Users className="w-5 h-5 text-indigo-600" />
+          <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+            <Users className="w-5 h-5 text-blue-600" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Edit Batch</h1>
@@ -127,7 +125,7 @@ export default function EditBatchPage() {
                   required
                   value={formData.department}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                 >
                   <option value="" disabled>
                     Select Department
@@ -154,7 +152,7 @@ export default function EditBatchPage() {
                     max={2100}
                     value={formData.startYear}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
@@ -166,7 +164,7 @@ export default function EditBatchPage() {
                     required
                     value={formData.totalSemesters}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                   >
                     <option value="4">4 Semesters (2-year)</option>
                     <option value="8">8 Semesters (4-year, BS)</option>
@@ -186,7 +184,7 @@ export default function EditBatchPage() {
                     value={formData.session}
                     onChange={handleChange}
                     placeholder="e.g., 2024-2028"
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
@@ -200,7 +198,7 @@ export default function EditBatchPage() {
                     max={8}
                     value={formData.currentSemesterNumber}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
@@ -212,25 +210,12 @@ export default function EditBatchPage() {
                   name="status"
                   value={formData.status}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                 >
                   <option value="active">Active</option>
                   <option value="suspended">Suspended</option>
                   <option value="completed">Completed</option>
                 </select>
-              </div>
-
-              {/* Notes */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-                <textarea
-                  name="notes"
-                  value={formData.notes}
-                  onChange={handleChange}
-                  rows={3}
-                  placeholder="Optional notes..."
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
-                />
               </div>
             </div>
 
@@ -244,7 +229,7 @@ export default function EditBatchPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="flex items-center space-x-2 px-6 py-2.5 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 disabled:opacity-50 transition-all shadow-sm"
+                className="flex items-center space-x-2 px-6 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-all shadow-sm"
               >
                 <Save size={18} />
                 <span>{loading ? 'Saving...' : 'Save Changes'}</span>

@@ -116,16 +116,6 @@ export const Batches: CollectionConfig = {
         width: '50%',
       },
     },
-
-    // ===== 8. NOTES =====
-    {
-      name: 'notes',
-      type: 'textarea',
-      label: 'Notes',
-      admin: {
-        description: 'Optional notes about this batch',
-      },
-    },
   ],
 
   // ===== INDEXES =====
