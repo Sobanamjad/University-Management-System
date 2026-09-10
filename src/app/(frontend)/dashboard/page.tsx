@@ -245,115 +245,105 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <div className="p-6">
-        {/* Stats Grid - Same as before */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {/* Departments Card */}
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <Layers className="w-6 h-6 text-green-600" />
-              </div>
-              <span className="text-3xl font-bold text-gray-900">{stats.departments}</span>
-            </div>
-            <h3 className="text-gray-600 font-medium">Departments</h3>
-            <p className="text-sm text-gray-500 mt-1">University departments</p>
-          </div>
+        {/* Stats — build list based on role, grid auto-fills with no gaps */}
+        {(() => {
+          const cards = [
+            {
+              label: 'Departments',
+              value: stats.departments,
+              sub: 'University departments',
+              icon: <Layers className="w-6 h-6 text-green-600" />,
+              bg: 'bg-green-100',
+              show: true,
+            },
+            {
+              label: 'Total Users',
+              value: stats.users,
+              sub: `Teachers: ${stats.teachers} | Coordinators: ${stats.coordinators}`,
+              icon: <Users className="w-6 h-6 text-purple-600" />,
+              bg: 'bg-purple-100',
+              show: user?.role === 'admin',
+            },
+            {
+              label: 'Teachers',
+              value: stats.teachers,
+              sub: 'Faculty members',
+              icon: <UserCog className="w-6 h-6 text-blue-600" />,
+              bg: 'bg-blue-100',
+              show: true,
+            },
+            {
+              label: 'Students',
+              value: stats.students,
+              sub: 'Enrolled students',
+              icon: <GraduationCap className="w-6 h-6 text-orange-600" />,
+              bg: 'bg-orange-100',
+              show: true,
+            },
+            {
+              label: 'Enrollments',
+              value: stats.enrollments,
+              sub: 'Student enrollments',
+              icon: <UserCheck className="w-6 h-6 text-teal-600" />,
+              bg: 'bg-teal-100',
+              show: true,
+            },
+            {
+              label: 'Batches',
+              value: stats.batches,
+              sub: 'Student batches',
+              icon: <Users className="w-6 h-6 text-blue-600" />,
+              bg: 'bg-blue-100',
+              show: true,
+            },
+            {
+              label: 'Semesters',
+              value: stats.semesters,
+              sub: 'University semesters',
+              icon: <Calendar className="w-6 h-6 text-pink-600" />,
+              bg: 'bg-pink-100',
+              show: true,
+            },
+            {
+              label: 'Courses',
+              value: stats.courses,
+              sub: 'Active courses',
+              icon: <BookOpen className="w-6 h-6 text-indigo-600" />,
+              bg: 'bg-indigo-100',
+              show: true,
+            },
+            {
+              label: 'Classes',
+              value: stats.classes,
+              sub: 'Scheduled classes',
+              icon: <Clock className="w-6 h-6 text-red-600" />,
+              bg: 'bg-red-100',
+              show: true,
+            },
+          ].filter((c) => c.show)
 
-          {/* Users Card */}
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Users className="w-6 h-6 text-purple-600" />
-              </div>
-              <span className="text-3xl font-bold text-gray-900">{stats.users}</span>
+          return (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              {cards.map((card) => (
+                <div
+                  key={card.label}
+                  className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div
+                      className={`w-12 h-12 ${card.bg} rounded-lg flex items-center justify-center`}
+                    >
+                      {card.icon}
+                    </div>
+                    <span className="text-3xl font-bold text-gray-900">{card.value}</span>
+                  </div>
+                  <h3 className="text-gray-600 font-medium">{card.label}</h3>
+                  <p className="text-sm text-gray-500 mt-1">{card.sub}</p>
+                </div>
+              ))}
             </div>
-            <h3 className="text-gray-600 font-medium">Total Users</h3>
-            <p className="text-sm text-gray-500 mt-1">
-              Teachers: {stats.teachers} | Coordinators: {stats.coordinators}
-            </p>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <UserCog className="w-6 h-6 text-blue-600" />
-              </div>
-              <span className="text-3xl font-bold text-gray-900">{stats.teachers}</span>
-            </div>
-            <h3 className="text-gray-600 font-medium">Teachers</h3>
-            <p className="text-sm text-gray-500 mt-1">Faculty members</p>
-          </div>
-
-          {/* Students Card */}
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                <GraduationCap className="w-6 h-6 text-orange-600" />
-              </div>
-              <span className="text-3xl font-bold text-gray-900">{stats.students}</span>
-            </div>
-            <h3 className="text-gray-600 font-medium">Students</h3>
-            <p className="text-sm text-gray-500 mt-1">Enrolled students</p>
-          </div>
-        </div>
-
-        {/* Second Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-teal-100 rounded-lg flex items-center justify-center">
-                <UserCheck className="w-6 h-6 text-teal-600" />
-              </div>
-              <span className="text-3xl font-bold text-gray-900">{stats.enrollments}</span>
-            </div>
-            <h3 className="text-gray-600 font-medium">Enrollments</h3>
-            <p className="text-sm text-gray-500 mt-1">Student enrollments</p>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
-                <Users className="w-6 h-6 text-indigo-600" />
-              </div>
-              <span className="text-3xl font-bold text-gray-900">{stats.batches}</span>
-            </div>
-            <h3 className="text-gray-600 font-medium">Batches</h3>
-            <p className="text-sm text-gray-500 mt-1">Student batches</p>
-          </div>
-          {/* Semesters Card */}
-
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center">
-                <Calendar className="w-6 h-6 text-pink-600" />
-              </div>
-              <span className="text-3xl font-bold text-gray-900">{stats.semesters}</span>
-            </div>
-            <h3 className="text-gray-600 font-medium">Semesters</h3>
-            <p className="text-sm text-gray-500 mt-1">University semesters</p>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
-                <BookOpen className="w-6 h-6 text-indigo-600" />
-              </div>
-              <span className="text-3xl font-bold text-gray-900">{stats.courses}</span>
-            </div>
-            <h3 className="text-gray-600 font-medium">Courses</h3>
-            <p className="text-sm text-gray-500 mt-1">Active courses</p>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                <Clock className="w-6 h-6 text-red-600" />
-              </div>
-              <span className="text-3xl font-bold text-gray-900">{stats.classes}</span>
-            </div>
-            <h3 className="text-gray-600 font-medium">Classes</h3>
-            <p className="text-sm text-gray-500 mt-1">Scheduled classes</p>
-          </div>
-        </div>
+          )
+        })()}
 
         {/* Active Batches Widget */}
         {activeBatches.length > 0 && (

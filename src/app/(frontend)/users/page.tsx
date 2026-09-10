@@ -2,6 +2,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { stringify } from 'qs'
 import type { Where } from 'payload'
@@ -23,6 +24,7 @@ import {
 } from 'lucide-react'
 
 export default function UsersPage() {
+  const router = useRouter()
   const [users, setUsers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -31,6 +33,17 @@ export default function UsersPage() {
   const [totalPages, setTotalPages] = useState(1)
   const [roleFilter, setRoleFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
+
+  // Redirect non-admin users away from this page
+  useEffect(() => {
+    fetch('/api/me')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.user && data.user.role !== 'admin') {
+          router.replace('/dashboard')
+        }
+      })
+  }, [])
 
   // Debounce search — wait 400ms after user stops typing
   useEffect(() => {
@@ -70,8 +83,7 @@ export default function UsersPage() {
         conditions.push({ status: { equals: statusFilter } })
       }
 
-      const where: Where | undefined =
-        conditions.length > 1 ? { and: conditions } : conditions[0]
+      const where: Where | undefined = conditions.length > 1 ? { and: conditions } : conditions[0]
 
       const queryString = stringify(
         {
