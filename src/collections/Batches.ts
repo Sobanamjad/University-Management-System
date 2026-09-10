@@ -61,8 +61,8 @@ export const Batches: CollectionConfig = {
       label: 'Total Semesters',
       defaultValue: '8',
       options: [
-        { label: '4 Semesters (2-year program)', value: '4' },
-        { label: '8 Semesters (4-year program, BS)', value: '8' },
+        { label: '4 Semesters — ADS (2-year program)', value: '4' },
+        { label: '8 Semesters — BS (4-year program)', value: '8' },
       ],
       admin: {
         description: 'Total number of semesters in this program',
@@ -129,10 +129,11 @@ export const Batches: CollectionConfig = {
   // ===== HOOKS =====
   hooks: {
     beforeChange: [
-      // Auto-generate batch name from department + startYear
+      // Auto-generate batch name: e.g. "BS Mathematics 2024" or "ADS Mathematics 2024"
       async ({ data, req }) => {
         const deptId = data?.department
         const startYear = data?.startYear
+        const totalSemesters = data?.totalSemesters
         if (deptId && startYear) {
           try {
             const dept = await req.payload.findByID({
@@ -141,7 +142,8 @@ export const Batches: CollectionConfig = {
               depth: 0,
               overrideAccess: true,
             })
-            data.name = `${dept?.name || 'Dept'} ${startYear}`
+            const prefix = totalSemesters === '4' ? 'ADS' : 'BS'
+            data.name = `${prefix} ${dept?.name || 'Dept'} ${startYear}`
           } catch {
             data.name = `Batch ${startYear}`
           }

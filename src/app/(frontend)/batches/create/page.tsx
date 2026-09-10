@@ -14,7 +14,14 @@ export default function CreateBatchPage() {
   const [deptLoading, setDeptLoading] = useState(true)
   const [deptError, setDeptError] = useState('')
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    department: number | string
+    startYear: number
+    totalSemesters: string
+    currentSemesterNumber: number
+    session: string
+    status: string
+  }>({
     department: '',
     startYear: new Date().getFullYear(),
     totalSemesters: '8',
@@ -52,7 +59,10 @@ export default function CreateBatchPage() {
     const { name, value } = e.target
     setFormData((prev) => ({
       ...prev,
-      [name]: name === 'startYear' || name === 'currentSemesterNumber' ? Number(value) : value,
+      [name]:
+        name === 'startYear' || name === 'currentSemesterNumber' || name === 'department'
+          ? Number(value)
+          : value,
     }))
   }
 
@@ -73,7 +83,8 @@ export default function CreateBatchPage() {
         router.push('/batches')
       } else {
         const data = await res.json()
-        setError(data.errors?.[0]?.message || 'Failed to create batch')
+        console.error('Batch create error:', JSON.stringify(data, null, 2))
+        setError(data.errors?.[0]?.message || data.message || 'Failed to create batch')
       }
     } catch {
       setError('An error occurred while creating the batch.')
@@ -82,7 +93,8 @@ export default function CreateBatchPage() {
     }
   }
 
-  const selectedDept = departments.find((d) => d.id === formData.department)
+  const selectedDept = departments.find((d) => String(d.id) === String(formData.department))
+  const programPrefix = formData.totalSemesters === '4' ? 'ADS' : 'BS'
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -118,7 +130,7 @@ export default function CreateBatchPage() {
                   Batch Name Preview
                 </p>
                 <p className="text-lg font-bold text-blue-800">
-                  {selectedDept?.name || 'Department'} {formData.startYear}
+                  {programPrefix} {selectedDept?.name || 'Department'} {formData.startYear}
                 </p>
               </div>
             )}
@@ -177,8 +189,8 @@ export default function CreateBatchPage() {
                     onChange={handleChange}
                     className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                   >
-                    <option value="4">4 Semesters (2-year)</option>
-                    <option value="8">8 Semesters (4-year, BS)</option>
+                    <option value="4">4 Semesters — ADS (2-year)</option>
+                    <option value="8">8 Semesters — BS (4-year)</option>
                   </select>
                 </div>
               </div>
