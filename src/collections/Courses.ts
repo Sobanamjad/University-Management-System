@@ -75,27 +75,19 @@ export const Courses: CollectionConfig = {
       },
     },
 
-    // ===== TEACHER (Filtered by department) =====
+    // ===== TEACHER =====
     {
       name: 'teacher',
       type: 'relationship',
       relationTo: 'users',
       required: false,
       label: 'Course Teacher',
-      filterOptions: ({ data }) => {
-        const deptId =
-          typeof data?.department === 'object' ? data.department?.value : data?.department
-        if (isValidId(deptId)) {
-          return {
-            role: { equals: 'teacher' },
-            'teacherInfo.department': { equals: deptId },
-          } as any
-        }
-        return true
+      filterOptions: {
+        role: { equals: 'teacher' },
       },
       admin: {
         condition: (data) => Boolean(data?.department),
-        description: 'Teachers filtered by department only',
+        description: 'Teachers filtered by role',
       },
     },
   ],

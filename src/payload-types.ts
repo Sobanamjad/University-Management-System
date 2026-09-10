@@ -307,7 +307,7 @@ export interface Course {
    */
   semester?: (number | null) | Semester;
   /**
-   * Teachers filtered by department only
+   * Teachers filtered by role
    */
   teacher?: (number | null) | User;
   updatedAt: string;
