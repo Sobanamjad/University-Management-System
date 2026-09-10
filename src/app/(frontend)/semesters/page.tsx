@@ -3,14 +3,13 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { stringify } from 'qs-esm'
+import type { Where } from 'payload'
 import {
   Plus,
   Search,
   Edit,
-  Trash2,
   Eye,
-  Filter,
-  Download,
   ChevronLeft,
   ChevronRight,
   Calendar,
@@ -18,46 +17,112 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
+  ArrowRight,
 } from 'lucide-react'
 
 export default function SemestersPage() {
   const [semesters, setSemesters] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [statusFilter, setStatusFilter] = useState('all')
+  const [advancing, setAdvancing] = useState<string | null>(null)
+  const [advanceMsg, setAdvanceMsg] = useState<{
+    id: string
+    msg: string
+    type: 'success' | 'error'
+  } | null>(null)
+
+  // Debounce search
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search.trim()), 400)
+    return () => clearTimeout(t)
+  }, [search])
+
+  useEffect(() => {
+    setPage(1)
+  }, [debouncedSearch, statusFilter])
 
   useEffect(() => {
     fetchSemesters()
-  }, [page, search, statusFilter])
+  }, [page, debouncedSearch, statusFilter])
 
   const fetchSemesters = async () => {
     setLoading(true)
     try {
-      const where: any = {}
-      if (search || statusFilter !== 'all') {
-        const and: any[] = []
-        if (search) and.push({ name: { like: search } })
-        if (statusFilter !== 'all') and.push({ status: { equals: statusFilter } })
-        where.and = and
-      }
+      const conditions: Where[] = []
+      if (debouncedSearch) conditions.push({ name: { contains: debouncedSearch } })
+      if (statusFilter !== 'all') conditions.push({ status: { equals: statusFilter } })
 
-      const query = new URLSearchParams({
-        page: page.toString(),
-        limit: '10',
-        depth: '2',
-        ...(Object.keys(where).length && { where: JSON.stringify(where) }),
-      })
+      const where: Where | undefined = conditions.length > 1 ? { and: conditions } : conditions[0]
 
-      const res = await fetch(`/api/semesters?${query}`)
+      const queryString = stringify(
+        { page, limit: 12, depth: 2, ...(where && { where }) },
+        { addQueryPrefix: true },
+      )
+
+      const res = await fetch(`/api/semesters${queryString}`)
       const data = await res.json()
-      setSemesters(data.docs)
-      setTotalPages(data.totalPages)
+      setSemesters(data.docs || [])
+      setTotalPages(data.totalPages || 1)
     } catch (error) {
       console.error('Error fetching semesters:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  // Complete current semester & advance the linked batch
+  const handleAdvance = async (semester: any) => {
+    const batchObj = semester.batch
+    if (!batchObj) {
+      setAdvanceMsg({ id: semester.id, msg: 'No batch linked to this semester.', type: 'error' })
+      setTimeout(() => setAdvanceMsg(null), 3000)
+      return
+    }
+
+    const batchId = typeof batchObj === 'object' ? batchObj.id : batchObj
+    const nextSem = (batchObj?.currentSemesterNumber || 1) + 1
+    const total = parseInt(batchObj?.totalSemesters || '8', 10)
+
+    if (nextSem > total) {
+      setAdvanceMsg({ id: semester.id, msg: `All ${total} semesters completed!`, type: 'error' })
+      setTimeout(() => setAdvanceMsg(null), 3000)
+      return
+    }
+
+    setAdvancing(semester.id)
+    try {
+      // Mark this semester inactive
+      await fetch(`/api/semesters/${semester.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isActive: false }),
+      })
+
+      // Advance the batch's current semester number
+      await fetch(`/api/batches/${batchId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currentSemesterNumber: nextSem,
+          ...(nextSem >= total ? { status: 'completed' } : {}),
+        }),
+      })
+
+      setAdvanceMsg({
+        id: semester.id,
+        msg: `Batch advanced to Semester ${nextSem}!`,
+        type: 'success',
+      })
+      fetchSemesters()
+      setTimeout(() => setAdvanceMsg(null), 3000)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setAdvancing(null)
     }
   }
 
@@ -113,7 +178,7 @@ export default function SemestersPage() {
       <div className="p-6">
         <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="relative">
+            <div className="relative md:col-span-2">
               <Search
                 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
                 size={20}
@@ -136,10 +201,6 @@ export default function SemestersPage() {
               <option value="upcoming">Upcoming</option>
               <option value="completed">Completed</option>
             </select>
-            <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center space-x-2">
-              <Filter size={20} />
-              <span>More Filters</span>
-            </button>
           </div>
         </div>
 
@@ -194,6 +255,17 @@ export default function SemestersPage() {
                           {semester.department?.name || 'N/A'}
                         </span>
                       </div>
+                      {semester.batch?.name && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600">Batch:</span>
+                          <Link
+                            href={`/batches/${semester.batch.id}`}
+                            className="text-sm font-medium text-indigo-600 hover:underline"
+                          >
+                            {semester.batch.name}
+                          </Link>
+                        </div>
+                      )}
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600">Duration:</span>
                         <span className="text-sm font-medium text-gray-900">
@@ -202,6 +274,19 @@ export default function SemestersPage() {
                         </span>
                       </div>
                     </div>
+
+                    {/* Advance message */}
+                    {advanceMsg?.id === semester.id && (
+                      <div
+                        className={`mb-3 px-3 py-2 rounded-lg text-xs font-medium ${
+                          advanceMsg?.type === 'success'
+                            ? 'bg-green-50 text-green-700'
+                            : 'bg-red-50 text-red-700'
+                        }`}
+                      >
+                        {advanceMsg?.msg}
+                      </div>
+                    )}
 
                     <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                       <div className="flex items-center space-x-2">
@@ -217,7 +302,23 @@ export default function SemestersPage() {
                           </span>
                         )}
                       </div>
-                      <div className="flex space-x-2">
+                      <div className="flex items-center space-x-1">
+                        {/* Complete & Advance — only for active semesters linked to a batch */}
+                        {semester.isActive && semester.batch && (
+                          <button
+                            onClick={() => handleAdvance(semester)}
+                            disabled={advancing === semester.id}
+                            title="Complete this semester & advance batch to next"
+                            className="flex items-center space-x-1 px-2.5 py-1.5 text-xs font-medium bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-lg transition-colors"
+                          >
+                            {advancing === semester.id ? (
+                              <div className="w-3 h-3 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                              <ArrowRight size={12} />
+                            )}
+                            <span>Advance</span>
+                          </button>
+                        )}
                         <Link
                           href={`/semesters/${semester.id}`}
                           className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
@@ -235,6 +336,23 @@ export default function SemestersPage() {
                   </div>
                 </div>
               ))}
+
+              {semesters.length === 0 && (
+                <div className="md:col-span-3 bg-white rounded-xl border border-dashed border-gray-300 p-12 text-center">
+                  <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900">No semesters found</h3>
+                  <p className="text-gray-500 mb-4">
+                    Try adjusting your search or create a new semester.
+                  </p>
+                  <Link
+                    href="/semesters/create"
+                    className="inline-flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  >
+                    <Plus size={18} />
+                    <span>Add Semester</span>
+                  </Link>
+                </div>
+              )}
             </div>
 
             {totalPages > 1 && (

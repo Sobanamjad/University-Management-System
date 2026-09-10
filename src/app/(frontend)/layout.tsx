@@ -62,6 +62,7 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
     { name: 'Users', href: '/users', icon: Users },
     { name: 'Teachers', href: '/teachers', icon: UserCog },
     { name: 'Students', href: '/students', icon: GraduationCap },
+    { name: 'Batches', href: '/batches', icon: BookMarked },
     { name: 'Semesters', href: '/semesters', icon: Calendar },
     { name: 'Courses', href: '/courses', icon: BookOpen },
     { name: 'Classes', href: '/classes', icon: Clock },

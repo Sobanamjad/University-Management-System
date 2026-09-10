@@ -11,6 +11,7 @@ import { Semesters } from './collections/Semesters'
 import { Courses } from './collections/Courses'
 import { Classes } from './collections/Classes'
 import { Students } from './collections/Students'
+import { Batches } from './collections/Batches'
 import { Enrollments } from './collections/Enrollments'
 import { TimeTable } from './collections/TimeTable'
 import { TeacherSalary } from './collections/TeacherSalary'
@@ -28,6 +29,7 @@ export default buildConfig({
   collections: [
     Users,
     Departments,
+    Batches,
     Semesters,
     Courses,
     Classes,
