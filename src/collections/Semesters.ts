@@ -123,7 +123,19 @@ export const Semesters: CollectionConfig = {
       },
     },
 
-    // ===== 5. DEPARTMENT (Now university-independent) =====
+    // ===== 5. BATCH (Link to a Batch for progression tracking) =====
+    {
+      name: 'batch',
+      type: 'relationship',
+      relationTo: 'batches',
+      required: false,
+      label: 'Batch',
+      admin: {
+        description: 'Select the batch this semester belongs to (optional but recommended)',
+      },
+    },
+
+    // ===== 6. DEPARTMENT =====
     {
       name: 'department',
       type: 'relationship',
@@ -131,7 +143,7 @@ export const Semesters: CollectionConfig = {
       required: true,
       label: 'Department',
       admin: {
-        description: 'Select the department (subject) for this semester',
+        description: 'Select the department for this semester',
       },
     },
 

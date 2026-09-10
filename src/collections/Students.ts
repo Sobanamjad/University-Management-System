@@ -33,6 +33,16 @@ export const Students: CollectionConfig = {
       },
     },
     {
+      name: 'batch',
+      type: 'relationship',
+      relationTo: 'batches',
+      required: false,
+      label: 'Batch',
+      admin: {
+        description: 'Link student to a specific batch for semester progression tracking',
+      },
+    },
+    {
       name: 'department',
       type: 'relationship',
       relationTo: 'departments',
@@ -59,15 +69,6 @@ export const Students: CollectionConfig = {
           } as any
         }
         return true
-      },
-    },
-    {
-      name: 'batch',
-      type: 'text',
-      required: true,
-      label: 'Batch',
-      admin: {
-        placeholder: 'e.g., 2024-2028',
       },
     },
     {

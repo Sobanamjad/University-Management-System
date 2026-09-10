@@ -17,6 +17,8 @@ import {
   Settings,
   ChevronDown,
   UserCog,
+  ArrowRight,
+  CheckCircle,
 } from 'lucide-react'
 
 export default function DashboardPage() {
@@ -35,7 +37,9 @@ export default function DashboardPage() {
     courses: 0,
     classes: 0,
     enrollments: 0,
+    batches: 0,
   })
+  const [activeBatches, setActiveBatches] = useState<any[]>([])
 
   useEffect(() => {
     fetch('/api/users/me', { credentials: 'include' })
@@ -65,7 +69,7 @@ export default function DashboardPage() {
 
   const fetchStats = async () => {
     try {
-      const [departments, users, students, semesters, courses, classes, enrollments] =
+      const [departments, users, students, semesters, courses, classes, enrollments, batches] =
         await Promise.all([
           fetch('/api/departments?limit=0').then((res) => res.json()),
           fetch('/api/users?limit=0').then((res) => res.json()),
@@ -74,6 +78,9 @@ export default function DashboardPage() {
           fetch('/api/courses?limit=0').then((res) => res.json()),
           fetch('/api/classes?limit=0').then((res) => res.json()),
           fetch('/api/enrollments?limit=0').then((res) => res.json()),
+          fetch('/api/batches?limit=100&depth=2&where[status][equals]=active&sort=-startYear').then(
+            (res) => res.json(),
+          ),
         ])
 
       const teachers = users.docs.filter((u: any) => u.role === 'teacher').length
@@ -89,7 +96,9 @@ export default function DashboardPage() {
         courses: courses.totalDocs || 0,
         classes: classes.totalDocs || 0,
         enrollments: enrollments.totalDocs || 0,
+        batches: batches.totalDocs || 0,
       })
+      setActiveBatches(batches.docs || [])
     } catch (error) {
       console.error('Error fetching stats:', error)
     }
@@ -300,6 +309,16 @@ export default function DashboardPage() {
             <h3 className="text-gray-600 font-medium">Enrollments</h3>
             <p className="text-sm text-gray-500 mt-1">Student enrollments</p>
           </div>
+          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
+                <Users className="w-6 h-6 text-indigo-600" />
+              </div>
+              <span className="text-3xl font-bold text-gray-900">{stats.batches}</span>
+            </div>
+            <h3 className="text-gray-600 font-medium">Batches</h3>
+            <p className="text-sm text-gray-500 mt-1">Student batches</p>
+          </div>
           {/* Semesters Card */}
 
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
@@ -335,6 +354,60 @@ export default function DashboardPage() {
             <p className="text-sm text-gray-500 mt-1">Scheduled classes</p>
           </div>
         </div>
+
+        {/* Active Batches Widget */}
+        {activeBatches.length > 0 && (
+          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Active Batches</h3>
+              <Link
+                href="/batches"
+                className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+              >
+                View all →
+              </Link>
+            </div>
+            <div className="space-y-3">
+              {activeBatches.slice(0, 5).map((batch: any) => {
+                const total = parseInt(batch.totalSemesters || '8', 10)
+                const current = batch.currentSemesterNumber || 1
+                const progress = Math.round((current / total) * 100)
+                return (
+                  <div
+                    key={batch.id}
+                    className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg hover:bg-indigo-50 transition-colors group"
+                  >
+                    <div className="w-9 h-9 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <span className="text-xs font-bold text-indigo-600">
+                        {batch.startYear?.toString().slice(-2)}
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="text-sm font-semibold text-gray-900 truncate">{batch.name}</p>
+                        <span className="text-xs text-gray-500 ml-2 flex-shrink-0">
+                          Sem {current}/{total}
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-1.5">
+                        <div
+                          className="h-1.5 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500"
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                    </div>
+                    <Link
+                      href={`/batches/${batch.id}`}
+                      className="flex-shrink-0 p-1.5 text-gray-400 hover:text-indigo-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <ArrowRight size={16} />
+                    </Link>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Quick Actions */}
         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 mb-8">

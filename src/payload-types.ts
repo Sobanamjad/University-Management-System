@@ -69,6 +69,7 @@ export interface Config {
   collections: {
     users: User;
     departments: Department;
+    batches: Batch;
     semesters: Semester;
     courses: Course;
     classes: Class;
@@ -85,6 +86,7 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     departments: DepartmentsSelect<false> | DepartmentsSelect<true>;
+    batches: BatchesSelect<false> | BatchesSelect<true>;
     semesters: SemestersSelect<false> | SemestersSelect<true>;
     courses: CoursesSelect<false> | CoursesSelect<true>;
     classes: ClassesSelect<false> | ClassesSelect<true>;
@@ -199,6 +201,53 @@ export interface Department {
    * e.g., CS, MATH, PHY
    */
   code: string;
+  /**
+   * Default program length for this department
+   */
+  totalSemesters?: ('4' | '8') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Manage student batches — one batch = one group of students per department per year
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "batches".
+ */
+export interface Batch {
+  id: number;
+  /**
+   * Auto-generated: e.g., BS CS 2024
+   */
+  name?: string | null;
+  /**
+   * Department this batch belongs to
+   */
+  department: number | Department;
+  /**
+   * Year the batch started (e.g., 2024)
+   */
+  startYear: number;
+  /**
+   * Total number of semesters in this program
+   */
+  totalSemesters: '4' | '8';
+  /**
+   * Which semester is currently active for this batch (auto-updated on advance)
+   */
+  currentSemesterNumber?: number | null;
+  /**
+   * Active = currently running, Completed = all semesters done
+   */
+  status: 'active' | 'completed' | 'suspended';
+  /**
+   * Full academic session range
+   */
+  session?: string | null;
+  /**
+   * Optional notes about this batch
+   */
+  notes?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -224,7 +273,11 @@ export interface Semester {
    */
   code?: string | null;
   /**
-   * Select the department (subject) for this semester
+   * Select the batch this semester belongs to (optional but recommended)
+   */
+  batch?: (number | null) | Batch;
+  /**
+   * Select the department for this semester
    */
   department: number | Department;
   startDate: string;
@@ -317,6 +370,10 @@ export interface Student {
   displayTitle?: string | null;
   rollNo: string;
   /**
+   * Link student to a specific batch for semester progression tracking
+   */
+  batch?: (number | null) | Batch;
+  /**
    * Auto-assigned when student is enrolled in a class
    */
   department?: (number | null) | Department;
@@ -324,7 +381,6 @@ export interface Student {
    * Assigned automatically when student is enrolled in a class
    */
   semester?: (number | null) | Semester;
-  batch: string;
   admissionDate: string;
   /**
    * Link to student account (personal info will come from Users)
@@ -467,6 +523,10 @@ export interface PayloadLockedDocument {
         value: number | Department;
       } | null)
     | ({
+        relationTo: 'batches';
+        value: number | Batch;
+      } | null)
+    | ({
         relationTo: 'semesters';
         value: number | Semester;
       } | null)
@@ -597,6 +657,23 @@ export interface UsersSelect<T extends boolean = true> {
 export interface DepartmentsSelect<T extends boolean = true> {
   name?: T;
   code?: T;
+  totalSemesters?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "batches_select".
+ */
+export interface BatchesSelect<T extends boolean = true> {
+  name?: T;
+  department?: T;
+  startYear?: T;
+  totalSemesters?: T;
+  currentSemesterNumber?: T;
+  status?: T;
+  session?: T;
+  notes?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -609,6 +686,7 @@ export interface SemestersSelect<T extends boolean = true> {
   semesterNumber?: T;
   name?: T;
   code?: T;
+  batch?: T;
   department?: T;
   startDate?: T;
   endDate?: T;
@@ -658,9 +736,9 @@ export interface ClassesSelect<T extends boolean = true> {
 export interface StudentsSelect<T extends boolean = true> {
   displayTitle?: T;
   rollNo?: T;
+  batch?: T;
   department?: T;
   semester?: T;
-  batch?: T;
   admissionDate?: T;
   user?: T;
   updatedAt?: T;
