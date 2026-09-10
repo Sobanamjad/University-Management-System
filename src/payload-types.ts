@@ -244,10 +244,6 @@ export interface Batch {
    * Full academic session range
    */
   session?: string | null;
-  /**
-   * Optional notes about this batch
-   */
-  notes?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -673,7 +669,6 @@ export interface BatchesSelect<T extends boolean = true> {
   currentSemesterNumber?: T;
   status?: T;
   session?: T;
-  notes?: T;
   updatedAt?: T;
   createdAt?: T;
 }
