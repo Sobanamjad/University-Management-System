@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { stringify } from 'qs-esm'
+import { stringify } from 'qs'
 import type { Where } from 'payload'
 import {
   Plus,

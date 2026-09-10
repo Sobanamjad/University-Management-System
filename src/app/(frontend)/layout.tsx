@@ -30,6 +30,7 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [user, setUser] = useState<any>(null)
+  const [userLoaded, setUserLoaded] = useState(false)
   const pathname = usePathname()
 
   useEffect(() => {
@@ -42,6 +43,8 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
         }
       } catch (err) {
         console.error('Failed to fetch user:', err)
+      } finally {
+        setUserLoaded(true)
       }
     }
     fetchUser()
@@ -57,19 +60,24 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
   }
 
   const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'Departments', href: '/departments', icon: Layers },
-    { name: 'Users', href: '/users', icon: Users },
-    { name: 'Teachers', href: '/teachers', icon: UserCog },
-    { name: 'Students', href: '/students', icon: GraduationCap },
-    { name: 'Batches', href: '/batches', icon: BookMarked },
-    { name: 'Semesters', href: '/semesters', icon: Calendar },
-    { name: 'Courses', href: '/courses', icon: BookOpen },
-    { name: 'Classes', href: '/classes', icon: Clock },
-    { name: 'Enrollments', href: '/enrollments', icon: UserCheck },
-    { name: 'Timetable', href: '/timetable', icon: BookMarked },
-    { name: 'Teacher Salary', href: '/teacher-salary', icon: Banknote },
+    { name: 'Dashboard', href: '/dashboard', icon: Home, adminOnly: false },
+    { name: 'Departments', href: '/departments', icon: Layers, adminOnly: false },
+    { name: 'Users', href: '/users', icon: Users, adminOnly: true },
+    { name: 'Teachers', href: '/teachers', icon: UserCog, adminOnly: false },
+    { name: 'Students', href: '/students', icon: GraduationCap, adminOnly: false },
+    { name: 'Batches', href: '/batches', icon: BookMarked, adminOnly: false },
+    { name: 'Semesters', href: '/semesters', icon: Calendar, adminOnly: false },
+    { name: 'Courses', href: '/courses', icon: BookOpen, adminOnly: false },
+    { name: 'Classes', href: '/classes', icon: Clock, adminOnly: false },
+    { name: 'Enrollments', href: '/enrollments', icon: UserCheck, adminOnly: false },
+    { name: 'Timetable', href: '/timetable', icon: BookMarked, adminOnly: false },
+    { name: 'Teacher Salary', href: '/teacher-salary', icon: Banknote, adminOnly: true },
   ]
+
+  // Hide adminOnly items only after user is confirmed loaded and is not admin
+  const visibleNav = navigation.filter(
+    (item) => !item.adminOnly || !userLoaded || user?.role === 'admin',
+  )
   const isAuthPage = pathname === '/login' || pathname === '/register' || pathname === '/'
 
   if (isAuthPage) {
@@ -123,7 +131,7 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
 
           {/* Navigation */}
           <nav className="flex-1 overflow-y-auto p-4 scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-            {navigation.map((item) => {
+            {visibleNav.map((item) => {
               const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
               return (
                 <Link
