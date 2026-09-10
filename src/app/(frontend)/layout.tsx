@@ -36,7 +36,7 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch('/api/me')
+        const res = await fetch('/api/users/me', { credentials: 'include' })
         if (res.ok) {
           const data = await res.json()
           setUser(data.user)

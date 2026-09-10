@@ -263,7 +263,7 @@ export interface Semester {
   /**
    * Auto-generated from session, semester number, and department
    */
-  name: string;
+  name?: string | null;
   /**
    * Auto-generated unique code including department
    */
@@ -307,7 +307,7 @@ export interface Course {
    */
   semester?: (number | null) | Semester;
   /**
-   * Teachers filtered by department only
+   * Teachers filtered by role
    */
   teacher?: (number | null) | User;
   updatedAt: string;
@@ -322,18 +322,19 @@ export interface Course {
 export interface Class {
   id: number;
   /**
-   * Auto-generated from course and section
+   * Auto-generated: Course Name - Section (Session)
    */
   title?: string | null;
   section: string;
   department: number | Department;
+  /**
+   * Which batch this class belongs to
+   */
+  batch?: (number | null) | Batch;
   course?: (number | null) | Course;
   semester?: (number | null) | Semester;
   teacher?: (number | null) | User;
   days: ('monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday')[];
-  /**
-   * Select time slot (hourly from 8 AM to 5 PM)
-   */
   timeSlot:
     | '08:00-09:00'
     | '09:00-10:00'
@@ -345,7 +346,6 @@ export interface Class {
     | '15:00-16:00'
     | '16:00-17:00'
     | '17:00-18:00';
-  maxStudents: number;
   currentStudents?: number | null;
   lectureType: 'theory' | 'lab';
   status: 'scheduled' | 'ongoing' | 'completed' | 'cancelled';
@@ -712,12 +712,12 @@ export interface ClassesSelect<T extends boolean = true> {
   title?: T;
   section?: T;
   department?: T;
+  batch?: T;
   course?: T;
   semester?: T;
   teacher?: T;
   days?: T;
   timeSlot?: T;
-  maxStudents?: T;
   currentStudents?: T;
   lectureType?: T;
   status?: T;

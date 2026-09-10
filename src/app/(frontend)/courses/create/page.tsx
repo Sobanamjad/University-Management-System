@@ -15,7 +15,14 @@ export default function CreateCoursePage() {
   const [semesters, setSemesters] = useState<any[]>([])
   const [teachers, setTeachers] = useState<any[]>([])
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    title: string
+    code: string
+    creditHours: number | string
+    department: string
+    semester: string
+    teacher: string
+  }>({
     title: '',
     code: '',
     creditHours: 3,
@@ -35,25 +42,20 @@ export default function CreateCoursePage() {
   // Fetch data based on department
   useEffect(() => {
     if (formData.department) {
+      const deptId = Number(formData.department)
+
+      // Fix 1: pass numeric ID for Postgres
       const q = new URLSearchParams({
         limit: '100',
-        where: JSON.stringify({ department: { equals: formData.department } }),
+        where: JSON.stringify({ department: { equals: deptId } }),
       })
       fetch(`/api/semesters?${q}`)
         .then((res) => res.json())
         .then((data) => setSemesters(data.docs || []))
         .catch((err) => console.error(err))
 
-      const teacherQ = new URLSearchParams({
-        limit: '100',
-        where: JSON.stringify({
-          and: [
-            { role: { equals: 'teacher' } },
-            { 'teacherInfo.department': { equals: formData.department } },
-          ],
-        }),
-      })
-      fetch(`/api/users?${teacherQ}`)
+      // Fix 2: teachers have no department field — just filter by role
+      fetch(`/api/users?where[role][equals]=teacher&limit=100`)
         .then((res) => res.json())
         .then((data) => setTeachers(data.docs || []))
         .catch((err) => console.error(err))
@@ -65,10 +67,13 @@ export default function CreateCoursePage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === 'creditHours' ? (value === '' ? '' : Number(value)) : value,
+    }))
 
     if (name === 'department') {
-      setFormData((prev) => ({ ...prev, semester: '', teacher: '' }))
+      setFormData((prev) => ({ ...prev, department: value, semester: '', teacher: '' }))
     }
   }
 
@@ -79,7 +84,7 @@ export default function CreateCoursePage() {
 
     const payload = {
       ...formData,
-      creditHours: Number(formData.creditHours),
+      creditHours: Number(formData.creditHours) || 1,
       department: Number(formData.department),
       semester: Number(formData.semester),
       teacher: formData.teacher ? Number(formData.teacher) : undefined,
@@ -95,7 +100,9 @@ export default function CreateCoursePage() {
           router.push('/courses')
         } else {
           res.json().then((data) => {
-            setError(data.errors?.[0]?.message || 'Failed to create course. Code may already exist.')
+            setError(
+              data.errors?.[0]?.message || 'Failed to create course. Code may already exist.',
+            )
             setLoading(false)
           })
         }
@@ -141,7 +148,9 @@ export default function CreateCoursePage() {
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-blue-50/50 rounded-xl border border-blue-100 text-sm mb-2">
                 <div>
-                  <label className="block font-semibold text-blue-900 mb-1">Department <span className="text-red-500">*</span></label>
+                  <label className="block font-semibold text-blue-900 mb-1">
+                    Department <span className="text-red-500">*</span>
+                  </label>
                   <select
                     name="department"
                     required
@@ -151,12 +160,16 @@ export default function CreateCoursePage() {
                   >
                     <option value="">Select Department</option>
                     {departments.map((dept) => (
-                      <option key={dept.id} value={dept.id}>{dept.name}</option>
+                      <option key={dept.id} value={dept.id}>
+                        {dept.name}
+                      </option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="block font-semibold text-blue-900 mb-1">Semester <span className="text-red-500">*</span></label>
+                  <label className="block font-semibold text-blue-900 mb-1">
+                    Semester <span className="text-red-500">*</span>
+                  </label>
                   <select
                     name="semester"
                     required
@@ -167,7 +180,9 @@ export default function CreateCoursePage() {
                   >
                     <option value="">Select Semester</option>
                     {semesters.map((sem) => (
-                      <option key={sem.id} value={sem.id}>{sem.name}</option>
+                      <option key={sem.id} value={sem.id}>
+                        {sem.name}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -175,7 +190,9 @@ export default function CreateCoursePage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-gray-100 pt-6">
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Course Title <span className="text-red-500">*</span></label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Course Title <span className="text-red-500">*</span>
+                  </label>
                   <input
                     type="text"
                     name="title"
@@ -188,7 +205,9 @@ export default function CreateCoursePage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Course Code <span className="text-red-500">*</span></label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Course Code <span className="text-red-500">*</span>
+                  </label>
                   <input
                     type="text"
                     name="code"
@@ -201,21 +220,28 @@ export default function CreateCoursePage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Credit Hours <span className="text-red-500">*</span></label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Credit Hours <span className="text-red-500">*</span>
+                  </label>
                   <input
                     type="number"
                     name="creditHours"
                     required
                     min="1"
                     max="6"
+                    step="1"
                     value={formData.creditHours}
                     onChange={handleChange}
+                    placeholder="1–6"
                     className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white transition-shadow"
                   />
+                  <p className="text-xs text-gray-400 mt-1">Enter a number between 1 and 6</p>
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Teacher (Optional)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Teacher (Optional)
+                  </label>
                   <select
                     name="teacher"
                     disabled={!formData.department}
@@ -225,7 +251,9 @@ export default function CreateCoursePage() {
                   >
                     <option value="">Select Teacher</option>
                     {teachers.map((t) => (
-                      <option key={t.id} value={t.id}>{t.name}</option>
+                      <option key={t.id} value={t.id}>
+                        {t.name}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -241,7 +269,13 @@ export default function CreateCoursePage() {
               </Link>
               <button
                 type="submit"
-                disabled={loading || !formData.title || !formData.code || !formData.department || !formData.semester}
+                disabled={
+                  loading ||
+                  !formData.title ||
+                  !formData.code ||
+                  !formData.department ||
+                  !formData.semester
+                }
                 className="flex items-center space-x-2 px-6 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-all shadow-sm shadow-blue-200"
               >
                 <Save size={18} />
