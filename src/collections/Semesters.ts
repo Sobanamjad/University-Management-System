@@ -207,6 +207,26 @@ export const Semesters: CollectionConfig = {
     beforeChange: [
       // Auto-generate name and code from session + semesterNumber + department
       async ({ data, req }) => {
+        // If batch is provided, enforce that department and semesterNumber match the batch
+        if (data?.batch) {
+          try {
+            const batch = await req.payload.findByID({
+              collection: 'batches',
+              id: String(data.batch),
+              depth: 1,
+              overrideAccess: true,
+            })
+            const batchDeptId =
+              typeof batch.department === 'object' ? batch.department.id : batch.department
+
+            // Force department and semesterNumber from batch — cannot be overridden
+            data.department = batchDeptId
+            data.semesterNumber = String(batch.currentSemesterNumber || data.semesterNumber)
+          } catch {
+            // batch not found — continue with user-provided values
+          }
+        }
+
         if (data?.session && data?.semesterNumber && data?.department) {
           try {
             const dept = await req.payload.findByID({

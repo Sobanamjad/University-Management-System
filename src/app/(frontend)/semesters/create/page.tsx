@@ -207,13 +207,19 @@ export default function CreateSemesterPage() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Semester Number <span className="text-red-500">*</span>
+                    {formData.batch && (
+                      <span className="ml-2 text-xs text-blue-600 font-normal">
+                        🔒 locked from batch
+                      </span>
+                    )}
                   </label>
                   <select
                     name="semesterNumber"
                     required
                     value={formData.semesterNumber}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                    disabled={!!formData.batch}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
                   >
                     {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
                       <option key={n} value={n.toString()}>
@@ -228,23 +234,35 @@ export default function CreateSemesterPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Department <span className="text-red-500">*</span>
+                  {formData.batch && (
+                    <span className="ml-2 text-xs text-blue-600 font-normal">
+                      🔒 locked from batch
+                    </span>
+                  )}
                 </label>
-                <select
-                  name="department"
-                  required
-                  value={String(formData.department)}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                >
-                  <option value="" disabled>
-                    Select Department
-                  </option>
-                  {departments.map((dept) => (
-                    <option key={dept.id} value={dept.id}>
-                      {dept.name}
+                {formData.batch ? (
+                  <div className="w-full px-4 py-2 border border-gray-200 rounded-xl bg-gray-100 text-gray-600 text-sm">
+                    {departments.find((d) => String(d.id) === String(formData.department))?.name ||
+                      'Loading...'}
+                  </div>
+                ) : (
+                  <select
+                    name="department"
+                    required
+                    value={String(formData.department)}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                  >
+                    <option value="" disabled>
+                      Select Department
                     </option>
-                  ))}
-                </select>
+                    {departments.map((dept) => (
+                      <option key={dept.id} value={dept.id}>
+                        {dept.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
 
               {/* Dates */}
