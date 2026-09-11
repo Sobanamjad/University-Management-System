@@ -29,6 +29,7 @@ export default function CreateStudentPage() {
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [departments, setDepartments] = useState<any[]>([])
+  const [batches, setBatches] = useState<any[]>([])
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -52,12 +53,16 @@ export default function CreateStudentPage() {
     state: '',
     // Step 3
     rollNo: '',
-    batch: '',
+    batch: '' as number | string,
     admissionDate: '',
+    status: 'active',
   })
 
   useEffect(() => {
-    // departments no longer needed on create — assigned via enrollment
+    // Load active batches for dropdown
+    fetch('/api/batches?where[status][equals]=active&limit=100&sort=-startYear&depth=1')
+      .then((r) => r.json())
+      .then((d) => setBatches(d.docs || []))
   }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -97,7 +102,7 @@ export default function CreateStudentPage() {
 
     if (step === 3) {
       if (!formData.rollNo.trim()) e.rollNo = 'Roll number is required'
-      if (!formData.batch.trim()) e.batch = 'Batch is required'
+      if (!formData.batch) e.batch = 'Please select a batch'
       if (!formData.admissionDate) e.admissionDate = 'Admission date is required'
     }
 
@@ -159,10 +164,12 @@ export default function CreateStudentPage() {
       const studentRes = await fetch('/api/students', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           rollNo: formData.rollNo,
-          batch: formData.batch,
+          batch: formData.batch ? Number(formData.batch) : undefined,
           admissionDate: formData.admissionDate,
+          status: formData.status,
           user: parseInt(String(userId), 10),
         }),
       })
