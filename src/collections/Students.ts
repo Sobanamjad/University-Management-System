@@ -6,7 +6,7 @@ export const Students: CollectionConfig = {
   admin: {
     useAsTitle: 'displayTitle',
     group: 'University',
-    defaultColumns: ['displayTitle', 'department', 'semester', 'batch'],
+    defaultColumns: ['displayTitle', 'rollNo', 'batch', 'department', 'semester', 'status'],
     description: 'Manage student University records',
   },
   fields: [
@@ -21,7 +21,7 @@ export const Students: CollectionConfig = {
       },
     },
 
-    // ===== University INFO ONLY =====
+    // ===== ROLL NUMBER =====
     {
       name: 'rollNo',
       type: 'text',
@@ -32,6 +32,8 @@ export const Students: CollectionConfig = {
         placeholder: 'e.g., CS-2024-001',
       },
     },
+
+    // ===== BATCH (relationship) =====
     {
       name: 'batch',
       type: 'relationship',
@@ -39,9 +41,11 @@ export const Students: CollectionConfig = {
       required: false,
       label: 'Batch',
       admin: {
-        description: 'Link student to a specific batch for semester progression tracking',
+        description: 'Link student to a batch for semester progression tracking',
       },
     },
+
+    // ===== DEPARTMENT (auto-filled from batch) =====
     {
       name: 'department',
       type: 'relationship',
@@ -49,33 +53,54 @@ export const Students: CollectionConfig = {
       required: false,
       label: 'Department',
       admin: {
-        description: 'Auto-assigned when student is enrolled in a class',
+        description: 'Auto-filled from batch',
         readOnly: true,
       },
     },
+
+    // ===== CURRENT SEMESTER (filtered by batch) =====
     {
       name: 'semester',
       type: 'relationship',
       relationTo: 'semesters',
       required: false,
       label: 'Current Semester',
-      admin: {
-        description: 'Assigned automatically when student is enrolled in a class',
-      },
       filterOptions: ({ data }) => {
-        if (data?.department) {
-          return {
-            department: { equals: data.department },
-          } as any
+        const batchId = typeof data?.batch === 'object' ? (data.batch as any)?.id : data?.batch
+        if (batchId) {
+          return { batch: { equals: batchId } } as any
         }
         return true
       },
+      admin: {
+        description: 'Filtered by batch',
+      },
     },
+
+    // ===== ADMISSION DATE =====
     {
       name: 'admissionDate',
       type: 'date',
       required: true,
       label: 'Admission Date',
+    },
+
+    // ===== STATUS =====
+    {
+      name: 'status',
+      type: 'select',
+      required: true,
+      defaultValue: 'active',
+      label: 'Status',
+      options: [
+        { label: 'Active', value: 'active' },
+        { label: 'Inactive', value: 'inactive' },
+        { label: 'Graduated', value: 'graduated' },
+        { label: 'Suspended', value: 'suspended' },
+      ],
+      admin: {
+        position: 'sidebar',
+      },
     },
 
     // ===== LINK TO USER =====
@@ -90,49 +115,55 @@ export const Students: CollectionConfig = {
         role: { equals: 'student' },
       },
       admin: {
-        description: 'Link to student account (personal info will come from Users)',
+        description: 'Link to student user account',
       },
     },
   ],
 
   // ===== INDEXES =====
   indexes: [
-    {
-      fields: ['rollNo'],
-      unique: true,
-    },
-    {
-      fields: ['user'],
-      unique: true,
-    },
-    {
-      fields: ['department'],
-    },
-    {
-      fields: ['semester'],
-    },
+    { fields: ['rollNo'], unique: true },
+    { fields: ['user'], unique: true },
+    { fields: ['department'] },
+    { fields: ['semester'] },
+    { fields: ['batch'] },
   ],
 
   // ===== HOOKS =====
   hooks: {
     beforeChange: [
       async ({ data, req }) => {
-        // Auto-generate rollNo if not set
-        if (!data?.rollNo && data?.department && data?.batch) {
-          const year = data.batch.split('-')[0] || new Date().getFullYear()
-          const deptCode = data.department?.toString().slice(-3).toUpperCase() || 'XXX'
-          const random = Math.floor(100 + Math.random() * 900)
-          data.rollNo = `${deptCode}-${year}-${random}`
+        // Auto-fill department from batch
+        if (data?.batch) {
+          try {
+            const batch = await req.payload.findByID({
+              collection: 'batches',
+              id: String(data.batch),
+              depth: 1,
+              overrideAccess: true,
+              req,
+            })
+            if (batch?.department) {
+              data.department =
+                typeof batch.department === 'object'
+                  ? (batch.department as any).id
+                  : batch.department
+            }
+          } catch {
+            // keep existing department
+          }
         }
 
-        // Auto-generate displayTitle: "rollNo - Name"
+        // Auto-generate displayTitle: "CS-2024-001 - Ali Hassan"
         if (data?.user) {
           try {
             const userId = typeof data.user === 'object' ? (data.user as any).id : data.user
             const userDoc = await req.payload.findByID({
               collection: 'users',
-              id: userId,
+              id: String(userId),
               depth: 0,
+              overrideAccess: true,
+              req,
             })
             const rollNo = data.rollNo || 'N/A'
             const name = userDoc?.name || 'Unknown'
