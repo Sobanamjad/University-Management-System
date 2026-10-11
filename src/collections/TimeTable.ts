@@ -99,7 +99,7 @@ export const TimeTable: CollectionConfig = {
       },
     },
 
-    // ===== 2. CLASS (Class Timetable ke liye) =====
+    // ===== 2. CLASS (For Class Timetable) =====
     {
       name: 'class',
       type: 'relationship',
@@ -360,13 +360,9 @@ export const TimeTable: CollectionConfig = {
       return user?.role === 'admin' || user?.role === 'coordinator'
     },
     update: ({ req: { user } }) => {
-      if (user?.role === 'admin' || user?.role === 'coordinator') return true
-      if (user?.role === 'teacher') {
-        return {
-          teacher: { equals: user.id },
-        }
-      }
-      return false
+      // Only admin and coordinator can edit
+      // Teacher can only read
+      return user?.role === 'admin' || user?.role === 'coordinator'
     },
     delete: ({ req: { user } }) => {
       return user?.role === 'admin'
