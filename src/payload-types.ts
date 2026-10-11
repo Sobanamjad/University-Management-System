@@ -147,12 +147,19 @@ export interface UserAuthOperations {
 export interface User {
   id: number;
   name: string;
-  role: 'admin' | 'coordinator' | 'teacher' | 'student';
+  role: 'admin' | 'coordinator' | 'teacher' | 'accountant' | 'student';
   status: 'active' | 'inactive';
   teacherInfo?: {
     designation: 'Permanent' | 'visiting';
     /**
      * e.g., PhD Computer Science, M.Sc Mathematics
+     */
+    qualification: string;
+    joiningDate: string;
+  };
+  accountantInfo?: {
+    /**
+     * e.g., B.Com, M.Com, MBA Finance
      */
     qualification: string;
     joiningDate: string;
@@ -644,7 +651,7 @@ export interface FeePayment {
    */
   remarks?: string | null;
   /**
-   * Admin who received this payment
+   * Admin or accountant who received this payment
    */
   receivedBy?: (number | null) | User;
   updatedAt: string;
@@ -886,6 +893,12 @@ export interface UsersSelect<T extends boolean = true> {
     | T
     | {
         designation?: T;
+        qualification?: T;
+        joiningDate?: T;
+      };
+  accountantInfo?:
+    | T
+    | {
         qualification?: T;
         joiningDate?: T;
       };

@@ -141,8 +141,8 @@ export const FeePayments: CollectionConfig = {
               const year = date.getFullYear()
               const month = String(date.getMonth() + 1).padStart(2, '0')
               const random = Math.floor(Math.random() * 10000)
-              .toString()
-              .padStart(4, '0')
+                .toString()
+                .padStart(4, '0')
               return `REC-${year}${month}-${random}`
             }
             return data.receiptNumber
@@ -198,10 +198,10 @@ export const FeePayments: CollectionConfig = {
       relationTo: 'users',
       label: 'Received By',
       filterOptions: {
-        role: { equals: 'admin' },
+        role: { in: ['admin', 'accountant'] },
       },
       admin: {
-        description: 'Admin who received this payment',
+        description: 'Admin or accountant who received this payment',
       },
     },
   ],
@@ -237,7 +237,15 @@ export const FeePayments: CollectionConfig = {
               const paidDate = new Date(data.paidDate)
 
               if (paidDate > dueDate) {
-                data.lateFeeApplied = feeStructure.lateFeePolicy.lateFeeAmount || 0
+                // Calculate late fee based on per-day or flat rate
+                if (feeStructure.lateFeePolicy.lateFeePerDay) {
+                  const daysLate = Math.ceil(
+                    (paidDate.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24),
+                  )
+                  data.lateFeeApplied = (feeStructure.lateFeePolicy.lateFeeAmount || 0) * daysLate
+                } else {
+                  data.lateFeeApplied = feeStructure.lateFeePolicy.lateFeeAmount || 0
+                }
               } else {
                 data.lateFeeApplied = 0
               }
@@ -260,11 +268,13 @@ export const FeePayments: CollectionConfig = {
       if (user?.role === 'student') {
         return { student: { user: { equals: user.id } } }
       }
-      // Admin and coordinator can see all
-      return user?.role === 'admin' || user?.role === 'coordinator'
+      // Admin, coordinator, and accountant can see all
+      return user?.role === 'admin' || user?.role === 'coordinator' || user?.role === 'accountant'
     },
-    create: ({ req: { user } }) => user?.role === 'admin' || user?.role === 'coordinator',
-    update: ({ req: { user } }) => user?.role === 'admin' || user?.role === 'coordinator',
+    create: ({ req: { user } }) =>
+      user?.role === 'admin' || user?.role === 'coordinator' || user?.role === 'accountant',
+    update: ({ req: { user } }) =>
+      user?.role === 'admin' || user?.role === 'coordinator' || user?.role === 'accountant',
     delete: ({ req: { user } }) => user?.role === 'admin',
   },
 }

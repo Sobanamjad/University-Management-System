@@ -158,14 +158,57 @@ export const FeeStructure: CollectionConfig = {
     { fields: ['status'] },
   ],
 
+  // ===== HOOKS =====
+  hooks: {
+    beforeValidate: [
+      async ({ data, req }) => {
+        // If batch is specified, validate that semester belongs to the same department
+        if (data?.batch && data?.semester) {
+          try {
+            const batch = await req.payload.findByID({
+              collection: 'batches',
+              id: String(data.batch),
+              depth: 1,
+              req,
+            })
+            const semester = await req.payload.findByID({
+              collection: 'semesters',
+              id: String(data.semester),
+              depth: 0,
+              req,
+            })
+
+            const batchDeptId =
+              typeof batch.department === 'object' ? batch.department.id : batch.department
+            const semesterDeptId =
+              typeof semester.department === 'object' ? semester.department.id : semester.department
+
+            if (batchDeptId !== semesterDeptId) {
+              throw new Error(
+                'Semester must belong to the same department as the batch. Please select a semester from the correct department.',
+              )
+            }
+          } catch (error) {
+            // If error is already thrown, re-throw it
+            if (error instanceof Error) throw error
+            // Otherwise continue (validation will fail on save if data is invalid)
+          }
+        }
+        return data
+      },
+    ],
+  },
+
   // ===== ACCESS CONTROL =====
   access: {
     read: ({ req: { user } }) => {
       if (!user) return false
-      return user?.role === 'admin' || user?.role === 'coordinator'
+      return user?.role === 'admin' || user?.role === 'coordinator' || user?.role === 'accountant'
     },
-    create: ({ req: { user } }) => user?.role === 'admin' || user?.role === 'coordinator',
-    update: ({ req: { user } }) => user?.role === 'admin' || user?.role === 'coordinator',
+    create: ({ req: { user } }) =>
+      user?.role === 'admin' || user?.role === 'coordinator' || user?.role === 'accountant',
+    update: ({ req: { user } }) =>
+      user?.role === 'admin' || user?.role === 'coordinator' || user?.role === 'accountant',
     delete: ({ req: { user } }) => user?.role === 'admin',
   },
 }
