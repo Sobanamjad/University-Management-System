@@ -366,20 +366,21 @@ export interface Student {
   displayTitle?: string | null;
   rollNo: string;
   /**
-   * Link student to a specific batch for semester progression tracking
+   * Link student to a batch for semester progression tracking
    */
   batch?: (number | null) | Batch;
   /**
-   * Auto-assigned when student is enrolled in a class
+   * Auto-filled from batch
    */
   department?: (number | null) | Department;
   /**
-   * Assigned automatically when student is enrolled in a class
+   * Filtered by batch
    */
   semester?: (number | null) | Semester;
   admissionDate: string;
+  status: 'active' | 'inactive' | 'graduated' | 'suspended';
   /**
-   * Link to student account (personal info will come from Users)
+   * Link to student user account
    */
   user: number | User;
   updatedAt: string;
@@ -397,13 +398,12 @@ export interface Enrollment {
    * Select department to filter students and classes
    */
   department: number | Department;
-  semester?: (number | null) | Semester;
   /**
-   * Students filtered by department & semester
+   * Students filtered by department
    */
   student?: (number | null) | Student;
   /**
-   * Classes filtered by department & semester
+   * Classes filtered by department
    */
   class?: (number | null) | Class;
   status: 'enrolled' | 'dropped' | 'completed';
@@ -735,6 +735,7 @@ export interface StudentsSelect<T extends boolean = true> {
   department?: T;
   semester?: T;
   admissionDate?: T;
+  status?: T;
   user?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -745,7 +746,6 @@ export interface StudentsSelect<T extends boolean = true> {
  */
 export interface EnrollmentsSelect<T extends boolean = true> {
   department?: T;
-  semester?: T;
   student?: T;
   class?: T;
   status?: T;

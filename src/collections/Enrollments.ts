@@ -32,27 +32,6 @@ export const Enrollments: CollectionConfig = {
       },
     },
 
-    // ===== SEMESTER (NEW) =====
-    {
-      name: 'semester',
-      type: 'relationship',
-      relationTo: 'semesters',
-      required: true,
-      label: 'Semester',
-      filterOptions: ({ data }) => {
-        const deptId = toId(data?.department)
-        if (deptId) {
-          return {
-            department: { equals: deptId },
-          } as any
-        }
-        return true
-      },
-      admin: {
-        condition: (data) => Boolean(data?.department),
-      },
-    },
-
     {
       name: 'student',
       type: 'relationship',
@@ -61,17 +40,12 @@ export const Enrollments: CollectionConfig = {
       label: 'Student',
       filterOptions: ({ data }) => {
         const deptId = toId(data?.department)
-        const semId = toId(data?.semester)
-
-        const where: any = { and: [] }
-        if (deptId) where.and.push({ department: { equals: deptId } })
-        if (semId) where.and.push({ semester: { equals: semId } })
-
-        return where.and.length > 0 ? (where as any) : true
+        if (deptId) return { department: { equals: deptId } } as any
+        return true
       },
       admin: {
-        condition: (data) => Boolean(data?.department && data?.semester),
-        description: 'Students filtered by department & semester',
+        condition: (data) => Boolean(data?.department),
+        description: 'Students filtered by department',
       },
     },
 
@@ -83,17 +57,12 @@ export const Enrollments: CollectionConfig = {
       label: 'Class',
       filterOptions: ({ data }) => {
         const deptId = toId(data?.department)
-        const semId = toId(data?.semester)
-
-        const where: any = { and: [] }
-        if (deptId) where.and.push({ department: { equals: deptId } })
-        if (semId) where.and.push({ semester: { equals: semId } })
-
-        return where.and.length > 0 ? (where as any) : true
+        if (deptId) return { department: { equals: deptId } } as any
+        return true
       },
       admin: {
-        condition: (data) => Boolean(data?.department && data?.semester),
-        description: 'Classes filtered by department & semester',
+        condition: (data) => Boolean(data?.department),
+        description: 'Classes filtered by department',
       },
     },
 
