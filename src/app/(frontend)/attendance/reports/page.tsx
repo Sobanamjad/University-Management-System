@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Calendar, TrendingUp, Users, CheckCircle, XCircle, Clock } from 'lucide-react'
+import { Calendar, TrendingUp, Users, CheckCircle, XCircle, Clock, Download } from 'lucide-react'
+import { generateAttendanceReportPDF } from '@/utils/pdfGenerator'
 
 interface AttendanceStats {
   total: number
@@ -15,6 +16,7 @@ interface AttendanceStats {
 
 export default function AttendanceReportsPage() {
   const [loading, setLoading] = useState(true)
+  const [attendanceData, setAttendanceData] = useState<any[]>([])
   const [stats, setStats] = useState<AttendanceStats>({
     total: 0,
     present: 0,
@@ -49,6 +51,8 @@ export default function AttendanceReportsPage() {
       const res = await fetch(`/api/attendance?${query}`)
       const data = await res.json()
       const attendance = data.docs || []
+
+      setAttendanceData(attendance)
 
       const total = attendance.length
       const present = attendance.filter((a: any) => a.status === 'present').length
@@ -136,9 +140,18 @@ export default function AttendanceReportsPage() {
       <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="max-w-[1600px] mx-auto px-6 h-20 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">Attendance Reports</h1>
+            <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">
+              Attendance Reports
+            </h1>
             <p className="text-sm font-medium text-gray-500">Attendance statistics and summaries</p>
           </div>
+          <button
+            onClick={() => generateAttendanceReportPDF(attendanceData, stats)}
+            className="flex items-center space-x-2 px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all font-semibold shadow-md shadow-blue-100"
+          >
+            <Download size={20} />
+            <span>Download Report</span>
+          </button>
         </div>
       </div>
 
@@ -157,7 +170,9 @@ export default function AttendanceReportsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Class (Optional)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Class (Optional)
+              </label>
               <input
                 type="text"
                 placeholder="Enter class ID..."
@@ -183,7 +198,9 @@ export default function AttendanceReportsPage() {
                   className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow"
                 >
                   <div className="flex items-center justify-between mb-4">
-                    <div className={`w-12 h-12 ${card.bgColor} rounded-xl flex items-center justify-center`}>
+                    <div
+                      className={`w-12 h-12 ${card.bgColor} rounded-xl flex items-center justify-center`}
+                    >
                       <card.icon size={24} className={card.textColor} />
                     </div>
                     <span className="text-3xl font-bold text-gray-900">{card.value}</span>
@@ -231,7 +248,8 @@ export default function AttendanceReportsPage() {
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-gray-700">{item.label}</span>
                       <span className="text-sm font-semibold text-gray-900">
-                        {item.count} ({stats.total > 0 ? Math.round((item.count / stats.total) * 100) : 0}%)
+                        {item.count} (
+                        {stats.total > 0 ? Math.round((item.count / stats.total) * 100) : 0}%)
                       </span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">

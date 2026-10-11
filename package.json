@@ -29,6 +29,8 @@
     "dotenv": "16.4.7",
     "graphql": "^16.8.1",
     "gsap": "^3.14.2",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.8",
     "lucide-react": "^0.576.0",
     "next": "15.4.11",
     "nodemailer": "^10.1.0",

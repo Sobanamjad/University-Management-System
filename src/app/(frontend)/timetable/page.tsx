@@ -15,9 +15,11 @@ import {
   ChevronRight,
   Printer,
   FileSpreadsheet,
+  Download,
 } from 'lucide-react'
 import Link from 'next/link'
 import TimetableEntry from './TimetableEntry'
+import { generateTimetablePDF } from '@/utils/pdfGenerator'
 
 const DAYS = [
   { label: 'Monday', value: 'monday' },
@@ -90,7 +92,7 @@ export default function TimetablePage() {
 
   const fetchTimetable = () => {
     setLoading(true)
-    
+
     const where: any = {
       and: [{ semester: { equals: selectedSemester } }],
     }
@@ -146,9 +148,12 @@ export default function TimetablePage() {
           </div>
 
           <div className="flex items-center space-x-3">
-            <button className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-all font-medium border border-gray-200">
-              <Printer size={18} />
-              <span>Print Schedule</span>
+            <button
+              onClick={() => generateTimetablePDF(timetableData)}
+              className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-all font-medium border border-gray-200"
+            >
+              <Download size={18} />
+              <span>Download PDF</span>
             </button>
             <Link
               href="/timetable/create"
