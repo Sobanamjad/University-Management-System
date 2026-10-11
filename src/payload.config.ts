@@ -15,6 +15,7 @@ import { Batches } from './collections/Batches'
 import { Enrollments } from './collections/Enrollments'
 import { TimeTable } from './collections/TimeTable'
 import { TeacherSalary } from './collections/TeacherSalary'
+import { Attendance } from './collections/Attendance'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -37,6 +38,7 @@ export default buildConfig({
     Enrollments,
     TimeTable,
     TeacherSalary,
+    Attendance,
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',

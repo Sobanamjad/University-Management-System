@@ -77,13 +77,26 @@ export const Batches: CollectionConfig = {
       defaultValue: 1,
       label: 'Current Semester Number',
       admin: {
-        description: 'Which semester is currently active for this batch (auto-updated on advance)',
+        description:
+          'Which semester is currently active for this batch (auto-updates all students)',
         width: '50%',
       },
       validate: (value: number | null | undefined) => {
         if (value === null || value === undefined) return true
         if (value < 1 || value > 8) return 'Must be between 1 and 8'
         return true
+      },
+    },
+
+    // ===== 5.5 CURRENT SEMESTER (Reference) =====
+    {
+      name: 'currentSemester',
+      type: 'relationship',
+      relationTo: 'semesters',
+      label: 'Current Semester Reference',
+      admin: {
+        description: 'Link to the actual semester document (auto-updated)',
+        readOnly: true,
       },
     },
 
@@ -152,9 +165,59 @@ export const Batches: CollectionConfig = {
       },
     ],
     afterChange: [
-      async ({ doc, operation }) => {
+      async ({ doc, previousDoc, operation, req }) => {
         if (operation === 'create') {
           console.log(`✅ New batch created: ${doc.name}`)
+        }
+
+        // Student Progression: Update all students when semester advances
+        if (
+          operation === 'update' &&
+          previousDoc?.currentSemesterNumber !== doc.currentSemesterNumber
+        ) {
+          const students = await req.payload.find({
+            collection: 'students',
+            where: { batch: { equals: doc.id } },
+            depth: 0,
+            overrideAccess: true,
+            req,
+          })
+
+          // Find the correct semester for this batch
+          const semester = await req.payload.find({
+            collection: 'semesters',
+            where: {
+              and: [
+                { department: { equals: doc.department } },
+                { semesterNumber: { equals: doc.currentSemesterNumber } },
+              ],
+            },
+            depth: 0,
+            overrideAccess: true,
+            req,
+          })
+
+          let updatedCount = 0
+          for (const student of students.docs) {
+            try {
+              await req.payload.update({
+                collection: 'students',
+                id: student.id,
+                data: {
+                  semester: semester.docs[0]?.id || null,
+                },
+                overrideAccess: true,
+                req,
+              })
+              updatedCount++
+            } catch (err) {
+              console.error(`Failed to update student ${student.id}:`, err)
+            }
+          }
+
+          console.log(
+            `✅ Advanced ${updatedCount} students to semester ${doc.currentSemesterNumber}`,
+          )
         }
       },
     ],

@@ -77,6 +77,7 @@ export interface Config {
     enrollments: Enrollment;
     timetable: Timetable;
     'teacher-salary': TeacherSalary;
+    attendance: Attendance;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -94,6 +95,7 @@ export interface Config {
     enrollments: EnrollmentsSelect<false> | EnrollmentsSelect<true>;
     timetable: TimetableSelect<false> | TimetableSelect<true>;
     'teacher-salary': TeacherSalarySelect<false> | TeacherSalarySelect<true>;
+    attendance: AttendanceSelect<false> | AttendanceSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -233,9 +235,13 @@ export interface Batch {
    */
   totalSemesters: '4' | '8';
   /**
-   * Which semester is currently active for this batch (auto-updated on advance)
+   * Which semester is currently active for this batch (auto-updates all students)
    */
   currentSemesterNumber?: number | null;
+  /**
+   * Link to the actual semester document (auto-updated)
+   */
+  currentSemester?: (number | null) | Semester;
   /**
    * Active = currently running, Completed = all semesters done
    */
@@ -406,7 +412,19 @@ export interface Enrollment {
    * Classes filtered by department
    */
   class?: (number | null) | Class;
+  /**
+   * Auto-filled from class
+   */
+  semester?: (number | null) | Semester;
   status: 'enrolled' | 'dropped' | 'completed';
+  /**
+   * Final grade for this course
+   */
+  grade?: ('A+' | 'A' | 'A-' | 'B+' | 'B' | 'B-' | 'C+' | 'C' | 'C-' | 'D+' | 'D' | 'F') | null;
+  /**
+   * Auto-calculated from grade
+   */
+  gpa?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -487,6 +505,49 @@ export interface TeacherSalary {
   createdAt: string;
 }
 /**
+ * Track student attendance for classes
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "attendance".
+ */
+export interface Attendance {
+  id: number;
+  /**
+   * Auto-generated: Student - Class - Date
+   */
+  displayTitle?: string | null;
+  /**
+   * Select student
+   */
+  student: number | Student;
+  /**
+   * Select class
+   */
+  class: number | Class;
+  /**
+   * Date of the class
+   */
+  date: string;
+  /**
+   * Student attendance status
+   */
+  status: 'present' | 'absent' | 'late' | 'leave' | 'excused';
+  /**
+   * Teacher who marked attendance
+   */
+  markedBy?: (number | null) | User;
+  /**
+   * Optional notes about this attendance record
+   */
+  remarks?: string | null;
+  /**
+   * Auto-filled from class
+   */
+  semester?: (number | null) | Semester;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -549,6 +610,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'teacher-salary';
         value: number | TeacherSalary;
+      } | null)
+    | ({
+        relationTo: 'attendance';
+        value: number | Attendance;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -667,6 +732,7 @@ export interface BatchesSelect<T extends boolean = true> {
   startYear?: T;
   totalSemesters?: T;
   currentSemesterNumber?: T;
+  currentSemester?: T;
   status?: T;
   session?: T;
   updatedAt?: T;
@@ -748,7 +814,10 @@ export interface EnrollmentsSelect<T extends boolean = true> {
   department?: T;
   student?: T;
   class?: T;
+  semester?: T;
   status?: T;
+  grade?: T;
+  gpa?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -790,6 +859,22 @@ export interface TeacherSalarySelect<T extends boolean = true> {
       };
   effectiveFrom?: T;
   status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "attendance_select".
+ */
+export interface AttendanceSelect<T extends boolean = true> {
+  displayTitle?: T;
+  student?: T;
+  class?: T;
+  date?: T;
+  status?: T;
+  markedBy?: T;
+  remarks?: T;
+  semester?: T;
   updatedAt?: T;
   createdAt?: T;
 }

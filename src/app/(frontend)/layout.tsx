@@ -24,6 +24,7 @@ import {
   ChevronDown,
   LogOut,
   User,
+  CheckSquare,
 } from 'lucide-react'
 
 export default function FrontendLayout({ children }: { children: React.ReactNode }) {
@@ -70,6 +71,7 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
     { name: 'Courses', href: '/courses', icon: BookOpen, adminOnly: false },
     { name: 'Classes', href: '/classes', icon: Clock, adminOnly: false },
     { name: 'Enrollments', href: '/enrollments', icon: UserCheck, adminOnly: false },
+    { name: 'Attendance', href: '/attendance', icon: CheckSquare, adminOnly: false },
     { name: 'Timetable', href: '/timetable', icon: BookMarked, adminOnly: false },
     { name: 'Teacher Salary', href: '/teacher-salary', icon: Banknote, adminOnly: true },
   ]
@@ -133,6 +135,7 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
           <nav className="flex-1 overflow-y-auto p-4 scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             {visibleNav.map((item) => {
               const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
+              const isAttendance = item.name === 'Attendance'
               return (
                 <Link
                   key={item.href}
@@ -144,7 +147,12 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
                   }`}
                   onClick={() => setSidebarOpen(false)}
                 >
-                  <item.icon size={20} className={isActive ? 'text-white' : 'text-gray-500'} />
+                  <item.icon
+                    size={20}
+                    className={
+                      isActive ? 'text-white' : isAttendance ? 'text-blue-600' : 'text-gray-500'
+                    }
+                  />
                   <span className="font-medium">{item.name}</span>
                 </Link>
               )
