@@ -176,14 +176,17 @@ export const Enrollments: CollectionConfig = {
         // Auto-fill semester from class
         if (data?.class && !data?.semester) {
           try {
-            const classDoc = await req.payload.findByID({
-              collection: 'classes',
-              id: toId(data.class),
-              depth: 0,
-              req,
-            })
-            if (classDoc?.semester) {
-              data.semester = classDoc.semester
+            const classId = toId(data.class)
+            if (classId) {
+              const classDoc = await req.payload.findByID({
+                collection: 'classes',
+                id: classId,
+                depth: 0,
+                req,
+              })
+              if (classDoc?.semester) {
+                data.semester = classDoc.semester
+              }
             }
           } catch {
             // Keep existing semester if any

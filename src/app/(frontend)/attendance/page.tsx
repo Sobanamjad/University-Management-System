@@ -30,7 +30,7 @@ export default function AttendancePage() {
   const fetchAttendance = useCallback(async () => {
     setLoading(true)
     try {
-      const where: Record<string, unknown> = { and: [] }
+      const where: any = { and: [] }
 
       if (statusFilter !== 'all') {
         where.and.push({ status: { equals: statusFilter } })
@@ -164,7 +164,9 @@ export default function AttendancePage() {
                           'bg-gray-100'
                         }`}
                       >
-                        {record.status?.charAt(0).toUpperCase() + record.status?.slice(1)}
+                        {record.status
+                          ? record.status.charAt(0).toUpperCase() + record.status.slice(1)
+                          : 'N/A'}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-gray-600">{record.markedBy?.name || 'N/A'}</td>

@@ -193,7 +193,7 @@ export const Exams: CollectionConfig = {
       if (!user) return false
       // Teachers can see exams for their classes
       if (user?.role === 'teacher') {
-        return { class: { teacher: { equals: user.id } } }
+        return { class: { teacher: { equals: user.id } } } as any
       }
       // Students can see exams for their enrolled classes
       if (user?.role === 'student') {
@@ -204,13 +204,13 @@ export const Exams: CollectionConfig = {
     },
     create: ({ req: { user } }) => {
       if (user?.role === 'teacher') {
-        return { class: { teacher: { equals: user.id } } }
+        return { class: { teacher: { equals: user.id } } } as any
       }
       return user?.role === 'admin' || user?.role === 'coordinator'
     },
     update: ({ req: { user } }) => {
       if (user?.role === 'teacher') {
-        return { class: { teacher: { equals: user.id } } }
+        return { class: { teacher: { equals: user.id } } } as any
       }
       return user?.role === 'admin' || user?.role === 'coordinator'
     },
