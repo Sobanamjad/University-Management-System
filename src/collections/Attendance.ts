@@ -28,11 +28,13 @@ export const Attendance: CollectionConfig = {
                   collection: 'students',
                   id: data.student,
                   depth: 0,
+                  req,
                 })
                 const classDoc = await req.payload.findByID({
                   collection: 'classes',
                   id: data.class,
                   depth: 0,
+                  req,
                 })
                 return `${student?.displayTitle || 'Student'} - ${classDoc?.title || 'Class'} - ${data.date}`
               } catch {
@@ -159,7 +161,10 @@ export const Attendance: CollectionConfig = {
   // ===== HOOKS =====
   hooks: {
     beforeChange: [
-      async ({ data, req }) => {
+      async ({ data, req, context }) => {
+        // Skip if this is a recursive call
+        if (context.skipSemesterFill) return data
+
         // Auto-fill semester from class
         if (data?.class && !data?.semester) {
           try {
@@ -167,7 +172,6 @@ export const Attendance: CollectionConfig = {
               collection: 'classes',
               id: data.class,
               depth: 0,
-              overrideAccess: true,
               req,
             })
             if (classDoc?.semester) {
@@ -186,18 +190,28 @@ export const Attendance: CollectionConfig = {
   access: {
     read: ({ req: { user } }) => {
       if (!user) return false
-      // Teachers can see attendance for their classes
+      // Teachers can see attendance for their classes only
       if (user?.role === 'teacher') {
-        return true
+        return { class: { teacher: { equals: user.id } } }
+      }
+      // Students can see their own attendance
+      if (user?.role === 'student') {
+        return { student: { user: { equals: user.id } } }
       }
       // Admin and coordinator can see all
       return user?.role === 'admin' || user?.role === 'coordinator'
     },
     create: ({ req: { user } }) => {
-      return user?.role === 'admin' || user?.role === 'coordinator' || user?.role === 'teacher'
+      if (user?.role === 'teacher') {
+        return { class: { teacher: { equals: user.id } } }
+      }
+      return user?.role === 'admin' || user?.role === 'coordinator'
     },
     update: ({ req: { user } }) => {
-      return user?.role === 'admin' || user?.role === 'coordinator' || user?.role === 'teacher'
+      if (user?.role === 'teacher') {
+        return { class: { teacher: { equals: user.id } } }
+      }
+      return user?.role === 'admin' || user?.role === 'coordinator'
     },
     delete: ({ req: { user } }) => {
       return user?.role === 'admin' || user?.role === 'coordinator'

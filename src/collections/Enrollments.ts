@@ -169,7 +169,10 @@ export const Enrollments: CollectionConfig = {
 
   hooks: {
     beforeChange: [
-      async ({ data, req, operation }) => {
+      async ({ data, req, operation, context }) => {
+        // Skip if this is a recursive call
+        if (context.skipSemesterFill) return data
+
         // Auto-fill semester from class
         if (data?.class && !data?.semester) {
           try {
@@ -177,7 +180,6 @@ export const Enrollments: CollectionConfig = {
               collection: 'classes',
               id: toId(data.class),
               depth: 0,
-              overrideAccess: true,
               req,
             })
             if (classDoc?.semester) {

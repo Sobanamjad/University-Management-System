@@ -191,14 +191,16 @@ export const Classes: CollectionConfig = {
   hooks: {
     beforeChange: [
       // Auto-generate title: "Data Structures - Section A (Fall 2024)"
-      async ({ data, req }) => {
+      async ({ data, req, context }) => {
+        // Skip if this is a recursive call
+        if (context.skipClassAutoFill) return data
+
         if (data?.course && data?.section) {
           try {
             const course = await req.payload.findByID({
               collection: 'courses',
               id: String(data.course),
               depth: 0,
-              overrideAccess: true,
               req,
             })
 
@@ -210,7 +212,6 @@ export const Classes: CollectionConfig = {
                   collection: 'semesters',
                   id: String(data.semester),
                   depth: 0,
-                  overrideAccess: true,
                   req,
                 })
                 session = sem?.session || ''
@@ -240,14 +241,16 @@ export const Classes: CollectionConfig = {
       },
 
       // Auto-set status from semester dates
-      async ({ data, req }) => {
+      async ({ data, req, context }) => {
+        // Skip if this is a recursive call
+        if (context.skipClassAutoFill) return data
+
         if (data?.semester) {
           try {
             const semester = await req.payload.findByID({
               collection: 'semesters',
               id: String(data.semester),
               depth: 0,
-              overrideAccess: true,
               req,
             })
             if (semester?.startDate && semester?.endDate) {

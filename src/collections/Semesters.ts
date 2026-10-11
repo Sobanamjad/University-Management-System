@@ -206,7 +206,10 @@ export const Semesters: CollectionConfig = {
 
     beforeChange: [
       // Auto-generate name and code from session + semesterNumber + department
-      async ({ data, req }) => {
+      async ({ data, req, context }) => {
+        // Skip if this is a recursive call
+        if (context.skipSemesterAutoFill) return data
+
         // If batch is provided, enforce that department and semesterNumber match the batch
         if (data?.batch) {
           try {
@@ -214,7 +217,7 @@ export const Semesters: CollectionConfig = {
               collection: 'batches',
               id: String(data.batch),
               depth: 1,
-              overrideAccess: true,
+              req,
             })
             const batchDeptId =
               typeof batch.department === 'object' ? batch.department.id : batch.department
@@ -233,7 +236,7 @@ export const Semesters: CollectionConfig = {
               collection: 'departments',
               id: String(data.department),
               depth: 0,
-              overrideAccess: true,
+              req,
             })
             const deptCode = dept?.code?.toUpperCase() || 'DEP'
             const semesterText = getSemesterText(data.semesterNumber)
@@ -252,7 +255,10 @@ export const Semesters: CollectionConfig = {
       },
 
       // Ensure only one active semester per department
-      async ({ data, req, originalDoc }) => {
+      async ({ data, req, originalDoc, context }) => {
+        // Skip if this is a recursive call
+        if (context.skipSemesterAutoFill) return data
+
         if (data.isActive) {
           const existingActive = await req.payload.find({
             collection: 'semesters',

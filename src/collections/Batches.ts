@@ -143,7 +143,10 @@ export const Batches: CollectionConfig = {
   hooks: {
     beforeChange: [
       // Auto-generate batch name: e.g. "BS Mathematics 2024" or "ADS Mathematics 2024"
-      async ({ data, req }) => {
+      async ({ data, req, context }) => {
+        // Skip if this is a recursive call
+        if (context.skipBatchNameGeneration) return data
+
         const deptId = data?.department
         const startYear = data?.startYear
         const totalSemesters = data?.totalSemesters
@@ -153,7 +156,7 @@ export const Batches: CollectionConfig = {
               collection: 'departments',
               id: String(deptId),
               depth: 0,
-              overrideAccess: true,
+              req,
             })
             const prefix = totalSemesters === '4' ? 'ADS' : 'BS'
             data.name = `${prefix} ${dept?.name || 'Dept'} ${startYear}`
@@ -165,7 +168,10 @@ export const Batches: CollectionConfig = {
       },
     ],
     afterChange: [
-      async ({ doc, previousDoc, operation, req }) => {
+      async ({ doc, previousDoc, operation, req, context }) => {
+        // Skip if this is a recursive call
+        if (context.skipStudentProgression) return
+
         if (operation === 'create') {
           console.log(`✅ New batch created: ${doc.name}`)
         }
@@ -179,7 +185,6 @@ export const Batches: CollectionConfig = {
             collection: 'students',
             where: { batch: { equals: doc.id } },
             depth: 0,
-            overrideAccess: true,
             req,
           })
 
@@ -193,7 +198,6 @@ export const Batches: CollectionConfig = {
               ],
             },
             depth: 0,
-            overrideAccess: true,
             req,
           })
 
@@ -206,7 +210,7 @@ export const Batches: CollectionConfig = {
                 data: {
                   semester: semester.docs[0]?.id || null,
                 },
-                overrideAccess: true,
+                context: { skipStudentProgression: true, skipStudentAutoFill: true },
                 req,
               })
               updatedCount++
