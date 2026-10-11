@@ -66,9 +66,10 @@ export const Students: CollectionConfig = {
       required: false,
       label: 'Current Semester',
       filterOptions: ({ data }) => {
-        const batchId = typeof data?.batch === 'object' ? (data.batch as any)?.id : data?.batch
+        const batchId =
+          typeof data?.batch === 'object' ? (data.batch as { id?: string }).id : data?.batch
         if (batchId) {
-          return { batch: { equals: batchId } } as any
+          return { batch: { equals: batchId } }
         }
         return true
       },
@@ -148,7 +149,7 @@ export const Students: CollectionConfig = {
             if (batch?.department) {
               data.department =
                 typeof batch.department === 'object'
-                  ? (batch.department as any).id
+                  ? (batch.department as { id?: string | number }).id
                   : batch.department
             }
           } catch {
@@ -159,7 +160,8 @@ export const Students: CollectionConfig = {
         // Auto-generate displayTitle: "CS-2024-001 - Ali Hassan"
         if (data?.user) {
           try {
-            const userId = typeof data.user === 'object' ? (data.user as any).id : data.user
+            const userId =
+              typeof data.user === 'object' ? (data.user as any).id : (data.user as any)
             const userDoc = await req.payload.findByID({
               collection: 'users',
               id: String(userId),

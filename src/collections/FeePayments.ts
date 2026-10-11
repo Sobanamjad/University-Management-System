@@ -91,11 +91,11 @@ export const FeePayments: CollectionConfig = {
       type: 'date',
       required: true,
       label: 'Payment Date',
+      defaultValue: () => new Date().toISOString(),
       admin: {
         date: {
           pickerAppearance: 'dayOnly',
         },
-        defaultValue: () => new Date().toISOString(),
       },
     },
 
@@ -266,7 +266,7 @@ export const FeePayments: CollectionConfig = {
       if (!user) return false
       // Students can see their own payments
       if (user?.role === 'student') {
-        return { student: { user: { equals: user.id } } }
+        return { student: { user: { equals: user.id } } } as any
       }
       // Admin, coordinator, and accountant can see all
       return user?.role === 'admin' || user?.role === 'coordinator' || user?.role === 'accountant'

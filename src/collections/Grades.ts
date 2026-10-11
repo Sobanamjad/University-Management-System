@@ -116,7 +116,6 @@ export const Grades: CollectionConfig = {
       label: 'GPA',
       min: 0,
       max: 4,
-      step: 0.1,
       admin: {
         description: 'Grade Point Average (0-4)',
       },
@@ -151,11 +150,11 @@ export const Grades: CollectionConfig = {
       name: 'gradingDate',
       type: 'date',
       label: 'Grading Date',
+      defaultValue: () => new Date().toISOString(),
       admin: {
         date: {
           pickerAppearance: 'dayOnly',
         },
-        defaultValue: () => new Date().toISOString(),
       },
     },
   ],
@@ -248,24 +247,24 @@ export const Grades: CollectionConfig = {
       if (!user) return false
       // Teachers can see grades for their exams
       if (user?.role === 'teacher') {
-        return { exam: { class: { teacher: { equals: user.id } } } }
+        return { exam: { class: { teacher: { equals: user.id } } } } as any
       }
       // Students can see their own grades
       if (user?.role === 'student') {
-        return { student: { user: { equals: user.id } } }
+        return { student: { user: { equals: user.id } } } as any
       }
       // Admin and coordinator can see all
       return user?.role === 'admin' || user?.role === 'coordinator'
     },
     create: ({ req: { user } }) => {
       if (user?.role === 'teacher') {
-        return { exam: { class: { teacher: { equals: user.id } } } }
+        return { exam: { class: { teacher: { equals: user.id } } } } as any
       }
       return user?.role === 'admin' || user?.role === 'coordinator'
     },
     update: ({ req: { user } }) => {
       if (user?.role === 'teacher') {
-        return { exam: { class: { teacher: { equals: user.id } } } }
+        return { exam: { class: { teacher: { equals: user.id } } } } as any
       }
       return user?.role === 'admin' || user?.role === 'coordinator'
     },

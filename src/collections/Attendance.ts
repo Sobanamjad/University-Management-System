@@ -192,24 +192,24 @@ export const Attendance: CollectionConfig = {
       if (!user) return false
       // Teachers can see attendance for their classes only
       if (user?.role === 'teacher') {
-        return { class: { teacher: { equals: user.id } } }
+        return { class: { teacher: { equals: user.id } } } as any
       }
       // Students can see their own attendance
       if (user?.role === 'student') {
-        return { student: { user: { equals: user.id } } }
+        return { student: { user: { equals: user.id } } } as any
       }
       // Admin and coordinator can see all
       return user?.role === 'admin' || user?.role === 'coordinator'
     },
     create: ({ req: { user } }) => {
       if (user?.role === 'teacher') {
-        return { class: { teacher: { equals: user.id } } }
+        return { class: { teacher: { equals: user.id } } } as any
       }
       return user?.role === 'admin' || user?.role === 'coordinator'
     },
     update: ({ req: { user } }) => {
       if (user?.role === 'teacher') {
-        return { class: { teacher: { equals: user.id } } }
+        return { class: { teacher: { equals: user.id } } } as any
       }
       return user?.role === 'admin' || user?.role === 'coordinator'
     },

@@ -32,7 +32,7 @@ export default function AttendanceReportsPage() {
   const fetchStats = useCallback(async () => {
     setLoading(true)
     try {
-      const where: Record<string, unknown> = { and: [] }
+      const where: any = { and: [] }
 
       if (selectedDate) {
         where.and.push({ date: { equals: selectedDate } })
