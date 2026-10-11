@@ -212,7 +212,7 @@ export const TeacherSalary: CollectionConfig = {
       if (!user) return false
       // Student cannot view salary data
       if (user.role === 'student') return false
-      // Admin, coordinator, teacher can all view
+      // Admin, coordinator, accountant, and teacher can all view
       return true
     },
     create: ({ req: { user } }) => user?.role === 'admin',

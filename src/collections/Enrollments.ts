@@ -17,7 +17,7 @@ export const Enrollments: CollectionConfig = {
   admin: {
     useAsTitle: 'id',
     group: 'University',
-    defaultColumns: ['student', 'semester', 'class', 'status', 'createdAt'],
+    defaultColumns: ['student', 'semester', 'class', 'status', 'grade', 'gpa', 'createdAt'],
     description: 'Manage student enrollments in class sections',
   },
   fields: [
@@ -66,6 +66,18 @@ export const Enrollments: CollectionConfig = {
       },
     },
 
+    // ===== SEMESTER (Auto-filled from class) =====
+    {
+      name: 'semester',
+      type: 'relationship',
+      relationTo: 'semesters',
+      label: 'Semester',
+      admin: {
+        readOnly: true,
+        description: 'Auto-filled from class',
+      },
+    },
+
     {
       name: 'status',
       type: 'select',
@@ -79,6 +91,65 @@ export const Enrollments: CollectionConfig = {
       ],
       admin: {
         position: 'sidebar',
+      },
+    },
+
+    // ===== GRADE =====
+    {
+      name: 'grade',
+      type: 'select',
+      label: 'Grade',
+      options: [
+        { label: 'A+ (4.0)', value: 'A+' },
+        { label: 'A (3.7)', value: 'A' },
+        { label: 'A- (3.3)', value: 'A-' },
+        { label: 'B+ (3.0)', value: 'B+' },
+        { label: 'B (2.7)', value: 'B' },
+        { label: 'B- (2.3)', value: 'B-' },
+        { label: 'C+ (2.0)', value: 'C+' },
+        { label: 'C (1.7)', value: 'C' },
+        { label: 'C- (1.3)', value: 'C-' },
+        { label: 'D+ (1.0)', value: 'D+' },
+        { label: 'D (0.7)', value: 'D' },
+        { label: 'F (0.0)', value: 'F' },
+      ],
+      admin: {
+        description: 'Final grade for this course',
+      },
+    },
+
+    // ===== GPA (Auto-calculated) =====
+    {
+      name: 'gpa',
+      type: 'number',
+      label: 'GPA Points',
+      admin: {
+        readOnly: true,
+        description: 'Auto-calculated from grade',
+      },
+      hooks: {
+        beforeChange: [
+          ({ data }) => {
+            const gradeToPoints: Record<string, number> = {
+              'A+': 4.0,
+              A: 3.7,
+              'A-': 3.3,
+              'B+': 3.0,
+              B: 2.7,
+              'B-': 2.3,
+              'C+': 2.0,
+              C: 1.7,
+              'C-': 1.3,
+              'D+': 1.0,
+              D: 0.7,
+              F: 0.0,
+            }
+            if (data?.grade) {
+              data.gpa = gradeToPoints[data.grade] || 0
+            }
+            return data
+          },
+        ],
       },
     },
   ],
@@ -98,7 +169,27 @@ export const Enrollments: CollectionConfig = {
 
   hooks: {
     beforeChange: [
-      async ({ data, req, operation }) => {
+      async ({ data, req, operation, context }) => {
+        // Skip if this is a recursive call
+        if (context.skipSemesterFill) return data
+
+        // Auto-fill semester from class
+        if (data?.class && !data?.semester) {
+          try {
+            const classDoc = await req.payload.findByID({
+              collection: 'classes',
+              id: toId(data.class),
+              depth: 0,
+              req,
+            })
+            if (classDoc?.semester) {
+              data.semester = classDoc.semester
+            }
+          } catch {
+            // Keep existing semester if any
+          }
+        }
+
         // Check class capacity on new enrollment
         if (operation === 'create' && data?.class && data?.status === 'enrolled') {
           const classId = toId(data.class)

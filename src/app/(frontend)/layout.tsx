@@ -24,6 +24,8 @@ import {
   ChevronDown,
   LogOut,
   User,
+  CheckSquare,
+  BarChart,
 } from 'lucide-react'
 
 export default function FrontendLayout({ children }: { children: React.ReactNode }) {
@@ -60,24 +62,82 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
   }
 
   const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: Home, adminOnly: false },
-    { name: 'Departments', href: '/departments', icon: Layers, adminOnly: false },
-    { name: 'Users', href: '/users', icon: Users, adminOnly: true },
-    { name: 'Teachers', href: '/teachers', icon: UserCog, adminOnly: false },
-    { name: 'Students', href: '/students', icon: GraduationCap, adminOnly: false },
-    { name: 'Batches', href: '/batches', icon: BookMarked, adminOnly: false },
-    { name: 'Semesters', href: '/semesters', icon: Calendar, adminOnly: false },
-    { name: 'Courses', href: '/courses', icon: BookOpen, adminOnly: false },
-    { name: 'Classes', href: '/classes', icon: Clock, adminOnly: false },
-    { name: 'Enrollments', href: '/enrollments', icon: UserCheck, adminOnly: false },
-    { name: 'Timetable', href: '/timetable', icon: BookMarked, adminOnly: false },
-    { name: 'Teacher Salary', href: '/teacher-salary', icon: Banknote, adminOnly: true },
+    { name: 'Dashboard', href: '/dashboard', icon: Home, adminOnly: false, studentOnly: false },
+    {
+      name: 'Student Portal',
+      href: '/student-portal',
+      icon: User,
+      adminOnly: false,
+      studentOnly: true,
+    },
+    {
+      name: 'Departments',
+      href: '/departments',
+      icon: Layers,
+      adminOnly: false,
+      studentOnly: false,
+    },
+    { name: 'Users', href: '/users', icon: Users, adminOnly: true, studentOnly: false },
+    { name: 'Teachers', href: '/teachers', icon: UserCog, adminOnly: false, studentOnly: false },
+    {
+      name: 'Students',
+      href: '/students',
+      icon: GraduationCap,
+      adminOnly: false,
+      studentOnly: false,
+    },
+    { name: 'Batches', href: '/batches', icon: BookMarked, adminOnly: false, studentOnly: false },
+    { name: 'Semesters', href: '/semesters', icon: Calendar, adminOnly: false, studentOnly: false },
+    { name: 'Courses', href: '/courses', icon: BookOpen, adminOnly: false, studentOnly: false },
+    { name: 'Classes', href: '/classes', icon: Clock, adminOnly: false, studentOnly: false },
+    {
+      name: 'Enrollments',
+      href: '/enrollments',
+      icon: UserCheck,
+      adminOnly: false,
+      studentOnly: false,
+    },
+    {
+      name: 'Attendance',
+      href: '/attendance',
+      icon: CheckSquare,
+      adminOnly: false,
+      studentOnly: false,
+    },
+    {
+      name: 'Attendance Reports',
+      href: '/attendance/reports',
+      icon: BarChart,
+      adminOnly: false,
+      studentOnly: false,
+    },
+    {
+      name: 'Timetable',
+      href: '/timetable',
+      icon: BookMarked,
+      adminOnly: false,
+      studentOnly: false,
+    },
+    {
+      name: 'Teacher Salary',
+      href: '/teacher-salary',
+      icon: Banknote,
+      adminOnly: true,
+      studentOnly: false,
+    },
   ]
 
   // Hide adminOnly items only after user is confirmed loaded and is not admin
-  const visibleNav = navigation.filter(
-    (item) => !item.adminOnly || !userLoaded || user?.role === 'admin',
-  )
+  // Show studentOnly items only for students
+  const visibleNav = navigation.filter((item) => {
+    if (item.adminOnly) {
+      return !userLoaded || user?.role === 'admin'
+    }
+    if (item.studentOnly) {
+      return user?.role === 'student'
+    }
+    return true
+  })
   const isAuthPage = pathname === '/login' || pathname === '/register' || pathname === '/'
 
   if (isAuthPage) {
@@ -133,6 +193,8 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
           <nav className="flex-1 overflow-y-auto p-4 scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             {visibleNav.map((item) => {
               const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
+              const isAttendanceRelated =
+                item.name === 'Attendance' || item.name === 'Attendance Reports'
               return (
                 <Link
                   key={item.href}
@@ -144,7 +206,16 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
                   }`}
                   onClick={() => setSidebarOpen(false)}
                 >
-                  <item.icon size={20} className={isActive ? 'text-white' : 'text-gray-500'} />
+                  <item.icon
+                    size={20}
+                    className={
+                      isActive
+                        ? 'text-white'
+                        : isAttendanceRelated
+                          ? 'text-blue-600'
+                          : 'text-gray-500'
+                    }
+                  />
                   <span className="font-medium">{item.name}</span>
                 </Link>
               )

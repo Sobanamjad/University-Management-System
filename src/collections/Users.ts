@@ -50,6 +50,7 @@ export const Users: CollectionConfig = {
         { label: 'Admin', value: 'admin' },
         { label: 'Coordinator', value: 'coordinator' },
         { label: 'Teacher', value: 'teacher' },
+        { label: 'Accountant', value: 'accountant' },
         { label: 'Student', value: 'student' },
       ],
     },
@@ -99,6 +100,41 @@ export const Users: CollectionConfig = {
         },
 
         // Joining Date
+        {
+          name: 'joiningDate',
+          type: 'date',
+          label: 'Joining Date',
+          admin: {
+            date: {
+              pickerAppearance: 'dayOnly',
+            },
+          },
+          required: true,
+        },
+      ],
+    },
+
+    // ========== ACCOUNTANT FIELDS (Only for accountants) ==========
+    {
+      name: 'accountantInfo',
+      type: 'group',
+      label: 'Accountant Information',
+      admin: {
+        condition: (data) => {
+          return data?.role === 'accountant'
+        },
+      },
+      fields: [
+        {
+          name: 'qualification',
+          type: 'text',
+          label: 'Qualification',
+          required: true,
+          admin: {
+            description: 'e.g., B.Com, M.Com, MBA Finance',
+          },
+        },
+
         {
           name: 'joiningDate',
           type: 'date',

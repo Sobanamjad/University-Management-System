@@ -11,9 +11,11 @@ import {
   ArrowUpRight,
   ChevronLeft,
   ChevronRight,
+  Download,
 } from 'lucide-react'
 import Link from 'next/link'
 import SalaryCard from './SalaryCard'
+import { generateSalarySlipPDF } from '@/utils/pdfGenerator'
 
 export default function TeacherSalaryPage() {
   const [salaries, setSalaries] = useState<any[]>([])

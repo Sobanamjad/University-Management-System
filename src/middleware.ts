@@ -17,6 +17,7 @@ const protectedRoutes = [
   '/enrollments',
   '/timetable',
   '/teacher-salary',
+  '/attendance',
   '/profile',
   '/settings',
   '/admin',
@@ -30,7 +31,9 @@ export function middleware(req: NextRequest) {
   const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route))
 
   // Check if the current path is a public route
-  const isPublicRoute = publicRoutes.some((route) => pathname === route || pathname.startsWith(route))
+  const isPublicRoute = publicRoutes.some(
+    (route) => pathname === route || pathname.startsWith(route),
+  )
 
   // If trying to access protected route without token, redirect to login
   if (isProtectedRoute && !token) {

@@ -77,6 +77,11 @@ export interface Config {
     enrollments: Enrollment;
     timetable: Timetable;
     'teacher-salary': TeacherSalary;
+    attendance: Attendance;
+    'fee-structure': FeeStructure;
+    'fee-payments': FeePayment;
+    exams: Exam;
+    grades: Grade;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -94,6 +99,11 @@ export interface Config {
     enrollments: EnrollmentsSelect<false> | EnrollmentsSelect<true>;
     timetable: TimetableSelect<false> | TimetableSelect<true>;
     'teacher-salary': TeacherSalarySelect<false> | TeacherSalarySelect<true>;
+    attendance: AttendanceSelect<false> | AttendanceSelect<true>;
+    'fee-structure': FeeStructureSelect<false> | FeeStructureSelect<true>;
+    'fee-payments': FeePaymentsSelect<false> | FeePaymentsSelect<true>;
+    exams: ExamsSelect<false> | ExamsSelect<true>;
+    grades: GradesSelect<false> | GradesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -137,12 +147,19 @@ export interface UserAuthOperations {
 export interface User {
   id: number;
   name: string;
-  role: 'admin' | 'coordinator' | 'teacher' | 'student';
+  role: 'admin' | 'coordinator' | 'teacher' | 'accountant' | 'student';
   status: 'active' | 'inactive';
   teacherInfo?: {
     designation: 'Permanent' | 'visiting';
     /**
      * e.g., PhD Computer Science, M.Sc Mathematics
+     */
+    qualification: string;
+    joiningDate: string;
+  };
+  accountantInfo?: {
+    /**
+     * e.g., B.Com, M.Com, MBA Finance
      */
     qualification: string;
     joiningDate: string;
@@ -233,9 +250,13 @@ export interface Batch {
    */
   totalSemesters: '4' | '8';
   /**
-   * Which semester is currently active for this batch (auto-updated on advance)
+   * Which semester is currently active for this batch (auto-updates all students)
    */
   currentSemesterNumber?: number | null;
+  /**
+   * Link to the actual semester document (auto-updated)
+   */
+  currentSemester?: (number | null) | Semester;
   /**
    * Active = currently running, Completed = all semesters done
    */
@@ -406,7 +427,19 @@ export interface Enrollment {
    * Classes filtered by department
    */
   class?: (number | null) | Class;
+  /**
+   * Auto-filled from class
+   */
+  semester?: (number | null) | Semester;
   status: 'enrolled' | 'dropped' | 'completed';
+  /**
+   * Final grade for this course
+   */
+  grade?: ('A+' | 'A' | 'A-' | 'B+' | 'B' | 'B-' | 'C+' | 'C' | 'C-' | 'D+' | 'D' | 'F') | null;
+  /**
+   * Auto-calculated from grade
+   */
+  gpa?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -487,6 +520,242 @@ export interface TeacherSalary {
   createdAt: string;
 }
 /**
+ * Track student attendance for classes
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "attendance".
+ */
+export interface Attendance {
+  id: number;
+  /**
+   * Auto-generated: Student - Class - Date
+   */
+  displayTitle?: string | null;
+  /**
+   * Select student
+   */
+  student: number | Student;
+  /**
+   * Select class
+   */
+  class: number | Class;
+  /**
+   * Date of the class
+   */
+  date: string;
+  /**
+   * Student attendance status
+   */
+  status: 'present' | 'absent' | 'late' | 'leave' | 'excused';
+  /**
+   * Teacher who marked attendance
+   */
+  markedBy?: (number | null) | User;
+  /**
+   * Optional notes about this attendance record
+   */
+  remarks?: string | null;
+  /**
+   * Auto-filled from class
+   */
+  semester?: (number | null) | Semester;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Define fee structures for different semesters
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fee-structure".
+ */
+export interface FeeStructure {
+  id: number;
+  /**
+   * e.g., Fall 2024 Semester Fee
+   */
+  title: string;
+  /**
+   * Which semester this fee applies to
+   */
+  semester: number | Semester;
+  /**
+   * Leave empty to apply to all batches
+   */
+  batch?: (number | null) | Batch;
+  feeType: 'tuition' | 'admission' | 'exam' | 'library' | 'lab' | 'sports' | 'transport' | 'other';
+  /**
+   * Fee amount in Pakistani Rupees
+   */
+  amount: number;
+  /**
+   * Last date to pay without late fee
+   */
+  dueDate: string;
+  lateFeePolicy?: {
+    hasLateFee?: boolean | null;
+    lateFeeAmount?: number | null;
+    /**
+     * If checked, late fee applies per day after due date
+     */
+    lateFeePerDay?: boolean | null;
+  };
+  /**
+   * Additional details about this fee
+   */
+  description?: string | null;
+  status: 'active' | 'inactive' | 'archived';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Track student fee payments
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fee-payments".
+ */
+export interface FeePayment {
+  id: number;
+  /**
+   * Auto-generated: Student - Fee Type - Amount
+   */
+  displayTitle?: string | null;
+  /**
+   * Student making the payment
+   */
+  student: number | Student;
+  /**
+   * The fee structure this payment is for
+   */
+  feeStructure: number | FeeStructure;
+  /**
+   * Actual amount paid by student
+   */
+  amount: number;
+  paidDate: string;
+  paymentMethod: 'cash' | 'bank_transfer' | 'cheque' | 'online' | 'credit_card';
+  /**
+   * Bank reference number or receipt number
+   */
+  transactionReference?: string | null;
+  /**
+   * Auto-generated receipt number
+   */
+  receiptNumber?: string | null;
+  /**
+   * Late fee amount if payment was made after due date
+   */
+  lateFeeApplied?: number | null;
+  status: 'pending' | 'completed' | 'failed' | 'refunded';
+  /**
+   * Additional notes about this payment
+   */
+  remarks?: string | null;
+  /**
+   * Admin or accountant who received this payment
+   */
+  receivedBy?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Manage exams and assessments
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "exams".
+ */
+export interface Exam {
+  id: number;
+  /**
+   * e.g., Midterm Exam - Data Structures
+   */
+  title: string;
+  /**
+   * Course this exam belongs to
+   */
+  course: number | Course;
+  /**
+   * Class section taking this exam
+   */
+  class?: (number | null) | Class;
+  /**
+   * Semester this exam belongs to
+   */
+  semester: number | Semester;
+  examType: 'quiz' | 'assignment' | 'midterm' | 'final' | 'lab_test' | 'project' | 'presentation';
+  examDate: string;
+  /**
+   * e.g., 09:00 AM
+   */
+  startTime?: string | null;
+  /**
+   * e.g., 11:00 AM
+   */
+  endTime?: string | null;
+  /**
+   * Exam location/hall
+   */
+  venue?: string | null;
+  /**
+   * Maximum marks for this exam
+   */
+  totalMarks: number;
+  /**
+   * Minimum marks required to pass
+   */
+  passingMarks: number;
+  /**
+   * Exam instructions or syllabus coverage
+   */
+  description?: string | null;
+  status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Track student grades and marks
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "grades".
+ */
+export interface Grade {
+  id: number;
+  /**
+   * Auto-generated: Student - Exam - Marks
+   */
+  displayTitle?: string | null;
+  /**
+   * Student being graded
+   */
+  student: number | Student;
+  /**
+   * Exam this grade is for
+   */
+  exam: number | Exam;
+  /**
+   * Marks obtained by student
+   */
+  obtainedMarks: number;
+  /**
+   * Letter grade based on marks
+   */
+  grade: 'A+' | 'A' | 'A-' | 'B+' | 'B' | 'B-' | 'C+' | 'C' | 'C-' | 'D' | 'F';
+  /**
+   * Grade Point Average (0-4)
+   */
+  gpa?: number | null;
+  /**
+   * Teacher comments on performance
+   */
+  remarks?: string | null;
+  /**
+   * Teacher who graded this
+   */
+  gradedBy?: (number | null) | User;
+  gradingDate?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -549,6 +818,26 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'teacher-salary';
         value: number | TeacherSalary;
+      } | null)
+    | ({
+        relationTo: 'attendance';
+        value: number | Attendance;
+      } | null)
+    | ({
+        relationTo: 'fee-structure';
+        value: number | FeeStructure;
+      } | null)
+    | ({
+        relationTo: 'fee-payments';
+        value: number | FeePayment;
+      } | null)
+    | ({
+        relationTo: 'exams';
+        value: number | Exam;
+      } | null)
+    | ({
+        relationTo: 'grades';
+        value: number | Grade;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -604,6 +893,12 @@ export interface UsersSelect<T extends boolean = true> {
     | T
     | {
         designation?: T;
+        qualification?: T;
+        joiningDate?: T;
+      };
+  accountantInfo?:
+    | T
+    | {
         qualification?: T;
         joiningDate?: T;
       };
@@ -667,6 +962,7 @@ export interface BatchesSelect<T extends boolean = true> {
   startYear?: T;
   totalSemesters?: T;
   currentSemesterNumber?: T;
+  currentSemester?: T;
   status?: T;
   session?: T;
   updatedAt?: T;
@@ -748,7 +1044,10 @@ export interface EnrollmentsSelect<T extends boolean = true> {
   department?: T;
   student?: T;
   class?: T;
+  semester?: T;
   status?: T;
+  grade?: T;
+  gpa?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -790,6 +1089,103 @@ export interface TeacherSalarySelect<T extends boolean = true> {
       };
   effectiveFrom?: T;
   status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "attendance_select".
+ */
+export interface AttendanceSelect<T extends boolean = true> {
+  displayTitle?: T;
+  student?: T;
+  class?: T;
+  date?: T;
+  status?: T;
+  markedBy?: T;
+  remarks?: T;
+  semester?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fee-structure_select".
+ */
+export interface FeeStructureSelect<T extends boolean = true> {
+  title?: T;
+  semester?: T;
+  batch?: T;
+  feeType?: T;
+  amount?: T;
+  dueDate?: T;
+  lateFeePolicy?:
+    | T
+    | {
+        hasLateFee?: T;
+        lateFeeAmount?: T;
+        lateFeePerDay?: T;
+      };
+  description?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fee-payments_select".
+ */
+export interface FeePaymentsSelect<T extends boolean = true> {
+  displayTitle?: T;
+  student?: T;
+  feeStructure?: T;
+  amount?: T;
+  paidDate?: T;
+  paymentMethod?: T;
+  transactionReference?: T;
+  receiptNumber?: T;
+  lateFeeApplied?: T;
+  status?: T;
+  remarks?: T;
+  receivedBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "exams_select".
+ */
+export interface ExamsSelect<T extends boolean = true> {
+  title?: T;
+  course?: T;
+  class?: T;
+  semester?: T;
+  examType?: T;
+  examDate?: T;
+  startTime?: T;
+  endTime?: T;
+  venue?: T;
+  totalMarks?: T;
+  passingMarks?: T;
+  description?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "grades_select".
+ */
+export interface GradesSelect<T extends boolean = true> {
+  displayTitle?: T;
+  student?: T;
+  exam?: T;
+  obtainedMarks?: T;
+  grade?: T;
+  gpa?: T;
+  remarks?: T;
+  gradedBy?: T;
+  gradingDate?: T;
   updatedAt?: T;
   createdAt?: T;
 }

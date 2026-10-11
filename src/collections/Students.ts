@@ -132,7 +132,10 @@ export const Students: CollectionConfig = {
   // ===== HOOKS =====
   hooks: {
     beforeChange: [
-      async ({ data, req }) => {
+      async ({ data, req, context }) => {
+        // Skip if this is a recursive call
+        if (context.skipStudentAutoFill) return data
+
         // Auto-fill department from batch
         if (data?.batch) {
           try {
@@ -140,7 +143,6 @@ export const Students: CollectionConfig = {
               collection: 'batches',
               id: String(data.batch),
               depth: 1,
-              overrideAccess: true,
               req,
             })
             if (batch?.department) {
@@ -162,7 +164,6 @@ export const Students: CollectionConfig = {
               collection: 'users',
               id: String(userId),
               depth: 0,
-              overrideAccess: true,
               req,
             })
             const rollNo = data.rollNo || 'N/A'
