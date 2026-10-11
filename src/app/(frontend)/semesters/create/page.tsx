@@ -1,12 +1,12 @@
 // src/app/(frontend)/semesters/create/page.tsx
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Calendar, Save } from 'lucide-react'
 
-export default function CreateSemesterPage() {
+function CreateSemesterContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [loading, setLoading] = useState(false)
@@ -331,5 +331,17 @@ export default function CreateSemesterPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function CreateSemesterPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>
+      }
+    >
+      <CreateSemesterContent />
+    </Suspense>
   )
 }

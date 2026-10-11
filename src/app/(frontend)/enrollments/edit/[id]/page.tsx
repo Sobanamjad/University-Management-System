@@ -154,8 +154,8 @@ export default function EditEnrollmentPage() {
                     <option value="completed">Completed</option>
                   </select>
                   <p className="mt-2 text-xs text-gray-500">
-                    Changing the status to "Dropped" or "Completed" will free up a seat in this
-                    class.
+                    Changing the status to &quot;Dropped&quot; or &quot;Completed&quot; will free up
+                    a seat in this class.
                   </p>
                 </div>
               </div>

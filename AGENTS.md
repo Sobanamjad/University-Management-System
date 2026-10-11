@@ -153,20 +153,20 @@ slugField({ fieldToUse: 'title' })
 ### 1. Local API Access Control (MOST IMPORTANT)
 
 ```typescript
-// ❌ SECURITY BUG: Access control bypassed
+//  SECURITY BUG: Access control bypassed
 await payload.find({
   collection: 'posts',
   user: someUser, // Ignored! Operation runs with ADMIN privileges
 })
 
-// ✅ SECURE: Enforces user permissions
+//  SECURE: Enforces user permissions
 await payload.find({
   collection: 'posts',
   user: someUser,
   overrideAccess: false, // REQUIRED
 })
 
-// ✅ Administrative operation (intentional bypass)
+//  Administrative operation (intentional bypass)
 await payload.find({
   collection: 'posts',
   // No user, overrideAccess defaults to true

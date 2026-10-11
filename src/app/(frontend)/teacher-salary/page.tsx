@@ -87,7 +87,9 @@ export default function TeacherSalaryPage() {
               <Banknote className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">Payroll Management</h1>
+              <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">
+                Payroll Management
+              </h1>
               <p className="text-sm font-medium text-gray-500">Teacher Salary & Compensation</p>
             </div>
           </div>
@@ -165,7 +167,10 @@ export default function TeacherSalaryPage() {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
             <div className="lg:col-span-4 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+              <Search
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                size={18}
+              />
               <input
                 type="text"
                 placeholder="Search by teacher name..."
@@ -206,7 +211,7 @@ export default function TeacherSalaryPage() {
             </div>
             <h3 className="text-xl font-bold text-gray-900 mb-2">No Salary Records Found</h3>
             <p className="text-gray-500 max-w-sm mx-auto mb-8">
-              We couldn't find any salary records matching your current filter criteria.
+              We couldn&apos;t find any salary records matching your current filter criteria.
             </p>
             <button
               onClick={() => {
