@@ -20,7 +20,7 @@ export const Users: CollectionConfig = {
     delete: authenticatedOnly,
   },
   fields: [
-    // ========== BASIC FIELDS (Sabke liye) ==========
+    // ========== BASIC FIELDS (For all users) ==========
     {
       name: 'name',
       type: 'text',
@@ -64,7 +64,7 @@ export const Users: CollectionConfig = {
       ],
     },
 
-    // ========== TEACHER FIELDS (Sirf teacher ke liye) ==========
+    // ========== TEACHER FIELDS (Only for teachers) ==========
     {
       name: 'teacherInfo',
       type: 'group',
@@ -113,7 +113,7 @@ export const Users: CollectionConfig = {
       ],
     },
 
-    // ========== COORDINATOR FIELDS (Sirf coordinator ke liye) ==========
+    // ========== COORDINATOR FIELDS (Only for coordinators) ==========
     {
       name: 'coordinatorInfo',
       type: 'group',
