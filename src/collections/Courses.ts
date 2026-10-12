@@ -57,7 +57,7 @@ export const Courses: CollectionConfig = {
       name: 'semester',
       type: 'relationship',
       relationTo: 'semesters',
-      required: true,
+      required: false,
       label: 'Semester',
       filterOptions: ({ data }) => {
         const deptId =
