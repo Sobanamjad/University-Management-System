@@ -192,26 +192,27 @@ export const Attendance: CollectionConfig = {
       if (!user) return false
       // Teachers can see attendance for their classes only
       if (user?.role === 'teacher') {
-        return { class: { teacher: { equals: user.id } } } as any
+        return { 'class.teacher': { equals: user.id } } as any
       }
       // Students can see their own attendance
       if (user?.role === 'student') {
-        return { student: { user: { equals: user.id } } } as any
+        return { 'student.user': { equals: user.id } } as any
       }
       // Admin and coordinator can see all
       return user?.role === 'admin' || user?.role === 'coordinator'
     },
+    // NOTE: create only accepts boolean — query constraints are not supported here
     create: ({ req: { user } }) => {
-      if (user?.role === 'teacher') {
-        return { class: { teacher: { equals: user.id } } } as any
-      }
-      return user?.role === 'admin' || user?.role === 'coordinator'
+      return user?.role === 'admin' || user?.role === 'coordinator' || user?.role === 'teacher'
     },
     update: ({ req: { user } }) => {
+      if (!user) return false
+      if (user?.role === 'admin' || user?.role === 'coordinator') return true
+      // Teachers: can update attendance records for their classes only
       if (user?.role === 'teacher') {
-        return { class: { teacher: { equals: user.id } } } as any
+        return { 'class.teacher': { equals: user.id } } as any
       }
-      return user?.role === 'admin' || user?.role === 'coordinator'
+      return false
     },
     delete: ({ req: { user } }) => {
       return user?.role === 'admin' || user?.role === 'coordinator'
