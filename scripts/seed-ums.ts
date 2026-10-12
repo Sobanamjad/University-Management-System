@@ -136,8 +136,24 @@ const seed = async () => {
       isActive: true,
     },
     {
+      session: 'Fall 2024',
+      semesterNumber: '1',
+      department: 'MATH',
+      startDate: '2024-09-01',
+      endDate: '2024-12-31',
+      isActive: true,
+    },
+    {
+      session: 'Fall 2024',
+      semesterNumber: '1',
+      department: 'ENG',
+      startDate: '2024-09-01',
+      endDate: '2024-12-31',
+      isActive: true,
+    },
+    {
       session: 'Spring 2025',
-      semesterNumber: '2',
+      semesterNumber: '1',
       department: 'CS',
       startDate: '2025-02-01',
       endDate: '2025-05-31',
@@ -157,7 +173,6 @@ const seed = async () => {
       where: {
         and: [
           { session: { equals: sem.session } },
-          { semesterNumber: { equals: sem.semesterNumber } },
           { department: { equals: deptId } },
         ],
       },
@@ -381,7 +396,9 @@ const seed = async () => {
     // Check or create Student record
     const existingStudent = await payload.find({
       collection: 'students',
-      where: { rollNo: { equals: student.rollNo } },
+      where: {
+        or: [{ rollNo: { equals: student.rollNo } }, { user: { equals: userId } }],
+      },
       limit: 1,
     })
 
@@ -558,9 +575,9 @@ const seed = async () => {
     const deptId = deptMap.get(c.department)
     const teacherId = teacherIds[c.teacherIndex]
 
-    if (!courseId || !deptId || !teacherId) continue
-
-    const semId = semCsId
+    const semKey = `${c.department}-Fall 2024-1`
+    const semId = semMap.get(semKey) || semCsId
+    const batchId = batchMap.get(c.department) || batchCsId
     const key = `${c.courseCode}-${c.section}`
 
     const existing = await payload.find({
@@ -584,7 +601,7 @@ const seed = async () => {
           course: courseId,
           semester: semId,
           teacher: teacherId,
-          ...(batchCsId && { batch: batchCsId }),
+          ...(batchId && { batch: batchId }),
           days: [...c.days],
           timeSlot: c.timeSlot,
           lectureType: c.lectureType,
@@ -801,7 +818,10 @@ const seed = async () => {
     const teacherId = teacherIds[tt.teacherIndex]
     const deptId = deptMap.get(tt.department)
 
-    if (!classId || !subjectId || !teacherId || !deptId || !semCsId) continue
+    const semKey = `${tt.department}-Fall 2024-1`
+    const semId = semMap.get(semKey) || semCsId
+
+    if (!classId || !subjectId || !teacherId || !deptId || !semId) continue
 
     const existing = await payload.find({
       collection: 'timetable',
@@ -810,7 +830,7 @@ const seed = async () => {
           { class: { equals: classId } },
           { day: { equals: tt.day } },
           { timeSlot: { equals: tt.timeSlot } },
-          { semester: { equals: semCsId } },
+          { semester: { equals: semId } },
         ],
       },
       limit: 1,
@@ -821,7 +841,7 @@ const seed = async () => {
         collection: 'timetable',
         data: {
           department: deptId,
-          semester: semCsId,
+          semester: semId,
           class: classId,
           subject: subjectId,
           teacher: teacherId,

@@ -169,55 +169,27 @@ export const Enrollments: CollectionConfig = {
 
   hooks: {
     beforeChange: [
-      async ({ data, req, operation, context }) => {
-        // Skip if this is a recursive call
-        if (context.skipSemesterFill) return data
+      async ({ data, req, context }) => {
+        // Skip if this is a seed-time bypass
+        if (context.skipSemesterFill || context.skipAllHooks) return data
 
         // Auto-fill semester from class
         if (data?.class && !data?.semester) {
           try {
             const classId = toId(data.class)
             if (classId) {
+              // Note: no req — runs as admin to avoid deepmerge circular ref crash
               const classDoc = await req.payload.findByID({
                 collection: 'classes',
                 id: classId,
                 depth: 0,
-                req,
               })
               if (classDoc?.semester) {
-                data.semester = classDoc.semester
+                data.semester = toId(classDoc.semester)
               }
             }
           } catch {
             // Keep existing semester if any
-          }
-        }
-
-        // Check class capacity on new enrollment
-        if (operation === 'create' && data?.class && data?.status === 'enrolled') {
-          const classId = toId(data.class)
-
-          if (classId) {
-            const classDoc = await req.payload.findByID({
-              collection: 'classes',
-              id: classId,
-              depth: 0,
-              req,
-            })
-
-            if (classDoc) {
-              const existingCount = await req.payload.find({
-                collection: 'enrollments',
-                where: {
-                  class: { equals: classId },
-                  status: { equals: 'enrolled' },
-                },
-                limit: 0,
-                req,
-              })
-
-              // maxStudents field removed — no capacity check needed
-            }
           }
         }
 
@@ -226,61 +198,32 @@ export const Enrollments: CollectionConfig = {
     ],
 
     afterChange: [
-      async ({ doc, req, operation }) => {
+      async ({ doc, req }) => {
         // Sync currentStudents count on the class after any enrollment change
         const classId = toId(doc?.class)
         if (classId) {
-          const enrolled = await req.payload.find({
-            collection: 'enrollments',
-            where: {
-              class: { equals: classId },
-              status: { equals: 'enrolled' },
-            },
-            limit: 0,
-            req,
-          })
+          try {
+            const enrolled = await req.payload.find({
+              collection: 'enrollments',
+              where: {
+                class: { equals: classId },
+                status: { equals: 'enrolled' },
+              },
+              limit: 0,
+            })
 
-          await req.payload.update({
-            collection: 'classes',
-            id: classId,
-            data: { currentStudents: enrolled.totalDocs },
-            req,
-          })
-        }
-
-        // Auto-assign department + semester on student from class (on first enrollment)
-        if (operation === 'create' && doc?.student && doc?.class) {
-          const studentId = toId(doc.student)
-          const classId2 = toId(doc.class)
-
-          if (studentId && classId2) {
-            try {
-              const classDoc = await req.payload.findByID({
-                collection: 'classes',
-                id: classId2,
-                depth: 0,
-                req,
-              })
-
-              if (classDoc?.department || classDoc?.semester) {
-                await req.payload.update({
-                  collection: 'students',
-                  id: studentId,
-                  data: {
-                    ...(classDoc.department && { department: toId(classDoc.department) }),
-                    ...(classDoc.semester && { semester: toId(classDoc.semester) }),
-                  },
-                  req,
-                })
-              }
-            } catch (err) {
-              // Non-critical — log but don't throw
-              console.error('Failed to auto-assign department/semester to student:', err)
-            }
+            await req.payload.update({
+              collection: 'classes',
+              id: classId,
+              data: { currentStudents: enrolled.totalDocs },
+            })
+          } catch {
+            // Non-critical
           }
         }
       },
     ],
+
   },
 
   access: {
